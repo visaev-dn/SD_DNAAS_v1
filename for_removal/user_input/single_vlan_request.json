@@ -1,0 +1,11 @@
+{
+  "service_type": "single_vlan",
+  "source_leaf": "leaf01",
+  "source_port": "Ethernet3",
+  "destination_leaf": "leaf03",
+  "destination_port": "Ethernet1",
+  "vlans": ["200"],
+  "description": "Single VLAN service between leaf01 and leaf03",
+  "priority": "high",
+  "auto_deploy": true
+} 

@@ -1,0 +1,5823 @@
+{
+  "timestamp": "2025-07-13T15:49:47.049035",
+  "scenarios": {
+    "random_pairs": [
+      {
+        "test_id": "random_1",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.049078",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B04"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-B04",
+        "source_interface": "ge100-0/0/11",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_random_1_1752410987",
+        "vlan_id": 1485
+      },
+      {
+        "test_id": "random_2",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.052430",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-A13",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_random_2_1752410987",
+        "vlan_id": 3527
+      },
+      {
+        "test_id": "random_3",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.056003",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_random_3_1752410987",
+        "vlan_id": 1528
+      },
+      {
+        "test_id": "random_4",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.065798",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_random_4_1752410987",
+        "vlan_id": 1855
+      },
+      {
+        "test_id": "random_5",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.074378",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_5_1752410987",
+        "vlan_id": 3912
+      },
+      {
+        "test_id": "random_6",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.077019",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A16",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A16",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/23",
+        "service_name": "test_service_random_6_1752410987",
+        "vlan_id": 1857
+      },
+      {
+        "test_id": "random_7",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.083192",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B01"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-B01",
+        "source_interface": "ge100-0/0/20",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_7_1752410987",
+        "vlan_id": 2226
+      },
+      {
+        "test_id": "random_8",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.094657",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_random_8_1752410987",
+        "vlan_id": 2193
+      },
+      {
+        "test_id": "random_9",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.097380",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C11"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-C11",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/13",
+        "service_name": "test_service_random_9_1752410987",
+        "vlan_id": 3205
+      },
+      {
+        "test_id": "random_10",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.104786",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_random_10_1752410987",
+        "vlan_id": 4077
+      },
+      {
+        "test_id": "random_11",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.114427",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-F16",
+        "source_interface": "ge100-0/0/18",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_random_11_1752410987",
+        "vlan_id": 3329
+      },
+      {
+        "test_id": "random_12",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.117023",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-2-(NCPL)"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_random_12_1752410987",
+        "vlan_id": 483
+      },
+      {
+        "test_id": "random_13",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.125676",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-B10",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/6",
+        "service_name": "test_service_random_13_1752410987",
+        "vlan_id": 3625
+      },
+      {
+        "test_id": "random_14",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.135290",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/10",
+        "dest_interface": "ge100-0/0/26",
+        "service_name": "test_service_random_14_1752410987",
+        "vlan_id": 3459
+      },
+      {
+        "test_id": "random_15",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.137794",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D16",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D16",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/40",
+        "dest_interface": "ge100-0/0/8",
+        "service_name": "test_service_random_15_1752410987",
+        "vlan_id": 3356
+      },
+      {
+        "test_id": "random_16",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.145729",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C10"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-C10",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/5",
+        "service_name": "test_service_random_16_1752410987",
+        "vlan_id": 207
+      },
+      {
+        "test_id": "random_17",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.151994",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-D12",
+        "source_interface": "ge100-0/0/36",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_17_1752410987",
+        "vlan_id": 2324
+      },
+      {
+        "test_id": "random_18",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.154743",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F16",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F16",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_18_1752410987",
+        "vlan_id": 744
+      },
+      {
+        "test_id": "random_19",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.162717",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/20",
+        "dest_interface": "ge100-0/0/4",
+        "service_name": "test_service_random_19_1752410987",
+        "vlan_id": 3038
+      },
+      {
+        "test_id": "random_20",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.172724",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-B10",
+        "source_interface": "ge100-0/0/35",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_random_20_1752410987",
+        "vlan_id": 688
+      },
+      {
+        "test_id": "random_21",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.175342",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B04"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B04",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/27",
+        "service_name": "test_service_random_21_1752410987",
+        "vlan_id": 3718
+      },
+      {
+        "test_id": "random_22",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.185011",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A10",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A10",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/38",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_random_22_1752410987",
+        "vlan_id": 3812
+      },
+      {
+        "test_id": "random_23",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.192469",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D13",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D13",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/35",
+        "service_name": "test_service_random_23_1752410987",
+        "vlan_id": 853
+      },
+      {
+        "test_id": "random_24",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.195188",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/23",
+        "dest_interface": "ge100-0/0/40",
+        "service_name": "test_service_random_24_1752410987",
+        "vlan_id": 1770
+      },
+      {
+        "test_id": "random_25",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.201844",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A10",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A10",
+        "dest_leaf": "DNAAS-LEAF-F14",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_random_25_1752410987",
+        "vlan_id": 3863
+      },
+      {
+        "test_id": "random_26",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.208624",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/5",
+        "service_name": "test_service_random_26_1752410987",
+        "vlan_id": 771
+      },
+      {
+        "test_id": "random_27",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.211248",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/10",
+        "dest_interface": "ge100-0/0/27",
+        "service_name": "test_service_random_27_1752410987",
+        "vlan_id": 1971
+      },
+      {
+        "test_id": "random_28",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.217830",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/39",
+        "service_name": "test_service_random_28_1752410987",
+        "vlan_id": 3315
+      },
+      {
+        "test_id": "random_29",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.224387",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-F14",
+        "source_interface": "ge100-0/0/6",
+        "dest_interface": "ge100-0/0/40",
+        "service_name": "test_service_random_29_1752410987",
+        "vlan_id": 1900
+      },
+      {
+        "test_id": "random_30",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.226958",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B02"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-B02",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_random_30_1752410987",
+        "vlan_id": 1667
+      },
+      {
+        "test_id": "random_31",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.241340",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/8",
+        "service_name": "test_service_random_31_1752410987",
+        "vlan_id": 309
+      },
+      {
+        "test_id": "random_32",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.255075",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_random_32_1752410987",
+        "vlan_id": 1977
+      },
+      {
+        "test_id": "random_33",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.259548",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/16",
+        "service_name": "test_service_random_33_1752410987",
+        "vlan_id": 3054
+      },
+      {
+        "test_id": "random_34",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.269368",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/6",
+        "service_name": "test_service_random_34_1752410987",
+        "vlan_id": 3253
+      },
+      {
+        "test_id": "random_35",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.280207",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_35_1752410987",
+        "vlan_id": 695
+      },
+      {
+        "test_id": "random_36",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.283052",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/3",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_random_36_1752410987",
+        "vlan_id": 3044
+      },
+      {
+        "test_id": "random_37",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.301212",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_random_37_1752410987",
+        "vlan_id": 3851
+      },
+      {
+        "test_id": "random_38",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.318273",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/21",
+        "dest_interface": "ge100-0/0/7",
+        "service_name": "test_service_random_38_1752410987",
+        "vlan_id": 3988
+      },
+      {
+        "test_id": "random_39",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.322722",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_39_1752410987",
+        "vlan_id": 2597
+      },
+      {
+        "test_id": "random_40",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.329917",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A10",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A10",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/33",
+        "service_name": "test_service_random_40_1752410987",
+        "vlan_id": 3625
+      },
+      {
+        "test_id": "random_41",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.333804",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D13",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D13",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/36",
+        "dest_interface": "ge100-0/0/23",
+        "service_name": "test_service_random_41_1752410987",
+        "vlan_id": 1345
+      },
+      {
+        "test_id": "random_42",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.341239",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-B"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-C12-B",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/18",
+        "service_name": "test_service_random_42_1752410987",
+        "vlan_id": 369
+      },
+      {
+        "test_id": "random_43",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.346549",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/31",
+        "service_name": "test_service_random_43_1752410987",
+        "vlan_id": 639
+      },
+      {
+        "test_id": "random_44",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.351402",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_random_44_1752410987",
+        "vlan_id": 782
+      },
+      {
+        "test_id": "random_45",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.355452",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/19",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_random_45_1752410987",
+        "vlan_id": 3251
+      },
+      {
+        "test_id": "random_46",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.365824",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_random_46_1752410987",
+        "vlan_id": 1567
+      },
+      {
+        "test_id": "random_47",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.371764",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-A14",
+        "source_interface": "ge100-0/0/6",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_random_47_1752410987",
+        "vlan_id": 1214
+      },
+      {
+        "test_id": "random_48",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.376525",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B05"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-B05",
+        "source_interface": "ge100-0/0/17",
+        "dest_interface": "ge100-0/0/5",
+        "service_name": "test_service_random_48_1752410987",
+        "vlan_id": 4034
+      },
+      {
+        "test_id": "random_49",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.399704",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/38",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_49_1752410987",
+        "vlan_id": 531
+      },
+      {
+        "test_id": "random_50",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.405369",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C13",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C13",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/31",
+        "service_name": "test_service_random_50_1752410987",
+        "vlan_id": 1836
+      },
+      {
+        "test_id": "random_51",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.427499",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_random_51_1752410987",
+        "vlan_id": 2410
+      },
+      {
+        "test_id": "random_52",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.444903",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_52_1752410987",
+        "vlan_id": 3501
+      },
+      {
+        "test_id": "random_53",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.448320",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/39",
+        "dest_interface": "ge100-0/0/13",
+        "service_name": "test_service_random_53_1752410987",
+        "vlan_id": 792
+      },
+      {
+        "test_id": "random_54",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.457546",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_random_54_1752410987",
+        "vlan_id": 669
+      },
+      {
+        "test_id": "random_55",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.492312",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-A14",
+        "source_interface": "ge100-0/0/14",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_random_55_1752410987",
+        "vlan_id": 2411
+      },
+      {
+        "test_id": "random_56",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.495027",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/19",
+        "dest_interface": "ge100-0/0/6",
+        "service_name": "test_service_random_56_1752410987",
+        "vlan_id": 909
+      },
+      {
+        "test_id": "random_57",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.505900",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C11"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-C11",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_random_57_1752410987",
+        "vlan_id": 168
+      },
+      {
+        "test_id": "random_58",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.508714",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-B13",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/9",
+        "service_name": "test_service_random_58_1752410987",
+        "vlan_id": 3797
+      },
+      {
+        "test_id": "random_59",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.517072",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D13",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C11"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D13",
+        "dest_leaf": "DNAAS-LEAF-C11",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/40",
+        "service_name": "test_service_random_59_1752410987",
+        "vlan_id": 162
+      },
+      {
+        "test_id": "random_60",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.526653",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D13",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D13",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/39",
+        "dest_interface": "ge100-0/0/6",
+        "service_name": "test_service_random_60_1752410987",
+        "vlan_id": 3506
+      },
+      {
+        "test_id": "random_61",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.529523",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/14",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_random_61_1752410987",
+        "vlan_id": 2384
+      },
+      {
+        "test_id": "random_62",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.536777",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B05"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B05",
+        "source_interface": "ge100-0/0/18",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_random_62_1752410987",
+        "vlan_id": 1027
+      },
+      {
+        "test_id": "random_63",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.906462",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A16",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A16",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/18",
+        "service_name": "test_service_random_63_1752410987",
+        "vlan_id": 307
+      },
+      {
+        "test_id": "random_64",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.908460",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_random_64_1752410987",
+        "vlan_id": 3993
+      },
+      {
+        "test_id": "random_65",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.915853",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-B"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-C12-B",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/32",
+        "service_name": "test_service_random_65_1752410987",
+        "vlan_id": 3553
+      },
+      {
+        "test_id": "random_66",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.923456",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/21",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_random_66_1752410987",
+        "vlan_id": 3791
+      },
+      {
+        "test_id": "random_67",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.925732",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-F16",
+        "source_interface": "ge100-0/0/3",
+        "dest_interface": "ge100-0/0/15",
+        "service_name": "test_service_random_67_1752410987",
+        "vlan_id": 315
+      },
+      {
+        "test_id": "random_68",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.933223",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A16",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A16",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/10",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_random_68_1752410987",
+        "vlan_id": 1225
+      },
+      {
+        "test_id": "random_69",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.944601",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_69_1752410987",
+        "vlan_id": 3980
+      },
+      {
+        "test_id": "random_70",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.946439",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/9",
+        "service_name": "test_service_random_70_1752410987",
+        "vlan_id": 1509
+      },
+      {
+        "test_id": "random_71",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.953917",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/1",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_random_71_1752410987",
+        "vlan_id": 2548
+      },
+      {
+        "test_id": "random_72",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.961234",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_random_72_1752410987",
+        "vlan_id": 772
+      },
+      {
+        "test_id": "random_73",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.963349",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-A14",
+        "source_interface": "ge100-0/0/2",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_random_73_1752410987",
+        "vlan_id": 3673
+      },
+      {
+        "test_id": "random_74",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.971155",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_74_1752410987",
+        "vlan_id": 760
+      },
+      {
+        "test_id": "random_75",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.977992",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-A13",
+        "source_interface": "ge100-0/0/38",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_random_75_1752410987",
+        "vlan_id": 1408
+      },
+      {
+        "test_id": "random_76",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.986292",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A16",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A16",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/28",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_random_76_1752410987",
+        "vlan_id": 1150
+      },
+      {
+        "test_id": "random_77",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.988335",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_random_77_1752410987",
+        "vlan_id": 1250
+      },
+      {
+        "test_id": "random_78",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:47.996011",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B01",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B01",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/39",
+        "service_name": "test_service_random_78_1752410987",
+        "vlan_id": 2772
+      },
+      {
+        "test_id": "random_79",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.003257",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B02"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-B02",
+        "source_interface": "ge100-0/0/11",
+        "dest_interface": "ge100-0/0/36",
+        "service_name": "test_service_random_79_1752410988",
+        "vlan_id": 790
+      },
+      {
+        "test_id": "random_80",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.005374",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/40",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_random_80_1752410988",
+        "vlan_id": 2015
+      },
+      {
+        "test_id": "random_81",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.013509",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/36",
+        "service_name": "test_service_random_81_1752410988",
+        "vlan_id": 3437
+      },
+      {
+        "test_id": "random_82",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.020976",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_random_82_1752410988",
+        "vlan_id": 217
+      },
+      {
+        "test_id": "random_83",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.023118",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-A13",
+        "source_interface": "ge100-0/0/39",
+        "dest_interface": "ge100-0/0/3",
+        "service_name": "test_service_random_83_1752410988",
+        "vlan_id": 409
+      },
+      {
+        "test_id": "random_84",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.030279",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_random_84_1752410988",
+        "vlan_id": 314
+      },
+      {
+        "test_id": "random_85",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.037945",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A13",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A13",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/16",
+        "service_name": "test_service_random_85_1752410988",
+        "vlan_id": 2450
+      },
+      {
+        "test_id": "random_86",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.040496",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A16",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A16",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/17",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_random_86_1752410988",
+        "vlan_id": 978
+      },
+      {
+        "test_id": "random_87",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.048336",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/28",
+        "dest_interface": "ge100-0/0/3",
+        "service_name": "test_service_random_87_1752410988",
+        "vlan_id": 220
+      },
+      {
+        "test_id": "random_88",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.056409",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A13",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A13",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_random_88_1752410988",
+        "vlan_id": 757
+      },
+      {
+        "test_id": "random_89",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.058683",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A13",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A13",
+        "dest_leaf": "DNAAS-LEAF-B13",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_random_89_1752410988",
+        "vlan_id": 2890
+      },
+      {
+        "test_id": "random_90",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.066467",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/38",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_random_90_1752410988",
+        "vlan_id": 806
+      },
+      {
+        "test_id": "random_91",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.073105",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/5",
+        "service_name": "test_service_random_91_1752410988",
+        "vlan_id": 285
+      },
+      {
+        "test_id": "random_92",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.075368",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_random_92_1752410988",
+        "vlan_id": 1918
+      },
+      {
+        "test_id": "random_93",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.084673",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_random_93_1752410988",
+        "vlan_id": 3995
+      },
+      {
+        "test_id": "random_94",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.091211",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-B10",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/33",
+        "service_name": "test_service_random_94_1752410988",
+        "vlan_id": 4003
+      },
+      {
+        "test_id": "random_95",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.093487",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/31",
+        "service_name": "test_service_random_95_1752410988",
+        "vlan_id": 2731
+      },
+      {
+        "test_id": "random_96",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.116555",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/8",
+        "service_name": "test_service_random_96_1752410988",
+        "vlan_id": 896
+      },
+      {
+        "test_id": "random_97",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.132778",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_random_97_1752410988",
+        "vlan_id": 2032
+      },
+      {
+        "test_id": "random_98",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.134625",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/14",
+        "dest_interface": "ge100-0/0/9",
+        "service_name": "test_service_random_98_1752410988",
+        "vlan_id": 3368
+      },
+      {
+        "test_id": "random_99",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.142771",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/10",
+        "service_name": "test_service_random_99_1752410988",
+        "vlan_id": 760
+      },
+      {
+        "test_id": "random_100",
+        "scenario": "random_pairs",
+        "timestamp": "2025-07-13T15:49:48.149632",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B02"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-B02",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/34",
+        "service_name": "test_service_random_100_1752410988",
+        "vlan_id": 1660
+      }
+    ],
+    "same_leaf": [
+      {
+        "test_id": "same_leaf_1",
+        "scenario": "same_leaf",
+        "timestamp": "2025-07-13T15:49:48.151834",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09"
+        ],
+        "config_commands": 12,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/15",
+        "service_name": "test_service_same_leaf_1_1752410988",
+        "vlan_id": 2620
+      },
+      {
+        "test_id": "same_leaf_2",
+        "scenario": "same_leaf",
+        "timestamp": "2025-07-13T15:49:48.158150",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09"
+        ],
+        "config_commands": 12,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-C16",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_same_leaf_2_1752410988",
+        "vlan_id": 2618
+      },
+      {
+        "test_id": "same_leaf_3",
+        "scenario": "same_leaf",
+        "timestamp": "2025-07-13T15:49:48.166532",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09"
+        ],
+        "config_commands": 12,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/19",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_same_leaf_3_1752410988",
+        "vlan_id": 1934
+      },
+      {
+        "test_id": "same_leaf_4",
+        "scenario": "same_leaf",
+        "timestamp": "2025-07-13T15:49:48.168534",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B06-1",
+          "DNAAS-SPINE-B08"
+        ],
+        "config_commands": 0,
+        "source_leaf": "DNAAS-LEAF-B06-1",
+        "dest_leaf": "DNAAS-LEAF-B06-1",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_same_leaf_4_1752410988",
+        "vlan_id": 3545
+      },
+      {
+        "test_id": "same_leaf_5",
+        "scenario": "same_leaf",
+        "timestamp": "2025-07-13T15:49:48.177074",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08"
+        ],
+        "config_commands": 12,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B02",
+        "source_interface": "ge100-0/0/30",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_same_leaf_5_1752410988",
+        "vlan_id": 2520
+      }
+    ],
+    "failed_spine_affected": [],
+    "edge_cases": [
+      {
+        "test_id": "edge_vlan_4094",
+        "scenario": "edge_cases",
+        "timestamp": "2025-07-13T15:49:48.183192",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_edge_vlan_4094_1752410988",
+        "vlan_id": 4094
+      },
+      {
+        "test_id": "edge_vlan_1",
+        "scenario": "edge_cases",
+        "timestamp": "2025-07-13T15:49:48.185339",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/39",
+        "service_name": "test_service_edge_vlan_1_1752410988",
+        "vlan_id": 1
+      },
+      {
+        "test_id": "edge_long_service",
+        "scenario": "edge_cases",
+        "timestamp": "2025-07-13T15:49:48.193847",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/23",
+        "service_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "vlan_id": 342
+      },
+      {
+        "test_id": "edge_special_chars",
+        "scenario": "edge_cases",
+        "timestamp": "2025-07-13T15:49:48.200124",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A10",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A10",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/10",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_with_special_chars_!@#$%^&*()",
+        "vlan_id": 1502
+      }
+    ],
+    "stress_test": [
+      {
+        "test_id": "stress_1",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.202460",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/1",
+        "dest_interface": "ge100-0/0/34",
+        "service_name": "test_service_stress_1_1752410988",
+        "vlan_id": 4029
+      },
+      {
+        "test_id": "stress_2",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.315448",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/14",
+        "dest_interface": "ge100-0/0/34",
+        "service_name": "test_service_stress_2_1752410988",
+        "vlan_id": 1502
+      },
+      {
+        "test_id": "stress_3",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.423058",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B01",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B01",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/15",
+        "service_name": "test_service_stress_3_1752410988",
+        "vlan_id": 597
+      },
+      {
+        "test_id": "stress_4",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.527426",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_stress_4_1752410988",
+        "vlan_id": 1210
+      },
+      {
+        "test_id": "stress_5",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.636285",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A13",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A13",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_5_1752410988",
+        "vlan_id": 1078
+      },
+      {
+        "test_id": "stress_6",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.747406",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-F16",
+        "source_interface": "ge100-0/0/6",
+        "dest_interface": "ge100-0/0/37",
+        "service_name": "test_service_stress_6_1752410988",
+        "vlan_id": 2414
+      },
+      {
+        "test_id": "stress_7",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.855239",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/11",
+        "dest_interface": "ge100-0/0/10",
+        "service_name": "test_service_stress_7_1752410988",
+        "vlan_id": 3491
+      },
+      {
+        "test_id": "stress_8",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:48.963674",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_stress_8_1752410988",
+        "vlan_id": 577
+      },
+      {
+        "test_id": "stress_9",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.077434",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C13",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C13",
+        "dest_leaf": "DNAAS-LEAF-B10",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_stress_9_1752410989",
+        "vlan_id": 3864
+      },
+      {
+        "test_id": "stress_10",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.195853",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B14",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B14",
+        "dest_leaf": "DNAAS-LEAF-A13",
+        "source_interface": "ge100-0/0/20",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_10_1752410989",
+        "vlan_id": 1743
+      },
+      {
+        "test_id": "stress_11",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.312098",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D13",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-2-(NCPL)"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-D13",
+        "dest_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "source_interface": "ge100-0/0/1",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_stress_11_1752410989",
+        "vlan_id": 2585
+      },
+      {
+        "test_id": "stress_12",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.426566",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F16",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F16",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_stress_12_1752410989",
+        "vlan_id": 2936
+      },
+      {
+        "test_id": "stress_13",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.544149",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-2-(NCPL)"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_13_1752410989",
+        "vlan_id": 3622
+      },
+      {
+        "test_id": "stress_14",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.660194",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F16",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F16",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/4",
+        "service_name": "test_service_stress_14_1752410989",
+        "vlan_id": 616
+      },
+      {
+        "test_id": "stress_15",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.777463",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/33",
+        "service_name": "test_service_stress_15_1752410989",
+        "vlan_id": 3614
+      },
+      {
+        "test_id": "stress_16",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:49.892448",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/12",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_stress_16_1752410989",
+        "vlan_id": 1580
+      },
+      {
+        "test_id": "stress_17",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.008552",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B06-2-(NCPL)",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/13",
+        "service_name": "test_service_stress_17_1752410990",
+        "vlan_id": 2328
+      },
+      {
+        "test_id": "stress_18",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.128788",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-B",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-B",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_stress_18_1752410990",
+        "vlan_id": 3978
+      },
+      {
+        "test_id": "stress_19",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.243737",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/21",
+        "dest_interface": "ge100-0/0/18",
+        "service_name": "test_service_stress_19_1752410990",
+        "vlan_id": 1726
+      },
+      {
+        "test_id": "stress_20",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.361458",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B01",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B01",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_20_1752410990",
+        "vlan_id": 3158
+      },
+      {
+        "test_id": "stress_21",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.479667",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/30",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_21_1752410990",
+        "vlan_id": 1407
+      },
+      {
+        "test_id": "stress_22",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.597593",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/35",
+        "dest_interface": "ge100-0/0/35",
+        "service_name": "test_service_stress_22_1752410990",
+        "vlan_id": 4070
+      },
+      {
+        "test_id": "stress_23",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.714484",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/1",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_stress_23_1752410990",
+        "vlan_id": 1405
+      },
+      {
+        "test_id": "stress_24",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.832095",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C13",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C13",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/18",
+        "service_name": "test_service_stress_24_1752410990",
+        "vlan_id": 3514
+      },
+      {
+        "test_id": "stress_25",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:50.947805",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B03",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B03",
+        "dest_leaf": "DNAAS-LEAF-B10",
+        "source_interface": "ge100-0/0/17",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_25_1752410990",
+        "vlan_id": 687
+      },
+      {
+        "test_id": "stress_26",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.063481",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-2-(NCPL)"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_26_1752410991",
+        "vlan_id": 904
+      },
+      {
+        "test_id": "stress_27",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.177507",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/27",
+        "service_name": "test_service_stress_27_1752410991",
+        "vlan_id": 1661
+      },
+      {
+        "test_id": "stress_28",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.295933",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_stress_28_1752410991",
+        "vlan_id": 3278
+      },
+      {
+        "test_id": "stress_29",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.412942",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/30",
+        "dest_interface": "ge100-0/0/10",
+        "service_name": "test_service_stress_29_1752410991",
+        "vlan_id": 2021
+      },
+      {
+        "test_id": "stress_30",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.530568",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_30_1752410991",
+        "vlan_id": 3939
+      },
+      {
+        "test_id": "stress_31",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.645864",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_stress_31_1752410991",
+        "vlan_id": 1016
+      },
+      {
+        "test_id": "stress_32",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.758487",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_stress_32_1752410991",
+        "vlan_id": 1914
+      },
+      {
+        "test_id": "stress_33",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.872918",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B03",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B03",
+        "dest_leaf": "DNAAS-LEAF-D12",
+        "source_interface": "ge100-0/0/17",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_33_1752410991",
+        "vlan_id": 1824
+      },
+      {
+        "test_id": "stress_34",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:51.990683",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_34_1752410991",
+        "vlan_id": 3437
+      },
+      {
+        "test_id": "stress_35",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.105582",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B01",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B01",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/1",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_stress_35_1752410992",
+        "vlan_id": 1138
+      },
+      {
+        "test_id": "stress_36",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.219551",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_36_1752410992",
+        "vlan_id": 3345
+      },
+      {
+        "test_id": "stress_37",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.338231",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B07"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-B07",
+        "source_interface": "ge100-0/0/6",
+        "dest_interface": "ge100-0/0/10",
+        "service_name": "test_service_stress_37_1752410992",
+        "vlan_id": 237
+      },
+      {
+        "test_id": "stress_38",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.455621",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-B"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-C12-B",
+        "source_interface": "ge100-0/0/20",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_stress_38_1752410992",
+        "vlan_id": 422
+      },
+      {
+        "test_id": "stress_39",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.568512",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/34",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_stress_39_1752410992",
+        "vlan_id": 122
+      },
+      {
+        "test_id": "stress_40",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.684163",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/31",
+        "dest_interface": "ge100-0/0/13",
+        "service_name": "test_service_stress_40_1752410992",
+        "vlan_id": 3670
+      },
+      {
+        "test_id": "stress_41",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.802207",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/18",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_41_1752410992",
+        "vlan_id": 2118
+      },
+      {
+        "test_id": "stress_42",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:52.917355",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B01",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B01",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_stress_42_1752410992",
+        "vlan_id": 1979
+      },
+      {
+        "test_id": "stress_43",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.034569",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D16",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D16",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_43_1752410993",
+        "vlan_id": 3747
+      },
+      {
+        "test_id": "stress_44",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.152794",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B01"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-B01",
+        "source_interface": "ge100-0/0/39",
+        "dest_interface": "ge100-0/0/15",
+        "service_name": "test_service_stress_44_1752410993",
+        "vlan_id": 376
+      },
+      {
+        "test_id": "stress_45",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.271049",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B06-1",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D12"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B06-1",
+        "dest_leaf": "DNAAS-LEAF-D12",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/23",
+        "service_name": "test_service_stress_45_1752410993",
+        "vlan_id": 598
+      },
+      {
+        "test_id": "stress_46",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.389444",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/30",
+        "dest_interface": "ge100-0/0/17",
+        "service_name": "test_service_stress_46_1752410993",
+        "vlan_id": 3288
+      },
+      {
+        "test_id": "stress_47",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.502376",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F14",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F14",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/7",
+        "service_name": "test_service_stress_47_1752410993",
+        "vlan_id": 460
+      },
+      {
+        "test_id": "stress_48",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.617409",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B04"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-B04",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_stress_48_1752410993",
+        "vlan_id": 2046
+      },
+      {
+        "test_id": "stress_49",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.733482",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-C15",
+        "source_interface": "ge100-0/0/39",
+        "dest_interface": "ge100-0/0/9",
+        "service_name": "test_service_stress_49_1752410993",
+        "vlan_id": 978
+      },
+      {
+        "test_id": "stress_50",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.842348",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C13",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C13",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/7",
+        "service_name": "test_service_stress_50_1752410993",
+        "vlan_id": 743
+      },
+      {
+        "test_id": "stress_51",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:53.955525",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-F16",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/24",
+        "service_name": "test_service_stress_51_1752410993",
+        "vlan_id": 332
+      },
+      {
+        "test_id": "stress_52",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.071984",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B06-1",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B06-1",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/12",
+        "dest_interface": "ge100-0/0/1",
+        "service_name": "test_service_stress_52_1752410994",
+        "vlan_id": 4004
+      },
+      {
+        "test_id": "stress_53",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.188082",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-1"
+        ],
+        "config_commands": 6,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-B06-1",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_53_1752410994",
+        "vlan_id": 519
+      },
+      {
+        "test_id": "stress_54",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.305468",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/24",
+        "service_name": "test_service_stress_54_1752410994",
+        "vlan_id": 1753
+      },
+      {
+        "test_id": "stress_55",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.420285",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-C13",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_stress_55_1752410994",
+        "vlan_id": 3968
+      },
+      {
+        "test_id": "stress_56",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.537402",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/18",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_56_1752410994",
+        "vlan_id": 1471
+      },
+      {
+        "test_id": "stress_57",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.652472",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-B",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-2-(NCPL)"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-C12-B",
+        "dest_leaf": "DNAAS-LEAF-B06-2-(NCPL)",
+        "source_interface": "ge100-0/0/3",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_57_1752410994",
+        "vlan_id": 2885
+      },
+      {
+        "test_id": "stress_58",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.767404",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/37",
+        "dest_interface": "ge100-0/0/27",
+        "service_name": "test_service_stress_58_1752410994",
+        "vlan_id": 3749
+      },
+      {
+        "test_id": "stress_59",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.877076",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/28",
+        "dest_interface": "ge100-0/0/10",
+        "service_name": "test_service_stress_59_1752410994",
+        "vlan_id": 1759
+      },
+      {
+        "test_id": "stress_60",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:54.993988",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B13",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B03"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B13",
+        "dest_leaf": "DNAAS-LEAF-B03",
+        "source_interface": "ge100-0/0/35",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_60_1752410994",
+        "vlan_id": 3968
+      },
+      {
+        "test_id": "stress_61",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.110238",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B10",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B10",
+        "dest_leaf": "DNAAS-LEAF-A13",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/6",
+        "service_name": "test_service_stress_61_1752410995",
+        "vlan_id": 937
+      },
+      {
+        "test_id": "stress_62",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.227172",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B03",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B04"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B03",
+        "dest_leaf": "DNAAS-LEAF-B04",
+        "source_interface": "ge100-0/0/7",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_stress_62_1752410995",
+        "vlan_id": 2062
+      },
+      {
+        "test_id": "stress_63",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.341305",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B04"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-B04",
+        "source_interface": "ge100-0/0/10",
+        "dest_interface": "ge100-0/0/12",
+        "service_name": "test_service_stress_63_1752410995",
+        "vlan_id": 3402
+      },
+      {
+        "test_id": "stress_64",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.460005",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B03",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B03",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/8",
+        "dest_interface": "ge100-0/0/34",
+        "service_name": "test_service_stress_64_1752410995",
+        "vlan_id": 601
+      },
+      {
+        "test_id": "stress_65",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.576286",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-F15",
+        "source_interface": "ge100-0/0/27",
+        "dest_interface": "ge100-0/0/32",
+        "service_name": "test_service_stress_65_1752410995",
+        "vlan_id": 2748
+      },
+      {
+        "test_id": "stress_66",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.691491",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C13",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C13",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/38",
+        "service_name": "test_service_stress_66_1752410995",
+        "vlan_id": 4091
+      },
+      {
+        "test_id": "stress_67",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.809563",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/3",
+        "dest_interface": "ge100-0/0/13",
+        "service_name": "test_service_stress_67_1752410995",
+        "vlan_id": 3766
+      },
+      {
+        "test_id": "stress_68",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:55.926430",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A14"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-A14",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_68_1752410995",
+        "vlan_id": 719
+      },
+      {
+        "test_id": "stress_69",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.044711",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A10",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A10",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/14",
+        "dest_interface": "ge100-0/0/9",
+        "service_name": "test_service_stress_69_1752410996",
+        "vlan_id": 2551
+      },
+      {
+        "test_id": "stress_70",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.158390",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-C10",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_70_1752410996",
+        "vlan_id": 1847
+      },
+      {
+        "test_id": "stress_71",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.273133",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/28",
+        "dest_interface": "ge100-0/0/19",
+        "service_name": "test_service_stress_71_1752410996",
+        "vlan_id": 320
+      },
+      {
+        "test_id": "stress_72",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.391442",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-F14",
+        "source_interface": "ge100-0/0/19",
+        "dest_interface": "ge100-0/0/22",
+        "service_name": "test_service_stress_72_1752410996",
+        "vlan_id": 834
+      },
+      {
+        "test_id": "stress_73",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.506479",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/35",
+        "service_name": "test_service_stress_73_1752410996",
+        "vlan_id": 3733
+      },
+      {
+        "test_id": "stress_74",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.623140",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B15",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B15",
+        "dest_leaf": "DNAAS-LEAF-C10",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/16",
+        "service_name": "test_service_stress_74_1752410996",
+        "vlan_id": 3241
+      },
+      {
+        "test_id": "stress_75",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.739159",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A13",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A13",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_75_1752410996",
+        "vlan_id": 4010
+      },
+      {
+        "test_id": "stress_76",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.857489",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-F09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C11",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-F09",
+          "DNAAS-LEAF-F16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C11",
+        "dest_leaf": "DNAAS-LEAF-F16",
+        "source_interface": "ge100-0/0/25",
+        "dest_interface": "ge100-0/0/24",
+        "service_name": "test_service_stress_76_1752410996",
+        "vlan_id": 1688
+      },
+      {
+        "test_id": "stress_77",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:56.974442",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D16",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D16",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/22",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_stress_77_1752410996",
+        "vlan_id": 407
+      },
+      {
+        "test_id": "stress_78",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.092266",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A14",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A14",
+        "dest_leaf": "DNAAS-LEAF-C16",
+        "source_interface": "ge100-0/0/31",
+        "dest_interface": "ge100-0/0/20",
+        "service_name": "test_service_stress_78_1752410997",
+        "vlan_id": 832
+      },
+      {
+        "test_id": "stress_79",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.206659",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C16",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-2"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C16",
+        "dest_leaf": "DNAAS-LEAF-A11-2",
+        "source_interface": "ge100-0/0/19",
+        "dest_interface": "ge100-0/0/15",
+        "service_name": "test_service_stress_79_1752410997",
+        "vlan_id": 2058
+      },
+      {
+        "test_id": "stress_80",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.324460",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B04",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B04",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/21",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_stress_80_1752410997",
+        "vlan_id": 1845
+      },
+      {
+        "test_id": "stress_81",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.440716",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_81_1752410997",
+        "vlan_id": 292
+      },
+      {
+        "test_id": "stress_82",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.558860",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B05",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B05",
+        "dest_leaf": "DNAAS-LEAF-D16",
+        "source_interface": "ge100-0/0/4",
+        "dest_interface": "ge100-0/0/2",
+        "service_name": "test_service_stress_82_1752410997",
+        "vlan_id": 357
+      },
+      {
+        "test_id": "stress_83",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.676175",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A12"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-A12",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_stress_83_1752410997",
+        "vlan_id": 1052
+      },
+      {
+        "test_id": "stress_84",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.793587",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B01"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-B01",
+        "source_interface": "ge100-0/0/32",
+        "dest_interface": "ge100-0/0/14",
+        "service_name": "test_service_stress_84_1752410997",
+        "vlan_id": 3933
+      },
+      {
+        "test_id": "stress_85",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:57.911545",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B02",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C12-A"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B02",
+        "dest_leaf": "DNAAS-LEAF-C12-A",
+        "source_interface": "ge100-0/0/31",
+        "dest_interface": "ge100-0/0/37",
+        "service_name": "test_service_stress_85_1752410997",
+        "vlan_id": 604
+      },
+      {
+        "test_id": "stress_86",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.026876",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B06-1",
+          "DNAAS-SPINE-B08",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C11"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-B06-1",
+        "dest_leaf": "DNAAS-LEAF-C11",
+        "source_interface": "ge100-0/0/5",
+        "dest_interface": "ge100-0/0/25",
+        "service_name": "test_service_stress_86_1752410998",
+        "vlan_id": 2886
+      },
+      {
+        "test_id": "stress_87",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.141852",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A15",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A15",
+        "dest_leaf": "DNAAS-LEAF-B15",
+        "source_interface": "ge100-0/0/26",
+        "dest_interface": "ge100-0/0/31",
+        "service_name": "test_service_stress_87_1752410998",
+        "vlan_id": 2049
+      },
+      {
+        "test_id": "stress_88",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.258256",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A11-1"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-A11-1",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/30",
+        "service_name": "test_service_stress_88_1752410998",
+        "vlan_id": 482
+      },
+      {
+        "test_id": "stress_89",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.375289",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A12",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-A12",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/29",
+        "dest_interface": "ge100-0/0/16",
+        "service_name": "test_service_stress_89_1752410998",
+        "vlan_id": 2890
+      },
+      {
+        "test_id": "stress_90",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.489810",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-A14",
+        "source_interface": "ge100-0/0/13",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_stress_90_1752410998",
+        "vlan_id": 3695
+      },
+      {
+        "test_id": "stress_91",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.605412",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B14"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-B14",
+        "source_interface": "ge100-0/0/12",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_91_1752410998",
+        "vlan_id": 1726
+      },
+      {
+        "test_id": "stress_92",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.717299",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C12-A",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A15"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C12-A",
+        "dest_leaf": "DNAAS-LEAF-A15",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/27",
+        "service_name": "test_service_stress_92_1752410998",
+        "vlan_id": 2506
+      },
+      {
+        "test_id": "stress_93",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.826007",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-F09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-F15",
+          "DNAAS-SPINE-F09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-1"
+        ],
+        "config_commands": 18,
+        "source_leaf": "DNAAS-LEAF-F15",
+        "dest_leaf": "DNAAS-LEAF-B06-1",
+        "source_interface": "ge100-0/0/36",
+        "dest_interface": "ge100-0/0/26",
+        "service_name": "test_service_stress_93_1752410998",
+        "vlan_id": 3004
+      },
+      {
+        "test_id": "stress_94",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:58.936178",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": true,
+          "source_spine": "DNAAS-SPINE-B08",
+          "superspine": null,
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 2
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B07",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B06-1"
+        ],
+        "config_commands": 6,
+        "source_leaf": "DNAAS-LEAF-B07",
+        "dest_leaf": "DNAAS-LEAF-B06-1",
+        "source_interface": "ge100-0/0/11",
+        "dest_interface": "ge100-0/0/11",
+        "service_name": "test_service_stress_94_1752410998",
+        "vlan_id": 407
+      },
+      {
+        "test_id": "stress_95",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.044282",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-C09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-1",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-C09",
+          "DNAAS-LEAF-C16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-1",
+        "dest_leaf": "DNAAS-LEAF-C16",
+        "source_interface": "ge100-0/0/16",
+        "dest_interface": "ge100-0/0/35",
+        "service_name": "test_service_stress_95_1752410999",
+        "vlan_id": 3752
+      },
+      {
+        "test_id": "stress_96",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.152353",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D12",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D12",
+        "dest_leaf": "DNAAS-LEAF-A16",
+        "source_interface": "ge100-0/0/15",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_stress_96_1752410999",
+        "vlan_id": 548
+      },
+      {
+        "test_id": "stress_97",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.262323",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-C09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-C10",
+          "DNAAS-SPINE-C09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B09",
+          "DNAAS-LEAF-B16"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-C10",
+        "dest_leaf": "DNAAS-LEAF-B16",
+        "source_interface": "ge100-0/0/2",
+        "dest_interface": "ge100-0/0/28",
+        "service_name": "test_service_stress_97_1752410999",
+        "vlan_id": 2012
+      },
+      {
+        "test_id": "stress_98",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.372279",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-A09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-D14",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-A11-2",
+          "DNAAS-SPINE-A09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-D14",
+          "DNAAS-LEAF-D13"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-A11-2",
+        "dest_leaf": "DNAAS-LEAF-D13",
+        "source_interface": "ge100-0/0/24",
+        "dest_interface": "ge100-0/0/29",
+        "service_name": "test_service_stress_98_1752410999",
+        "vlan_id": 2238
+      },
+      {
+        "test_id": "stress_99",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.485224",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-B09",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-A09",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-B16",
+          "DNAAS-SPINE-B09",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-A09",
+          "DNAAS-LEAF-A10"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-B16",
+        "dest_leaf": "DNAAS-LEAF-A10",
+        "source_interface": "ge100-0/0/33",
+        "dest_interface": "ge100-0/0/21",
+        "service_name": "test_service_stress_99_1752410999",
+        "vlan_id": 339
+      },
+      {
+        "test_id": "stress_100",
+        "scenario": "stress_test",
+        "timestamp": "2025-07-13T15:49:59.600434",
+        "success": true,
+        "error": null,
+        "path_info": {
+          "is_2_tier": false,
+          "source_spine": "DNAAS-SPINE-D14",
+          "superspine": "DNAAS-SUPERSPINE-D04-NCC0",
+          "dest_spine": "DNAAS-SPINE-B08",
+          "segments": 4
+        },
+        "devices_in_path": [
+          "DNAAS-LEAF-D16",
+          "DNAAS-SPINE-D14",
+          "DNAAS-SUPERSPINE-D04-NCC0",
+          "DNAAS-SPINE-B08",
+          "DNAAS-LEAF-B05"
+        ],
+        "config_commands": 30,
+        "source_leaf": "DNAAS-LEAF-D16",
+        "dest_leaf": "DNAAS-LEAF-B05",
+        "source_interface": "ge100-0/0/9",
+        "dest_interface": "ge100-0/0/8",
+        "service_name": "test_service_stress_100_1752410999",
+        "vlan_id": 1532
+      }
+    ]
+  },
+  "summary": {
+    "total_tests": 209,
+    "successful_tests": 209,
+    "failed_tests": 0,
+    "scenario_breakdown": {
+      "random_pairs": {
+        "total": 100,
+        "successful": 100,
+        "failed": 0,
+        "success_rate": 100.0
+      },
+      "same_leaf": {
+        "total": 5,
+        "successful": 5,
+        "failed": 0,
+        "success_rate": 100.0
+      },
+      "failed_spine_affected": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "success_rate": 0
+      },
+      "edge_cases": {
+        "total": 4,
+        "successful": 4,
+        "failed": 0,
+        "success_rate": 100.0
+      },
+      "stress_test": {
+        "total": 100,
+        "successful": 100,
+        "failed": 0,
+        "success_rate": 100.0
+      }
+    },
+    "overall_success_rate": 100.0
+  }
+}

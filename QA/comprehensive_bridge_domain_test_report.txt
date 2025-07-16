@@ -1,0 +1,1089 @@
+================================================================================
+🔍 COMPREHENSIVE BRIDGE DOMAIN TEST REPORT
+================================================================================
+Timestamp: 2025-07-13T15:49:47.049035
+Total Tests: 209
+Successful: 209
+Failed: 0
+Overall Success Rate: 100.0%
+
+📊 SCENARIO BREAKDOWN:
+  RANDOM_PAIRS:
+    • Total: 100
+    • Successful: 100
+    • Failed: 0
+    • Success Rate: 100.0%
+
+  SAME_LEAF:
+    • Total: 5
+    • Successful: 5
+    • Failed: 0
+    • Success Rate: 100.0%
+
+  FAILED_SPINE_AFFECTED:
+    • Total: 0
+    • Successful: 0
+    • Failed: 0
+    • Success Rate: 0.0%
+
+  EDGE_CASES:
+    • Total: 4
+    • Successful: 4
+    • Failed: 0
+    • Success Rate: 100.0%
+
+  STRESS_TEST:
+    • Total: 100
+    • Successful: 100
+    • Failed: 0
+    • Success Rate: 100.0%
+
+📋 RANDOM_PAIRS DETAILED RESULTS:
+  random_1: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_2: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_3: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_4: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_5: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_6: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_7: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_8: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_9: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_10: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_11: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_12: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  random_13: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_14: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_15: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_16: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_17: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_18: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_19: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_20: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_21: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_22: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_23: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_24: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_25: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_26: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_27: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_28: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_29: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_30: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_31: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_32: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_33: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_34: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_35: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_36: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_37: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_38: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_39: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_40: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_41: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_42: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_43: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_44: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_45: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_46: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_47: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_48: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_49: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_50: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_51: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_52: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_53: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_54: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_55: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_56: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_57: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_58: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_59: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_60: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_61: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_62: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_63: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_64: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_65: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_66: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_67: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_68: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_69: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_70: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_71: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_72: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_73: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_74: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_75: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_76: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_77: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_78: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_79: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_80: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_81: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_82: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_83: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_84: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_85: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_86: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_87: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_88: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_89: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_90: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_91: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_92: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_93: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_94: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_95: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_96: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_97: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  random_98: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_99: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  random_100: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+📋 SAME_LEAF DETAILED RESULTS:
+  same_leaf_1: ✅ SUCCESS
+    • Devices in path: 2
+    • Config commands: 12
+    • Path type: 2-tier
+
+  same_leaf_2: ✅ SUCCESS
+    • Devices in path: 2
+    • Config commands: 12
+    • Path type: 2-tier
+
+  same_leaf_3: ✅ SUCCESS
+    • Devices in path: 2
+    • Config commands: 12
+    • Path type: 2-tier
+
+  same_leaf_4: ✅ SUCCESS
+    • Devices in path: 2
+    • Config commands: 0
+    • Path type: 2-tier
+
+  same_leaf_5: ✅ SUCCESS
+    • Devices in path: 2
+    • Config commands: 12
+    • Path type: 2-tier
+
+📋 FAILED_SPINE_AFFECTED DETAILED RESULTS:
+📋 EDGE_CASES DETAILED RESULTS:
+  edge_vlan_4094: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  edge_vlan_1: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  edge_long_service: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  edge_special_chars: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+📋 STRESS_TEST DETAILED RESULTS:
+  stress_1: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_2: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_3: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_4: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_5: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_6: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_7: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_8: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_9: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_10: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_11: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_12: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_13: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_14: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_15: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_16: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_17: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_18: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_19: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_20: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_21: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_22: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_23: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_24: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_25: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_26: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_27: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_28: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_29: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_30: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_31: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_32: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_33: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_34: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_35: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_36: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_37: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_38: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_39: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_40: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_41: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_42: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_43: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_44: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_45: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_46: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_47: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_48: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_49: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_50: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_51: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_52: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_53: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 6
+    • Path type: 2-tier
+
+  stress_54: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_55: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_56: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_57: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_58: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_59: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_60: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_61: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_62: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_63: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_64: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_65: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_66: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_67: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_68: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_69: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_70: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_71: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_72: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_73: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_74: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_75: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_76: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_77: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_78: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_79: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_80: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_81: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_82: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_83: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_84: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_85: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_86: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_87: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_88: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_89: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 18
+    • Path type: 2-tier
+
+  stress_90: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_91: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_92: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_93: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 18
+    • Path type: 3-tier
+
+  stress_94: ✅ SUCCESS
+    • Devices in path: 3
+    • Config commands: 6
+    • Path type: 2-tier
+
+  stress_95: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_96: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_97: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_98: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_99: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier
+
+  stress_100: ✅ SUCCESS
+    • Devices in path: 5
+    • Config commands: 30
+    • Path type: 3-tier

@@ -1,0 +1,23 @@
+=== INTERACTIVE SHELL TEST ===
+Command: show network-services bridge-domain g_visaev_v123
+Full interactive output:
+DRIVENETS CLI Loading...                        DNAAS-LEAF-B14# show network-services bridge-domain g_visaev_v123
+[FDNAAS-LEAF-B14(14-Jul-2025-11:00:26)# show network-services bridge-domain g_visaev_v123
+
+Bridge-Domain: g_visaev_v123
+    Description: 
+    Admin State: Up
+
+    Associated Interfaces:
+        bundle-60000.123
+        ge100-0/0/25.123
+
+DNAAS-LEAF-B14# 
+
+=== EXEC_COMMAND TEST ===
+Command: show network-services bridge-domain g_visaev_v123
+STDOUT:
+Invalid command
+
+STDERR:
+

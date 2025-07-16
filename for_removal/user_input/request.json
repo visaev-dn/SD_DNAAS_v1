@@ -1,0 +1,12 @@
+{
+  "service_type": "qinq",
+  "source_leaf": "leaf01",
+  "source_port": "Ethernet1",
+  "destination_leaf": "leaf02",
+  "destination_port": "Ethernet2",
+  "vlans": ["100-105"],
+  "encapsulation": "dot1q",
+  "description": "Q-in-Q service between leaf01 and leaf02",
+  "priority": "normal",
+  "auto_deploy": true
+} 

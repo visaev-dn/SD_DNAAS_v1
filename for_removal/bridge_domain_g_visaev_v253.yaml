@@ -1,0 +1,35 @@
+DNAAS-LEAF-C12-B:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface ge100-0/0/10.253
+- interfaces ge100-0/0/10.253 l2-service enabled
+- interfaces ge100-0/0/10.253 vlan-id 253
+DNAAS-SPINE-C09:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60008.253
+- interfaces bundle-60008.253 l2-service enabled
+- interfaces bundle-60008.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+DNAAS-SuperSpine-D04-NCC1:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60006.253
+- interfaces bundle-60006.253 l2-service enabled
+- interfaces bundle-60006.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60007.253
+- interfaces bundle-60007.253 l2-service enabled
+- interfaces bundle-60007.253 vlan-id 253
+DNAAS_LEAF_D13:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface ge100-0/0/20.253
+- interfaces ge100-0/0/20.253 l2-service enabled
+- interfaces ge100-0/0/20.253 vlan-id 253
+DNAAS_SPINE_D14:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60002.253
+- interfaces bundle-60002.253 l2-service enabled
+- interfaces bundle-60002.253 vlan-id 253

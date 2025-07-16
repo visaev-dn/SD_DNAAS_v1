@@ -1,0 +1,11 @@
+{
+  "service_type": "multi_vlan",
+  "source_leaf": "leaf02",
+  "source_port": "Ethernet4",
+  "destination_leaf": "leaf03",
+  "destination_port": "Ethernet2",
+  "vlans": ["300", "301", "302"],
+  "description": "Multi-VLAN trunk between leaf02 and leaf03",
+  "priority": "normal",
+  "auto_deploy": true
+} 

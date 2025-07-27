@@ -216,27 +216,39 @@ def show_user_menu():
         print("👤 USER OPTIONS")
         print("🎯" + "=" * 68)
         print("📋 User Workflow:")
-        print("1. 🔨 Bridge-Domain Builder")
-        print("2. 🚀 Push Config via SSH")
-        print("3. 🌳 View ASCII Topology Tree")
-        print("4. 🌳 View Minimized Topology Tree")
-        print("5. 🔙 Back to Main Menu")
+        print("1. 🔨 Bridge-Domain Builder (P2P)")
+        print("2. 🌐 P2MP Bridge-Domain Builder")
+        print("3. 🔨 Enhanced Bridge-Domain Builder (with Superspine Support)")
+        print("4. 🚀 Push Config via SSH")
+        print("5. 🌳 View ASCII Topology Tree")
+        print("6. 🌳 View Minimized Topology Tree")
+        print("7. 🔍 Discover Existing Bridge Domains")
+        print("8. 🌐 Visualize Bridge Domain Topology")
+        print("9. 🔙 Back to Main Menu")
         print()
         
-        choice = input("Select an option [1-5]: ").strip()
+        choice = input("Select an option [1-9]: ").strip()
         
         if choice == '1':
             run_bridge_domain_builder()
         elif choice == '2':
-            run_ssh_push_menu()
+            run_p2mp_bridge_domain_builder()
         elif choice == '3':
-            run_ascii_tree_viewer()
+            run_enhanced_bridge_domain_builder()
         elif choice == '4':
-            run_minimized_tree_viewer()
+            run_ssh_push_menu()
         elif choice == '5':
+            run_ascii_tree_viewer()
+        elif choice == '6':
+            run_minimized_tree_viewer()
+        elif choice == '7':
+            run_bridge_domain_discovery()
+        elif choice == '8':
+            run_bridge_domain_visualization()
+        elif choice == '9':
             break
         else:
-            print("❌ Invalid choice. Please select 1, 2, 3, 4, or 5.")
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, 7, 8, or 9.")
 
 def run_enhanced_topology_discovery():
     print("\n" + "🌐" + "=" * 68)
@@ -361,42 +373,287 @@ def run_bridge_domain_builder():
             source_port_num = default_source_port_num
         source_port = f"ge100-0/0/{source_port_num}"
         
-        # Destination leaf selection
-        dest_leaf = select_leaf_device(organized_devices, "Destination")
-        if not dest_leaf:
+        # Destination selection
+        print(f"\n🌐 P2MP Destination Selection")
+        print("─" * 40)
+        print("Select destinations for P2MP bridge domain:")
+        
+        destinations = []
+        while True:
+            # Destination leaf selection using same interface as P2P
+            dest_leaf = select_leaf_device(organized_devices, "Destination")
+            if not dest_leaf:
+                if destinations:
+                    print("✅ Finished adding destinations.")
+                    break
+                else:
+                    print("❌ No destinations selected.")
+                    return
+            
+            # Destination port
+            default_dest_port_num = str(20 + len(destinations))
+            dest_port_num = input(f"🔌 Enter the interface number (X) for ge100-0/0/X (e.g., {default_dest_port_num}): ").strip()
+            if not dest_port_num:
+                dest_port_num = default_dest_port_num
+            dest_port = f"ge100-0/0/{dest_port_num}"
+            
+            destinations.append({
+                'leaf': dest_leaf,
+                'port': dest_port
+            })
+            
+            print(f"✅ Added destination: {dest_leaf}:{dest_port}")
+            
+            # Ask if user wants to add another destination
+            add_another = input(f"\nAdd another destination? (y/n): ").strip().lower()
+            if add_another not in ['y', 'yes']:
+                break
+        
+        if not destinations:
+            print("❌ No destinations selected.")
             return
         
-        # Destination port
-        default_dest_port_num = "20"
-        dest_port_num = input(f"🔌 Enter the interface number (X) for ge100-0/0/X (e.g., {default_dest_port_num}): ").strip()
-        if not dest_port_num:
-            dest_port_num = default_dest_port_num
-        dest_port = f"ge100-0/0/{dest_port_num}"
+        print(f"\n✅ Selected {len(destinations)} destinations:")
+        for dest in destinations:
+            print(f"   • {dest['leaf']}:{dest['port']}")
         
-        # Build the configuration
-        print(f"\n🔨 Building bridge domain configuration...")
-        configs = builder.build_bridge_domain_config(
+        # Build the configuration (automatic path determination)
+        print(f"\n🔨 Building P2MP bridge domain configuration...")
+        print("📡 Automatically determining optimal paths (2-tier for same spine, 3-tier for different spines)")
+        configs = builder.build_p2mp_bridge_domain_config(
             service_name, vlan_id,
             source_leaf, source_port,
-            dest_leaf, dest_port
+            destinations
         )
         
         if not configs:
-            print("❌ Failed to build bridge domain configuration.")
+            print("❌ Failed to build P2MP bridge domain configuration.")
             return
         
+        # Show configuration summary
+        print(f"\n📋 Configuration Summary:")
+        summary = builder.get_configuration_summary(configs)
+        print(summary)
+        
+        # Show path visualization
+        metadata = configs.get('_metadata', {})
+        path_calculation = metadata.get('path_calculation', {})
+        if path_calculation:
+            print(f"\n🌳 Path Visualization:")
+            visualization = builder.visualize_p2mp_paths(path_calculation)
+            print(visualization)
+        
         # Save the configuration
-        output_file = f"bridge_domain_{service_name}.yaml"
+        output_file = f"p2mp_bridge_domain_{service_name}.yaml"
         builder.save_configuration(configs, output_file)
         
-        print(f"\n✅ Bridge domain configuration built successfully!")
+        print(f"\n✅ P2MP bridge domain configuration built successfully!")
         print(f"📁 Configuration saved to: {output_file}")
-        print(f"📋 Devices configured: {', '.join(configs.keys())}")
+        
+        # Show device count
+        device_count = len([k for k in configs.keys() if k != '_metadata'])
+        print(f"📋 Devices configured: {device_count}")
         
     except ImportError as e:
         print(f"❌ Failed to import bridge domain builder: {e}")
     except Exception as e:
         print(f"❌ Bridge domain builder failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+def run_p2mp_bridge_domain_builder():
+    print("\n" + "🌐" + "=" * 68)
+    print("🌐 P2MP BRIDGE-DOMAIN BUILDER")
+    print("🌐" + "=" * 68)
+    
+    # Check if topology files exist
+    topology_file = Path("topology/complete_topology_v2.json")
+    bundle_file = Path("topology/bundle_mapping_v2.yaml")
+    
+    if not topology_file.exists():
+        print("❌ Topology file not found. Please run topology discovery first.")
+        return
+    
+    if not bundle_file.exists():
+        print("❌ Bundle mapping file not found. Please run topology discovery first.")
+        return
+    
+    print("✅ Topology files found. Starting P2MP bridge domain builder...")
+    
+    # Import and run the P2MP bridge domain builder
+    try:
+        from config_engine.p2mp_bridge_domain_builder import P2MPBridgeDomainBuilder
+        
+        # Initialize the builder
+        builder = P2MPBridgeDomainBuilder()
+        
+        # Interactive prompts
+        print("\n📋 P2MP Bridge Domain Configuration")
+        print("─" * 40)
+        
+        # Username
+        default_username = "visaev"
+        username = input(f"👤 Username (e.g., {default_username}): ").strip()
+        if not username:
+            username = default_username
+        
+        # VLAN ID
+        default_vlan_id = "253"
+        vlan_id_input = input(f"🏷️  VLAN ID (e.g., {default_vlan_id}): ").strip()
+        if not vlan_id_input:
+            vlan_id_input = default_vlan_id
+        try:
+            vlan_id = int(vlan_id_input)
+        except ValueError:
+            print("❌ Invalid VLAN ID. Must be a number.")
+            return
+        
+        # Format service name as g_"username"_v"vlan-id"
+        service_name = f"g_{username}_v{vlan_id}"
+        print(f"✅ Service name will be: {service_name}")
+        
+        # Get successful devices and organize by row
+        successful_devices = get_successful_devices_from_status()
+        if not successful_devices:
+            print("❌ No successful devices found. Please run probe+parse first.")
+            return
+        
+        # Filter to only leaf devices
+        leaf_devices = [dev for dev in successful_devices if 'LEAF' in dev.upper()]
+        if not leaf_devices:
+            print("❌ No successful leaf devices found.")
+            return
+        
+        # Get available leaves from P2MP bridge domain builder
+        available_leaves = builder.get_available_leaves()
+        unavailable_reasons = builder.get_unavailable_leaves()
+        
+        if not available_leaves:
+            print("❌ No available leaf devices found for bridge domain calculations.")
+            if unavailable_reasons:
+                print("🔴 Unavailable leaves:")
+                for leaf, reason in unavailable_reasons.items():
+                    print(f"   • {leaf}: {reason.get('description', 'Unknown reason')}")
+            return
+        
+        # Filter to only available leaf devices
+        available_leaf_devices = [dev for dev in leaf_devices if dev in available_leaves]
+        if not available_leaf_devices:
+            print("❌ No available leaf devices found after filtering.")
+            return
+        
+        # Show information about unavailable leaves
+        unavailable_leaf_devices = [dev for dev in leaf_devices if dev not in available_leaves]
+        if unavailable_leaf_devices:
+            print(f"\n⚠️  {len(unavailable_leaf_devices)} leaf devices are unavailable for bridge domain calculations:")
+            for leaf in unavailable_leaf_devices:
+                reason = unavailable_reasons.get(leaf, {})
+                description = reason.get('description', 'Unknown reason')
+                print(f"   • {leaf}: {description}")
+            print()
+        
+        # Organize by DC row
+        organized_devices = organize_leaf_devices_by_row(available_leaf_devices)
+        
+        print(f"\n📊 Found {len(available_leaf_devices)} available leaf devices across {len(organized_devices)} DC rows")
+        
+        # Source leaf selection
+        source_leaf = select_leaf_device(organized_devices, "Source")
+        if not source_leaf:
+            return
+        
+        # Source port
+        default_source_port_num = "10"
+        source_port_num = input(f"🔌 Enter the interface number (X) for ge100-0/0/X (e.g., {default_source_port_num}): ").strip()
+        if not source_port_num:
+            source_port_num = default_source_port_num
+        source_port = f"ge100-0/0/{source_port_num}"
+        
+        # Destination selection
+        print(f"\n🌐 P2MP Destination Selection")
+        print("─" * 40)
+        print("Select destinations for P2MP bridge domain:")
+        
+        destinations = []
+        while True:
+            # Destination leaf selection using same interface as P2P
+            dest_leaf = select_leaf_device(organized_devices, "Destination")
+            if not dest_leaf:
+                if destinations:
+                    print("✅ Finished adding destinations.")
+                    break
+                else:
+                    print("❌ No destinations selected.")
+                    return
+            
+            # Destination port
+            default_dest_port_num = str(20 + len(destinations))
+            dest_port_num = input(f"🔌 Enter the interface number (X) for ge100-0/0/X (e.g., {default_dest_port_num}): ").strip()
+            if not dest_port_num:
+                dest_port_num = default_dest_port_num
+            dest_port = f"ge100-0/0/{dest_port_num}"
+            
+            destinations.append({
+                'leaf': dest_leaf,
+                'port': dest_port
+            })
+            
+            print(f"✅ Added destination: {dest_leaf}:{dest_port}")
+            
+            # Ask if user wants to add another destination
+            add_another = input(f"\nAdd another destination? (y/n): ").strip().lower()
+            if add_another not in ['y', 'yes']:
+                break
+        
+        if not destinations:
+            print("❌ No destinations selected.")
+            return
+        
+        print(f"\n✅ Selected {len(destinations)} destinations:")
+        for dest in destinations:
+            print(f"   • {dest['leaf']}:{dest['port']}")
+        
+        # Build the configuration (automatic path determination)
+        print(f"\n🔨 Building P2MP bridge domain configuration...")
+        print("📡 Automatically determining optimal paths (2-tier for same spine, 3-tier for different spines)")
+        configs = builder.build_p2mp_bridge_domain_config(
+            service_name, vlan_id,
+            source_leaf, source_port,
+            destinations
+        )
+        
+        if not configs:
+            print("❌ Failed to build P2MP bridge domain configuration.")
+            return
+        
+        # Show configuration summary
+        print(f"\n📋 Configuration Summary:")
+        summary = builder.get_configuration_summary(configs)
+        print(summary)
+        
+        # Show path visualization
+        metadata = configs.get('_metadata', {})
+        path_calculation = metadata.get('path_calculation', {})
+        if path_calculation:
+            print(f"\n🌳 Path Visualization:")
+            visualization = builder.visualize_p2mp_paths(path_calculation)
+            print(visualization)
+        
+        # Save the configuration
+        output_file = f"p2mp_bridge_domain_{service_name}.yaml"
+        builder.save_configuration(configs, output_file)
+        
+        print(f"\n✅ P2MP bridge domain configuration built successfully!")
+        print(f"📁 Configuration saved to: {output_file}")
+        
+        # Show device count
+        device_count = len([k for k in configs.keys() if k != '_metadata'])
+        print(f"📋 Devices configured: {device_count}")
+        
+    except ImportError as e:
+        print(f"❌ Failed to import P2MP bridge domain builder: {e}")
+    except Exception as e:
+        print(f"❌ P2MP bridge domain builder failed: {e}")
         import traceback
         traceback.print_exc()
 
@@ -528,6 +785,146 @@ def run_minimized_tree_viewer():
                 print(line.strip())
     except Exception as e:
         print(f"❌ Failed to read minimized topology tree file: {e}")
+        import traceback
+        traceback.print_exc()
+
+def run_bridge_domain_discovery():
+    print("\n" + "🔍" + "=" * 68)
+    print("🔍 BRIDGE DOMAIN DISCOVERY")
+    print("🔍" + "=" * 68)
+    
+    # Check if parsed data exists
+    parsed_data_dir = Path("topology/configs/parsed_data")
+    if not parsed_data_dir.exists():
+        print("❌ Parsed data directory not found. Please run probe+parse first.")
+        return
+    
+    # Check if bridge domain data exists
+    bridge_domain_parsed_dir = Path("topology/configs/parsed_data/bridge_domain_parsed")
+    if not bridge_domain_parsed_dir.exists():
+        print("❌ Bridge domain parsed data directory not found. Please run probe+parse first.")
+        return
+    
+    bridge_domain_files = list(bridge_domain_parsed_dir.glob("*_bridge_domain_instance_parsed_*.yaml"))
+    if not bridge_domain_files:
+        print("❌ No bridge domain data found. Please run probe+parse first.")
+        return
+    
+    print("✅ Bridge domain data found. Starting discovery...")
+    
+    # Import and run the bridge domain discovery
+    try:
+        from config_engine.bridge_domain_discovery import BridgeDomainDiscovery
+        
+        # Initialize the discovery engine
+        discovery = BridgeDomainDiscovery()
+        
+        # Run discovery
+        print("\n🔍 Analyzing bridge domain configurations...")
+        mapping = discovery.run_discovery()
+        
+        # Show summary
+        print("\n" + "=" * 80)
+        print("BRIDGE DOMAIN DISCOVERY COMPLETE")
+        print("=" * 80)
+        
+        summary_report = discovery.generate_summary_report(mapping)
+        print(summary_report)
+        
+        # Show file locations
+        output_dir = Path("topology/bridge_domain_discovery")
+        mapping_files = list(output_dir.glob("bridge_domain_mapping_*.json"))
+        summary_files = list(output_dir.glob("bridge_domain_summary_*.txt"))
+        
+        if mapping_files:
+            latest_mapping = max(mapping_files, key=lambda x: x.stat().st_mtime)
+            print(f"\n📁 Latest mapping file: {latest_mapping}")
+        
+        if summary_files:
+            latest_summary = max(summary_files, key=lambda x: x.stat().st_mtime)
+            print(f"📁 Latest summary file: {latest_summary}")
+        
+        print(f"\n✅ Bridge domain discovery completed successfully!")
+        print(f"📊 Found {len(mapping.get('bridge_domains', []))} high-confidence bridge domains")
+        print(f"⚠️  Found {len(mapping.get('unmapped_configurations', []))} unmapped configurations")
+        
+    except ImportError as e:
+        print(f"❌ Failed to import bridge domain discovery: {e}")
+    except Exception as e:
+        print(f"❌ Bridge domain discovery failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+def run_bridge_domain_visualization():
+    print("\n" + "🌐" + "=" * 68)
+    print("🌐 BRIDGE DOMAIN VISUALIZATION")
+    print("🌐" + "=" * 68)
+    
+    # Check if parsed data exists
+    parsed_data_dir = Path("topology/configs/parsed_data")
+    if not parsed_data_dir.exists():
+        print("❌ Parsed data directory not found. Please run probe+parse first.")
+        return
+    
+    # Check if bridge domain data exists
+    bridge_domain_parsed_dir = Path("topology/configs/parsed_data/bridge_domain_parsed")
+    if not bridge_domain_parsed_dir.exists():
+        print("❌ Bridge domain parsed data directory not found. Please run probe+parse first.")
+        return
+    
+    bridge_domain_files = list(bridge_domain_parsed_dir.glob("*_bridge_domain_instance_parsed_*.yaml"))
+    if not bridge_domain_files:
+        print("❌ No bridge domain data found. Please run probe+parse first.")
+        return
+    
+    print("✅ Bridge domain data found. Starting visualization...")
+    
+    # Import and run the bridge domain visualization
+    try:
+        from config_engine.bridge_domain_visualization import BridgeDomainVisualization
+        
+        # Initialize the visualization engine
+        visualization = BridgeDomainVisualization()
+        
+        # Run visualization
+        print("\n🌐 Analyzing bridge domain configurations...")
+        visualization.run_visualization()
+        
+        # Show file locations
+        output_dir = Path("topology/bridge_domain_visualization")
+        visualization_files = list(output_dir.glob("bridge_domain_visualization_*.txt"))
+        
+        if visualization_files:
+            latest_visualization = max(visualization_files, key=lambda x: x.stat().st_mtime)
+            print(f"\n📁 Latest visualization file: {latest_visualization}")
+        
+        print(f"\n✅ Bridge domain visualization completed successfully!")
+        
+    except ImportError as e:
+        print(f"❌ Failed to import bridge domain visualization: {e}")
+    except Exception as e:
+        print(f"❌ Bridge domain visualization failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+def run_enhanced_bridge_domain_builder():
+    """Run the enhanced bridge domain builder with Superspine support."""
+    try:
+        from config_engine.enhanced_menu_system import EnhancedMenuSystem
+        
+        menu_system = EnhancedMenuSystem()
+        success = menu_system.run_enhanced_bridge_domain_builder()
+        
+        if success:
+            print("\n✅ Enhanced bridge domain builder completed successfully!")
+        else:
+            print("\n❌ Enhanced bridge domain builder failed.")
+            
+    except ImportError as e:
+        print(f"❌ Failed to import enhanced menu system: {e}")
+        print("   Please ensure all enhanced modules are available.")
+    except Exception as e:
+        print(f"❌ Enhanced bridge domain builder failed: {e}")
         import traceback
         traceback.print_exc()
 

@@ -1,0 +1,33 @@
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface ge100-0/0/10.253
+- interfaces ge100-0/0/10.253 l2-service enabled
+- interfaces ge100-0/0/10.253 vlan-id 253
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60003.253
+- interfaces bundle-60003.253 l2-service enabled
+- interfaces bundle-60003.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60000.253
+- interfaces bundle-60000.253 l2-service enabled
+- interfaces bundle-60000.253 vlan-id 253
+DNAAS-SUPERSPINE-D04:
+- network-services bridge-domain instance g_visaev_v253 interface bundle-60004.253
+- interfaces bundle-60004.253 l2-service enabled
+- interfaces bundle-60004.253 vlan-id 253
+- network-services bridge-domain instance g_visaev_v253 interface ge100-4/0/28.253
+- interfaces ge100-4/0/28.253 l2-service enabled
+- interfaces ge100-4/0/28.253 vlan-id 253
+_metadata:
+  dest_device: DNAAS-SUPERSPINE-D04
+  dest_device_type: superspine
+  path:
+  - DNAAS-LEAF-B14
+  - DNAAS-SPINE-B09
+  - DNAAS-SUPERSPINE-D04
+  service_name: g_visaev_v253
+  source_device: DNAAS-LEAF-B14
+  source_device_type: leaf
+  topology_type: P2P
+  vlan_id: 253

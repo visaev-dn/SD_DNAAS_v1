@@ -1,0 +1,35 @@
+DNAAS-LEAF-A01:
+- network-services bridge-domain instance g_integration_v300 interface bundle-3195.300
+- interfaces bundle-3195.300 l2-service enabled
+- interfaces bundle-3195.300 vlan-id 300
+- network-services bridge-domain instance g_integration_v300 interface ge100-0/0/10.300
+- interfaces ge100-0/0/10.300 l2-service enabled
+- interfaces ge100-0/0/10.300 vlan-id 300
+DNAAS-LEAF-A02:
+- network-services bridge-domain instance g_integration_v300 interface bundle-60529.300
+- interfaces bundle-60529.300 l2-service enabled
+- interfaces bundle-60529.300 vlan-id 300
+- network-services bridge-domain instance g_integration_v300 interface ge100-0/0/20.300
+- interfaces ge100-0/0/20.300 l2-service enabled
+- interfaces ge100-0/0/20.300 vlan-id 300
+DNAAS-LEAF-A03:
+- network-services bridge-domain instance g_integration_v300 interface bundle-60529.300
+- interfaces bundle-60529.300 l2-service enabled
+- interfaces bundle-60529.300 vlan-id 300
+- network-services bridge-domain instance g_integration_v300 interface ge100-0/0/30.300
+- interfaces ge100-0/0/30.300 l2-service enabled
+- interfaces ge100-0/0/30.300 vlan-id 300
+DNAAS-LEAF-A04:
+- network-services bridge-domain instance g_integration_v300 interface bundle-60529.300
+- interfaces bundle-60529.300 l2-service enabled
+- interfaces bundle-60529.300 vlan-id 300
+- network-services bridge-domain instance g_integration_v300 interface ge100-0/0/40.300
+- interfaces ge100-0/0/40.300 l2-service enabled
+- interfaces ge100-0/0/40.300 vlan-id 300
+DNAAS-SPINE-A08:
+- network-services bridge-domain instance g_integration_v300 interface bundle-3195.300
+- interfaces bundle-3195.300 l2-service enabled
+- interfaces bundle-3195.300 vlan-id 300
+- network-services bridge-domain instance g_integration_v300 interface bundle-60529.300
+- interfaces bundle-60529.300 l2-service enabled
+- interfaces bundle-60529.300 vlan-id 300

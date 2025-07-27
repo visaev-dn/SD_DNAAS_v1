@@ -1,0 +1,21 @@
+DNAAS-LEAF-A01:
+- network-services bridge-domain instance g_custom_v200 interface bundle-60000.200
+- interfaces bundle-60000.200 l2-service enabled
+- interfaces bundle-60000.200 vlan-id 200
+- network-services bridge-domain instance g_custom_v200 interface ge100-0/0/15.200
+- interfaces ge100-0/0/15.200 l2-service enabled
+- interfaces ge100-0/0/15.200 vlan-id 200
+DNAAS-LEAF-A02:
+- network-services bridge-domain instance g_custom_v200 interface bundle-60994.200
+- interfaces bundle-60994.200 l2-service enabled
+- interfaces bundle-60994.200 vlan-id 200
+- network-services bridge-domain instance g_custom_v200 interface ge100-0/0/25.200
+- interfaces ge100-0/0/25.200 l2-service enabled
+- interfaces ge100-0/0/25.200 vlan-id 200
+DNAAS-SPINE-A08:
+- network-services bridge-domain instance g_custom_v200 interface bundle-60000.200
+- interfaces bundle-60000.200 l2-service enabled
+- interfaces bundle-60000.200 vlan-id 200
+- network-services bridge-domain instance g_custom_v200 interface bundle-60994.200
+- interfaces bundle-60994.200 l2-service enabled
+- interfaces bundle-60994.200 vlan-id 200

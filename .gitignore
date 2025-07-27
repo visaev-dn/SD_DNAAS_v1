@@ -58,4 +58,7 @@ backups/
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+
+# Large archive files
+*.tar.gz 

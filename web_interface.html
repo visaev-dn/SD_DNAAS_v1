@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Automation Framework - Web Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .device-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .device-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .device-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .device-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background: #28a745;
+        }
+        
+        .status-inactive {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Lab Automation Framework</h1>
+            <p>Network Automation & Bridge Domain Builder</p>
+        </div>
+        
+        <div class="content">
+            <!-- Health Check Section -->
+            <div class="section">
+                <h2>🔍 API Health Check</h2>
+                <button onclick="checkHealth()">Check API Status</button>
+                <div id="healthResult" class="result" style="display: none;"></div>
+            </div>
+            
+            <!-- Devices Section -->
+            <div class="section">
+                <h2>📊 Available Devices</h2>
+                <button onclick="loadDevices()">Load Devices</button>
+                <div id="devicesResult" class="result" style="display: none;"></div>
+                <div id="devicesList" class="device-list" style="display: none;"></div>
+            </div>
+            
+            <!-- Bridge Domain Builder Section -->
+            <div class="section">
+                <h2>🔨 Bridge Domain Builder</h2>
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" value="test_user" placeholder="Enter username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="vlanId">VLAN ID:</label>
+                    <input type="number" id="vlanId" value="253" placeholder="Enter VLAN ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sourceDevice">Source Device:</label>
+                    <select id="sourceDevice">
+                        <option value="">Select source device...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sourceInterface">Source Interface:</label>
+                    <select id="sourceInterface">
+                        <option value="">Select source interface...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destDevice">Destination Device:</label>
+                    <select id="destDevice">
+                        <option value="">Select destination device...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destInterface">Destination Interface:</label>
+                    <select id="destInterface">
+                        <option value="">Select destination interface...</option>
+                    </select>
+                </div>
+                
+                <button onclick="validateConfiguration()">Validate Configuration</button>
+                <button onclick="generateConfiguration()">Generate Configuration</button>
+                
+                <div id="builderResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        // Utility functions
+        function showResult(elementId, content, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.innerHTML = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+        }
+        
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result loading';
+            element.innerHTML = 'Loading...';
+        }
+        
+        // API Functions
+        async function checkHealth() {
+            showLoading('healthResult');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResult('healthResult', data, 'success');
+            } catch (error) {
+                showResult('healthResult', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadDevices() {
+            showLoading('devicesResult');
+            try {
+                const response = await fetch(`${API_BASE}/builder/devices`);
+                const devices = await response.json();
+                
+                // Populate device dropdowns
+                const sourceSelect = document.getElementById('sourceDevice');
+                const destSelect = document.getElementById('destDevice');
+                
+                sourceSelect.innerHTML = '<option value="">Select source device...</option>';
+                destSelect.innerHTML = '<option value="">Select destination device...</option>';
+                
+                devices.forEach(device => {
+                    const option1 = document.createElement('option');
+                    option1.value = device.name;
+                    option1.textContent = `${device.name} (${device.location})`;
+                    sourceSelect.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = device.name;
+                    option2.textContent = `${device.name} (${device.location})`;
+                    destSelect.appendChild(option2);
+                });
+                
+                // Display devices in cards
+                const devicesList = document.getElementById('devicesList');
+                devicesList.innerHTML = devices.map(device => `
+                    <div class="device-card">
+                        <div class="device-name">
+                            <span class="status-indicator status-${device.status}"></span>
+                            ${device.name}
+                        </div>
+                        <div class="device-info">
+                            Location: ${device.location}<br>
+                            IP: ${device.mgmt_ip}<br>
+                            Type: ${device.type}
+                        </div>
+                    </div>
+                `).join('');
+                
+                devicesList.style.display = 'grid';
+                showResult('devicesResult', `Loaded ${devices.length} devices`, 'success');
+            } catch (error) {
+                showResult('devicesResult', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadInterfaces(deviceName, selectId) {
+            try {
+                const response = await fetch(`${API_BASE}/builder/interfaces/${deviceName}`);
+                const interfaces = await response.json();
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Select interface...</option>';
+                
+                interfaces.forEach(interface => {
+                    const option = document.createElement('option');
+                    option.value = interface;
+                    option.textContent = interface;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading interfaces:', error);
+            }
+        }
+        
+        async function validateConfiguration() {
+            const username = document.getElementById('username').value;
+            const vlanId = document.getElementById('vlanId').value;
+            const sourceDevice = document.getElementById('sourceDevice').value;
+            const sourceInterface = document.getElementById('sourceInterface').value;
+            const destDevice = document.getElementById('destDevice').value;
+            const destInterface = document.getElementById('destInterface').value;
+            
+            if (!username || !vlanId || !sourceDevice || !sourceInterface || !destDevice || !destInterface) {
+                showResult('builderResult', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            showLoading('builderResult');
+            
+            try {
+                const response = await fetch(`${API_BASE}/builder/validate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        vlanId: vlanId.toString(),
+                        sourceDevice: sourceDevice,
+                        sourceInterface: sourceInterface,
+                        destinations: [{
+                            device: destDevice,
+                            interfaceName: destInterface
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                showResult('builderResult', data, data.valid ? 'success' : 'error');
+            } catch (error) {
+                showResult('builderResult', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function generateConfiguration() {
+            const username = document.getElementById('username').value;
+            const vlanId = document.getElementById('vlanId').value;
+            const sourceDevice = document.getElementById('sourceDevice').value;
+            const sourceInterface = document.getElementById('sourceInterface').value;
+            const destDevice = document.getElementById('destDevice').value;
+            const destInterface = document.getElementById('destInterface').value;
+            
+            if (!username || !vlanId || !sourceDevice || !sourceInterface || !destDevice || !destInterface) {
+                showResult('builderResult', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            showLoading('builderResult');
+            
+            try {
+                const response = await fetch(`${API_BASE}/builder/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        vlanId: vlanId.toString(),
+                        sourceDevice: sourceDevice,
+                        sourceInterface: sourceInterface,
+                        destinations: [{
+                            device: destDevice,
+                            interfaceName: destInterface
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                showResult('builderResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult('builderResult', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Event listeners for dynamic interface loading
+        document.getElementById('sourceDevice').addEventListener('change', function() {
+            if (this.value) {
+                loadInterfaces(this.value, 'sourceInterface');
+            }
+        });
+        
+        document.getElementById('destDevice').addEventListener('change', function() {
+            if (this.value) {
+                loadInterfaces(this.value, 'destInterface');
+            }
+        });
+        
+        // Auto-check health on page load
+        window.addEventListener('load', function() {
+            checkHealth();
+        });
+    </script>
+</body>
+</html> 

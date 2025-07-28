@@ -460,6 +460,226 @@ def generate_configuration():
         }), 500
 
 # ============================================================================
+# BRIDGE DOMAIN DISCOVERY & VISUALIZATION ENDPOINTS
+# ============================================================================
+
+@app.route('/api/bridge-domains/discover', methods=['POST'])
+def discover_bridge_domains():
+    """Discover existing bridge domains across the network"""
+    try:
+        from config_engine.bridge_domain_discovery import BridgeDomainDiscovery
+        
+        discovery = BridgeDomainDiscovery()
+        result = discovery.run_discovery()
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": "Bridge domain discovery completed successfully",
+                "discovered_count": len(result.get('bridge_domains', {})),
+                "mapping_file": str(discovery.bridge_domain_mapping_dir / f"bridge_domain_mapping_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Bridge domain discovery failed"
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Bridge domain discovery error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Bridge domain discovery failed: {str(e)}"
+        }), 500
+
+@app.route('/api/bridge-domains/list', methods=['GET'])
+def list_bridge_domains():
+    """Get list of discovered bridge domains"""
+    try:
+        from config_engine.bridge_domain_visualization import BridgeDomainVisualization
+        
+        visualization = BridgeDomainVisualization()
+        mapping = visualization.load_latest_mapping()
+        
+        if not mapping:
+            return jsonify({
+                "success": False,
+                "error": "No bridge domain mapping found. Please run discovery first."
+            }), 404
+        
+        bridge_domains = mapping.get('bridge_domains', {})
+        bridge_domain_list = []
+        
+        for name, data in bridge_domains.items():
+            topology_analysis = data.get('topology_analysis', {})
+            bridge_domain_list.append({
+                "name": name,
+                "vlan": data.get('detected_vlan', 'unknown'),
+                "username": data.get('detected_username', 'unknown'),
+                "confidence": data.get('confidence', 0),
+                "topology_type": data.get('topology_type', 'unknown'),
+                "total_devices": len(data.get('devices', {})),
+                "total_interfaces": topology_analysis.get('total_interfaces', 0),
+                "access_interfaces": topology_analysis.get('access_interfaces', 0),
+                "path_complexity": topology_analysis.get('path_complexity', 'unknown'),
+                "detection_method": data.get('detection_method', 'unknown')
+            })
+        
+        return jsonify({
+            "success": True,
+            "bridge_domains": bridge_domain_list,
+            "total_count": len(bridge_domain_list),
+            "summary": mapping.get('topology_summary', {})
+        })
+        
+    except Exception as e:
+        logger.error(f"List bridge domains error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to list bridge domains: {str(e)}"
+        }), 500
+
+@app.route('/api/bridge-domains/<bridge_domain_name>/details', methods=['GET'])
+def get_bridge_domain_details(bridge_domain_name):
+    """Get detailed information about a specific bridge domain"""
+    try:
+        from config_engine.bridge_domain_visualization import BridgeDomainVisualization
+        
+        visualization = BridgeDomainVisualization()
+        mapping = visualization.load_latest_mapping()
+        
+        if not mapping:
+            return jsonify({
+                "success": False,
+                "error": "No bridge domain mapping found. Please run discovery first."
+            }), 404
+        
+        bridge_domains = mapping.get('bridge_domains', {})
+        bridge_domain_data = bridge_domains.get(bridge_domain_name)
+        
+        if not bridge_domain_data:
+            return jsonify({
+                "success": False,
+                "error": f"Bridge domain '{bridge_domain_name}' not found"
+            }), 404
+        
+        return jsonify({
+            "success": True,
+            "bridge_domain": bridge_domain_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Get bridge domain details error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get bridge domain details: {str(e)}"
+        }), 500
+
+@app.route('/api/bridge-domains/<bridge_domain_name>/visualize', methods=['GET'])
+def visualize_bridge_domain(bridge_domain_name):
+    """Generate visualization for a specific bridge domain"""
+    try:
+        from config_engine.bridge_domain_visualization import BridgeDomainVisualization
+        
+        visualization = BridgeDomainVisualization()
+        mapping = visualization.load_latest_mapping()
+        
+        if not mapping:
+            return jsonify({
+                "success": False,
+                "error": "No bridge domain mapping found. Please run discovery first."
+            }), 404
+        
+        # Generate visualization
+        viz_result = visualization.visualize_bridge_domain_topology(bridge_domain_name, mapping)
+        
+        if viz_result.startswith("❌"):
+            return jsonify({
+                "success": False,
+                "error": viz_result
+            }), 404
+        
+        # Generate details
+        bridge_domain_data = mapping.get('bridge_domains', {}).get(bridge_domain_name)
+        if bridge_domain_data:
+            details = visualization.generate_bridge_domain_details(bridge_domain_data)
+        else:
+            details = "Details not available"
+        
+        return jsonify({
+            "success": True,
+            "visualization": viz_result,
+            "details": details,
+            "bridge_domain_name": bridge_domain_name
+        })
+        
+    except Exception as e:
+        logger.error(f"Visualize bridge domain error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to visualize bridge domain: {str(e)}"
+        }), 500
+
+@app.route('/api/bridge-domains/search', methods=['GET'])
+def search_bridge_domains():
+    """Search bridge domains by name, VLAN, or username"""
+    try:
+        query = request.args.get('q', '').lower()
+        if not query:
+            return jsonify({
+                "success": False,
+                "error": "Search query is required"
+            }), 400
+        
+        from config_engine.bridge_domain_visualization import BridgeDomainVisualization
+        
+        visualization = BridgeDomainVisualization()
+        mapping = visualization.load_latest_mapping()
+        
+        if not mapping:
+            return jsonify({
+                "success": False,
+                "error": "No bridge domain mapping found. Please run discovery first."
+            }), 404
+        
+        bridge_domains = mapping.get('bridge_domains', {})
+        results = []
+        
+        for name, data in bridge_domains.items():
+            # Search in name, VLAN, and username
+            if (query in name.lower() or 
+                query in str(data.get('detected_vlan', '')).lower() or
+                query in str(data.get('detected_username', '')).lower()):
+                
+                topology_analysis = data.get('topology_analysis', {})
+                results.append({
+                    "name": name,
+                    "vlan": data.get('detected_vlan', 'unknown'),
+                    "username": data.get('detected_username', 'unknown'),
+                    "confidence": data.get('confidence', 0),
+                    "topology_type": data.get('topology_type', 'unknown'),
+                    "total_devices": len(data.get('devices', {})),
+                    "total_interfaces": topology_analysis.get('total_interfaces', 0),
+                    "access_interfaces": topology_analysis.get('access_interfaces', 0),
+                    "path_complexity": topology_analysis.get('path_complexity', 'unknown'),
+                    "detection_method": data.get('detection_method', 'unknown')
+                })
+        
+        return jsonify({
+            "success": True,
+            "results": results,
+            "total_count": len(results),
+            "query": query
+        })
+        
+    except Exception as e:
+        logger.error(f"Search bridge domains error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to search bridge domains: {str(e)}"
+        }), 500
+
+# ============================================================================
 # FILE MANAGEMENT ENDPOINTS
 # ============================================================================
 
@@ -738,4 +958,4 @@ if __name__ == '__main__':
         logger.info("Starting API server in development mode")
     
     logger.info(f"API server starting on {args.host}:{args.port}")
-    socketio.run(app, host=args.host, port=args.port, debug=args.debug) 
+    socketio.run(app, host=args.host, port=args.port, debug=args.debug, allow_unsafe_werkzeug=True) 

@@ -477,7 +477,7 @@ def discover_bridge_domains():
                 "success": True,
                 "message": "Bridge domain discovery completed successfully",
                 "discovered_count": len(result.get('bridge_domains', {})),
-                "mapping_file": str(discovery.bridge_domain_mapping_dir / f"bridge_domain_mapping_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+                "mapping_file": str(discovery.output_dir / f"bridge_domain_mapping_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
             })
         else:
             return jsonify({

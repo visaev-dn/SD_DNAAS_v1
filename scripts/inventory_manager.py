@@ -13,6 +13,7 @@ import yaml
 import requests
 import tempfile
 import os
+import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional
 import logging
@@ -324,6 +325,30 @@ class InventoryManager:
             
         except Exception as e:
             self.logger.error(f"Inventory population failed: {e}")
+            return False
+    
+    def run_probe_and_parse(self) -> bool:
+        """Run probe+parse to collect LACP and LLDP data from network devices"""
+        try:
+            self.logger.info("🔍 Running probe+parse LACP+LLDP...")
+            
+            # Run the collect_lacp_xml.py script with --phase both
+            result = subprocess.run([
+                sys.executable, "scripts/collect_lacp_xml.py", "--phase", "both"
+            ], capture_output=True, text=True, timeout=300)
+            
+            if result.returncode == 0:
+                self.logger.info("✅ Probe+parse completed successfully")
+                return True
+            else:
+                self.logger.error(f"❌ Probe+parse failed: {result.stderr}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            self.logger.error("❌ Probe+parse timed out")
+            return False
+        except Exception as e:
+            self.logger.error(f"❌ Probe+parse failed with exception: {e}")
             return False
 
 def main():

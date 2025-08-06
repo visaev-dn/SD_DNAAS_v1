@@ -268,17 +268,27 @@ def run_bridge_domain_builder():
             print(f"\n✅ Bridge domain configuration generated successfully!")
             print(f"📁 Configuration saved for {len(configs)} devices")
             
-            # Save to file in configs/pending directory
-            output_file = f"bridge_domain_{service_name}.yaml"
-            
-            # Ensure configs/pending directory exists
-            configs_pending_dir = Path("configs/pending")
-            configs_pending_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Save to configs/pending directory
-            output_path = configs_pending_dir / output_file
-            builder.save_configuration(configs, str(output_path))
-            print(f"📁 Configuration saved to: {output_path}")
+            # Save to database instead of file
+            try:
+                from database_manager import DatabaseManager
+                db_manager = DatabaseManager()
+                
+                # Save to database
+                success = db_manager.save_configuration(
+                    service_name=service_name,
+                    vlan_id=vlan_id,
+                    config_data=configs
+                )
+                
+                if success:
+                    print(f"📁 Configuration saved to database")
+                    print(f"📋 Service Name: {service_name}")
+                    print(f"📋 VLAN ID: {vlan_id}")
+                else:
+                    print("❌ Failed to save configuration to database")
+                    
+            except Exception as e:
+                print(f"❌ Error saving to database: {e}")
         else:
             print("❌ Failed to generate bridge domain configuration.")
             

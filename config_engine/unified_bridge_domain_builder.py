@@ -151,7 +151,7 @@ class UnifiedBridgeDomainBuilder:
     
     def build_bridge_domain_config(self, service_name: str, vlan_id: int,
                                  source_device: str, source_interface: str,
-                                 destinations: List[Dict]) -> Dict:
+                                 destinations: List[Dict]) -> Union[Dict, Tuple[Dict, Dict]]:
         """
         Build bridge domain configuration for any scenario.
         
@@ -163,17 +163,22 @@ class UnifiedBridgeDomainBuilder:
             destinations: List of destination dictionaries with 'device' and 'port' keys
             
         Returns:
-            Bridge domain configuration dictionary
+            Bridge domain configuration dictionary, or tuple (config_data, metadata) for P2MP or enhanced P2P
         """
         # Determine configuration type based on destination count
         if len(destinations) == 1:
-            return self._build_p2p_config(service_name, vlan_id, source_device, source_interface, destinations[0])
+            result = self._build_p2p_config(service_name, vlan_id, source_device, source_interface, destinations[0])
+            # Handle both dict and tuple returns
+            if isinstance(result, tuple):
+                return result
+            else:
+                return result
         else:
             return self._build_p2mp_config(service_name, vlan_id, source_device, source_interface, destinations)
     
     def _build_p2p_config(self, service_name: str, vlan_id: int,
                           source_device: str, source_interface: str,
-                          destination: Dict) -> Dict:
+                          destination: Dict) -> Union[Dict, Tuple[Dict, Dict]]:
         """Build P2P bridge domain configuration"""
         dest_device = destination['device']
         dest_interface = destination['port']
@@ -206,7 +211,7 @@ class UnifiedBridgeDomainBuilder:
     
     def _build_p2mp_config(self, service_name: str, vlan_id: int,
                            source_device: str, source_interface: str,
-                           destinations: List[Dict]) -> Dict:
+                           destinations: List[Dict]) -> Tuple[Dict, Dict]:
         """Build P2MP bridge domain configuration"""
         # Analyze destination types
         leaf_destinations = []
@@ -233,11 +238,32 @@ class UnifiedBridgeDomainBuilder:
             )
         elif leaf_destinations:
             # All leaf destinations - use P2MP builder
-            return self._build_leaf_p2mp_config(
-                service_name, vlan_id,
-                source_device, source_interface,
-                leaf_destinations
-            )
+            try:
+                from .p2mp_bridge_domain_builder import P2MPBridgeDomainBuilder
+                p2mp_builder = P2MPBridgeDomainBuilder(str(self.topology_dir))
+                
+                # Convert destinations to P2MP format
+                p2mp_destinations = []
+                for dest in leaf_destinations:
+                    p2mp_destinations.append({
+                        'leaf': dest['device'],
+                        'port': dest['port']
+                    })
+                
+                config_data, metadata = p2mp_builder.build_p2mp_bridge_domain_config(
+                    service_name, vlan_id,
+                    source_device, source_interface,
+                    p2mp_destinations
+                )
+                
+                # Remove _metadata from config_data if it exists
+                if '_metadata' in config_data:
+                    del config_data['_metadata']
+                
+                return config_data, metadata
+                
+            except ImportError:
+                raise ValueError("P2MP bridge domain builder not available")
         elif superspine_destinations:
             # All superspine destinations - build individual P2P configs
             return self._build_superspine_p2mp_config(
@@ -250,7 +276,7 @@ class UnifiedBridgeDomainBuilder:
     
     def _build_leaf_to_superspine_p2p_config(self, service_name: str, vlan_id: int,
                                             source_leaf: str, source_interface: str,
-                                            dest_superspine: str, dest_interface: str) -> Dict:
+                                            dest_superspine: str, dest_interface: str) -> Tuple[Dict, Dict]:
         """Build P2P configuration for leaf-to-superspine"""
         # Find spine connected to source leaf
         source_spine = None
@@ -310,8 +336,8 @@ class UnifiedBridgeDomainBuilder:
         )
         configs[dest_superspine] = superspine_config
         
-        # Add metadata
-        configs['_metadata'] = {
+        # Create metadata separately
+        metadata = {
             'service_name': service_name,
             'vlan_id': vlan_id,
             'topology_type': 'P2P',
@@ -322,37 +348,11 @@ class UnifiedBridgeDomainBuilder:
             'path': [source_leaf, source_spine, dest_superspine]
         }
         
-        return configs
-    
-    def _build_leaf_p2mp_config(self, service_name: str, vlan_id: int,
-                                source_device: str, source_interface: str,
-                                destinations: List[Dict]) -> Dict:
-        """Build P2MP configuration for leaf destinations"""
-        # Use P2MP builder for leaf-to-leaf P2MP
-        try:
-            from .p2mp_bridge_domain_builder import P2MPBridgeDomainBuilder
-            p2mp_builder = P2MPBridgeDomainBuilder(str(self.topology_dir))
-            
-            # Convert destinations to P2MP format
-            p2mp_destinations = []
-            for dest in destinations:
-                p2mp_destinations.append({
-                    'leaf': dest['device'],
-                    'port': dest['port']
-                })
-            
-            return p2mp_builder.build_p2mp_bridge_domain_config(
-                service_name, vlan_id,
-                source_device, source_interface,
-                p2mp_destinations
-            )
-            
-        except ImportError:
-            raise ValueError("P2MP bridge domain builder not available")
+        return configs, metadata
     
     def _build_superspine_p2mp_config(self, service_name: str, vlan_id: int,
                                      source_device: str, source_interface: str,
-                                     destinations: List[Dict]) -> Dict:
+                                     destinations: List[Dict]) -> Tuple[Dict, Dict]:
         """Build P2MP configuration for superspine destinations (individual P2P configs)"""
         all_configs = {}
         successful_configs = 0
@@ -363,7 +363,7 @@ class UnifiedBridgeDomainBuilder:
             
             try:
                 # Build individual P2P config for each superspine
-                config = self._build_leaf_to_superspine_p2p_config(
+                config, _ = self._build_leaf_to_superspine_p2p_config(
                     service_name, vlan_id,
                     source_device, source_interface,
                     dest_device, dest_interface
@@ -381,8 +381,8 @@ class UnifiedBridgeDomainBuilder:
             except Exception as e:
                 self.logger.error(f"Failed to build config for {dest_device}: {e}")
         
-        # Add unified metadata
-        all_configs['_metadata'] = {
+        # Create metadata separately
+        metadata = {
             'service_name': service_name,
             'vlan_id': vlan_id,
             'topology_type': 'P2MP',
@@ -394,29 +394,44 @@ class UnifiedBridgeDomainBuilder:
             'total_destinations': len(destinations)
         }
         
-        return all_configs
+        return all_configs, metadata
     
     def _build_mixed_p2mp_config(self, service_name: str, vlan_id: int,
                                  source_device: str, source_interface: str,
                                  leaf_destinations: List[Dict],
-                                 superspine_destinations: List[Dict]) -> Dict:
+                                 superspine_destinations: List[Dict]) -> Tuple[Dict, Dict]:
         """Build P2MP configuration for mixed leaf and superspine destinations"""
         all_configs = {}
         
         # Build P2MP config for leaf destinations
         if leaf_destinations:
-            leaf_config = self._build_leaf_p2mp_config(
-                service_name, vlan_id,
-                source_device, source_interface,
-                leaf_destinations
-            )
-            
-            # Merge leaf configs
-            for device, device_config in leaf_config.items():
-                if device != '_metadata':
-                    if device not in all_configs:
-                        all_configs[device] = []
-                    all_configs[device].extend(device_config)
+            try:
+                from .p2mp_bridge_domain_builder import P2MPBridgeDomainBuilder
+                p2mp_builder = P2MPBridgeDomainBuilder(str(self.topology_dir))
+                
+                # Convert destinations to P2MP format
+                p2mp_destinations = []
+                for dest in leaf_destinations:
+                    p2mp_destinations.append({
+                        'leaf': dest['device'],
+                        'port': dest['port']
+                    })
+                
+                leaf_config_data, leaf_metadata = p2mp_builder.build_p2mp_bridge_domain_config(
+                    service_name, vlan_id,
+                    source_device, source_interface,
+                    p2mp_destinations
+                )
+                
+                # Merge leaf configs (excluding metadata)
+                for device, device_config in leaf_config_data.items():
+                    if device != '_metadata':
+                        if device not in all_configs:
+                            all_configs[device] = []
+                        all_configs[device].extend(device_config)
+                        
+            except ImportError:
+                raise ValueError("P2MP bridge domain builder not available")
         
         # Build individual P2P configs for superspine destinations
         successful_superspine_configs = 0
@@ -425,13 +440,13 @@ class UnifiedBridgeDomainBuilder:
             dest_interface = dest['port']
             
             try:
-                config = self._build_leaf_to_superspine_p2p_config(
+                config, _ = self._build_leaf_to_superspine_p2p_config(
                     service_name, vlan_id,
                     source_device, source_interface,
                     dest_device, dest_interface
                 )
                 
-                # Merge configs with deduplication
+                # Merge configs with deduplication (excluding metadata)
                 for device, device_config in config.items():
                     if device != '_metadata':
                         if device not in all_configs:
@@ -453,8 +468,8 @@ class UnifiedBridgeDomainBuilder:
             except Exception as e:
                 self.logger.error(f"Failed to build config for {dest_device}: {e}")
         
-        # Add unified metadata
-        all_configs['_metadata'] = {
+        # Create unified metadata separately
+        metadata = {
             'service_name': service_name,
             'vlan_id': vlan_id,
             'topology_type': 'P2MP_MIXED',
@@ -467,7 +482,7 @@ class UnifiedBridgeDomainBuilder:
             'total_destinations': len(leaf_destinations) + len(superspine_destinations)
         }
         
-        return all_configs
+        return all_configs, metadata
     
     def _build_leaf_config(self, service_name: str, vlan_id: int,
                           device: str, user_port: str, spine_interface: str,

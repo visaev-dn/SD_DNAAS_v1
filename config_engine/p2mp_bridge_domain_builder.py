@@ -7,7 +7,7 @@ Main class for building Point-to-Multipoint bridge domain configurations
 import yaml
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from .bridge_domain_builder import BridgeDomainBuilder
 from .p2mp_path_calculator import P2MPPathCalculator
 from .p2mp_config_generator import P2MPConfigGenerator
@@ -35,7 +35,7 @@ class P2MPBridgeDomainBuilder:
     
     def build_p2mp_bridge_domain_config(self, service_name: str, vlan_id: int,
                                       source_leaf: str, source_port: str,
-                                      destinations: List[Dict]) -> Dict:
+                                      destinations: List[Dict]) -> Tuple[Dict, Dict]:
         """
         Build P2MP bridge domain configuration
         Automatically determines optimal paths:
@@ -50,7 +50,7 @@ class P2MPBridgeDomainBuilder:
             destinations: List of {leaf: str, port: str} dictionaries
             
         Returns:
-            Configuration for all devices in the P2MP topology
+            Tuple of (config_data, metadata)
         """
         self.logger.info(f"Building P2MP bridge domain config for {service_name} (VLAN {vlan_id})")
         self.logger.info(f"Source: {source_leaf}:{source_port}")
@@ -65,15 +65,15 @@ class P2MPBridgeDomainBuilder:
         # Validate path calculation results
         if not path_calculation['destinations']:
             self.logger.error("No valid paths found for any destinations")
-            return {}
+            return {}, {}
         
         # Generate configuration
         configs = self.config_generator.generate_p2mp_config(
             service_name, vlan_id, source_leaf, source_port, destinations, path_calculation
         )
         
-        # Add path calculation metadata to configs
-        configs['_metadata'] = {
+        # Create metadata separately (not part of device configs)
+        metadata = {
             'service_name': service_name,
             'vlan_id': vlan_id,
             'source_leaf': source_leaf,
@@ -81,8 +81,8 @@ class P2MPBridgeDomainBuilder:
             'path_calculation': path_calculation
         }
         
-        self.logger.info(f"Generated P2MP configuration for {len(configs)-1} devices")  # -1 for metadata
-        return configs
+        self.logger.info(f"Generated P2MP configuration for {len(configs)} devices")
+        return configs, metadata
     
     def get_available_leaves(self) -> List[str]:
         """Get list of available leaf devices"""

@@ -429,19 +429,35 @@ class EnhancedMenuSystem:
             summary = self.builder.get_configuration_summary(configs)
             print(summary)
             
-            # Save configuration
-            output_file = f"unified_bridge_domain_{service_name}.yaml"
-            
-            # Ensure configs/pending directory exists
-            configs_pending_dir = Path("configs/pending")
-            configs_pending_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Save to configs/pending directory
-            output_path = configs_pending_dir / output_file
-            self.builder.save_configuration(configs, str(output_path))
-            
-            print(f"\n✅ Unified bridge domain configuration built successfully!")
-            print(f"📁 Configuration saved to: {output_path}")
+            # Save configuration to database instead of file
+            try:
+                from database_manager import DatabaseManager
+                db_manager = DatabaseManager()
+                
+                # Extract service name and VLAN ID from configs
+                metadata = configs.get('_metadata', {})
+                service_name = metadata.get('service_name', service_name)
+                vlan_id = metadata.get('vlan_id', vlan_id)
+                
+                # Save to database
+                success = db_manager.save_configuration(
+                    service_name=service_name,
+                    vlan_id=vlan_id,
+                    config_data=configs
+                )
+                
+                if success:
+                    print(f"\n✅ Unified bridge domain configuration built successfully!")
+                    print(f"📁 Configuration saved to database")
+                    print(f"📋 Service Name: {service_name}")
+                    print(f"📋 VLAN ID: {vlan_id}")
+                else:
+                    print("❌ Failed to save configuration to database")
+                    return False
+                    
+            except Exception as e:
+                print(f"❌ Error saving to database: {e}")
+                return False
             
             # Show device count
             device_count = len([k for k in configs.keys() if k != '_metadata'])

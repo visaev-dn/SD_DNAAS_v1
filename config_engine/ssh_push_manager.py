@@ -42,57 +42,101 @@ class SSHPushManager:
             directory.mkdir(parents=True, exist_ok=True)
     
     def get_available_configs(self) -> List[Dict]:
-        """Get list of available configurations for deployment (pending configs)."""
+        """Get list of available configurations for deployment (pending configs) from database."""
         configs = []
         
-        # Check pending directory for configurations ready to deploy
-        for config_file in self.pending_dir.glob("*.yaml"):
-            config_info = {
-                "name": config_file.stem,
-                "path": str(config_file),
-                "type": "bridge_domain",
-                "status": "pending",
-                "created": datetime.fromtimestamp(config_file.stat().st_mtime).isoformat()
-            }
-            configs.append(config_info)
+        try:
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get all configurations with 'pending' status
+            pending_configs = db_manager.get_configurations_by_status('pending')
+            
+            for config_record in pending_configs:
+                config_info = {
+                    "name": config_record['service_name'],
+                    "path": f"database://{config_record['service_name']}",
+                    "type": config_record.get('config_type', 'bridge_domain'),
+                    "status": config_record['status'],
+                    "created": config_record['created_at'],
+                    "vlan_id": config_record.get('vlan_id')
+                }
+                configs.append(config_info)
+            
+        except Exception as e:
+            print(f"Error loading available configs from database: {e}")
         
         return configs
     
     def get_deployed_configs(self) -> List[Dict]:
-        """Get list of currently deployed configurations."""
+        """Get list of currently deployed configurations from database."""
         deployed_configs = []
         
-        for config_file in self.deployed_dir.glob("*.yaml"):
-            config_info = {
-                "name": config_file.stem,
-                "path": str(config_file),
-                "type": "bridge_domain",
-                "status": "deployed",
-                "deployed_at": datetime.fromtimestamp(config_file.stat().st_mtime).isoformat()
-            }
-            deployed_configs.append(config_info)
+        try:
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get all configurations with 'deployed' status
+            deployed_db_configs = db_manager.get_configurations_by_status('deployed')
+            
+            for config_record in deployed_db_configs:
+                config_info = {
+                    "name": config_record['service_name'],
+                    "path": f"database://{config_record['service_name']}",
+                    "type": config_record.get('config_type', 'bridge_domain'),
+                    "status": config_record['status'],
+                    "deployed_at": config_record['deployed_at'],
+                    "vlan_id": config_record.get('vlan_id')
+                }
+                deployed_configs.append(config_info)
+            
+        except Exception as e:
+            print(f"Error loading deployed configs from database: {e}")
         
         return deployed_configs
     
     def get_removed_configs(self) -> List[Dict]:
-        """Get list of removed configurations that can be restored."""
+        """Get list of removed configurations that can be restored from database."""
         removed_configs = []
         
-        for config_file in self.removed_dir.glob("*.yaml"):
-            config_info = {
-                "name": config_file.stem,
-                "path": str(config_file),
-                "type": "bridge_domain",
-                "status": "removed",
-                "removed_at": datetime.fromtimestamp(config_file.stat().st_mtime).isoformat()
-            }
-            removed_configs.append(config_info)
+        try:
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get all configurations with 'deleted' status
+            deleted_db_configs = db_manager.get_configurations_by_status('deleted')
+            
+            for config_record in deleted_db_configs:
+                config_info = {
+                    "name": config_record['service_name'],
+                    "path": f"database://{config_record['service_name']}",
+                    "type": config_record.get('config_type', 'bridge_domain'),
+                    "status": config_record['status'],
+                    "deleted_at": config_record.get('deployed_at'),  # Using deployed_at as deleted_at
+                    "vlan_id": config_record.get('vlan_id')
+                }
+                removed_configs.append(config_info)
+            
+        except Exception as e:
+            print(f"Error loading removed configs from database: {e}")
         
         return removed_configs
     
     def restore_config(self, config_name: str) -> Tuple[bool, List[str]]:
         """
-        Restore a removed configuration to pending for redeployment.
+        Restore a removed configuration to pending for redeployment from database.
         
         Args:
             config_name: Name of the configuration to restore
@@ -100,42 +144,92 @@ class SSHPushManager:
         Returns:
             Tuple of (success, errors)
         """
-        # Check if config exists in removed directory
-        removed_config_path = self.removed_dir / f"{config_name}.yaml"
-        if not removed_config_path.exists():
-            return False, [f"Configuration {config_name} not found in removed directory"]
-        
-        # Check if config already exists in pending directory
-        pending_config_path = self.pending_dir / f"{config_name}.yaml"
-        if pending_config_path.exists():
-            return False, [f"Configuration {config_name} already exists in pending directory"]
-        
-        # Check if config already exists in deployed directory
-        deployed_config_path = self.deployed_dir / f"{config_name}.yaml"
-        if deployed_config_path.exists():
-            return False, [f"Configuration {config_name} already exists in deployed directory"]
-        
         try:
-            # Move config from removed to pending
-            shutil.move(str(removed_config_path), str(pending_config_path))
-            print(f"✅ Configuration {config_name} restored to pending")
-            print(f"📁 Configuration moved from removed to pending")
-            return True, []
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get the configuration from database
+            config_record = db_manager.get_configuration_by_service_name(config_name)
+            
+            if not config_record:
+                return False, [f"Configuration {config_name} not found in database"]
+            
+            if config_record['status'] != 'deleted':
+                return False, [f"Configuration {config_name} is not in 'deleted' status (current: {config_record['status']})"]
+            
+            # Check if there's already a pending configuration with the same name
+            pending_configs = db_manager.get_configurations_by_status('pending')
+            for pending_config in pending_configs:
+                if pending_config['service_name'] == config_name:
+                    return False, [f"Configuration {config_name} already exists in pending status"]
+            
+            # Check if there's already a deployed configuration with the same name
+            deployed_configs = db_manager.get_configurations_by_status('deployed')
+            for deployed_config in deployed_configs:
+                if deployed_config['service_name'] == config_name:
+                    return False, [f"Configuration {config_name} already exists in deployed status"]
+            
+            # Update the configuration status to 'pending'
+            try:
+                import sqlite3
+                conn = sqlite3.connect(db_manager.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE configurations 
+                    SET status = 'pending', deployed_at = NULL, deployed_by = NULL
+                    WHERE service_name = ?
+                """, (config_name,))
+                
+                conn.commit()
+                conn.close()
+                
+                print(f"✅ Configuration {config_name} restored to pending")
+                print(f"📁 Configuration status updated in database")
+                return True, []
+                
+            except Exception as e:
+                return False, [f"Failed to restore {config_name}: {e}"]
+                
         except Exception as e:
             error_msg = f"Failed to restore {config_name}: {e}"
             return False, [error_msg]
     
     def load_config(self, config_name: str) -> Optional[Dict]:
-        """Load a configuration file from pending directory."""
-        config_path = self.pending_dir / f"{config_name}.yaml"
-        if not config_path.exists():
-            return None
-        
+        """Load a configuration from the database by service name."""
         try:
-            with open(config_path, 'r') as f:
-                return yaml.safe_load(f)
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get configuration from database
+            config_record = db_manager.get_configuration_by_service_name(config_name)
+            
+            if not config_record:
+                print(f"Configuration {config_name} not found in database")
+                return None
+            
+            # Parse the config_data JSON string
+            if config_record.get('config_data'):
+                try:
+                    config_data = json.loads(config_record['config_data'])
+                    return config_data
+                except json.JSONDecodeError as e:
+                    print(f"Error parsing config data for {config_name}: {e}")
+                    return None
+            else:
+                print(f"No config data found for {config_name}")
+                return None
+                
         except Exception as e:
-            print(f"Error loading config {config_name}: {e}")
+            print(f"Error loading config {config_name} from database: {e}")
             return None
     
     def validate_config(self, config_name: str) -> Tuple[bool, List[str]]:
@@ -145,7 +239,7 @@ class SSHPushManager:
         # Load config
         config = self.load_config(config_name)
         if not config:
-            errors.append(f"Configuration {config_name} not found in pending directory")
+            errors.append(f"Configuration {config_name} not found in database")
             return False, errors
         
         # Basic structure validation
@@ -153,13 +247,14 @@ class SSHPushManager:
             errors.append("Configuration must be a dictionary")
             return False, errors
         
-        # Check for required devices
-        if not config:
-            errors.append("Configuration is empty")
+        # Check for required devices (exclude _metadata)
+        actual_devices = {k: v for k, v in config.items() if k != '_metadata'}
+        if not actual_devices:
+            errors.append("Configuration is empty (no actual devices)")
             return False, errors
         
         # Validate each device configuration
-        for device_name, device_config in config.items():
+        for device_name, device_config in actual_devices.items():
             if not isinstance(device_config, list):
                 errors.append(f"Device {device_name}: configuration must be a list")
                 continue
@@ -195,11 +290,15 @@ class SSHPushManager:
         # Load config
         config = self.load_config(config_name)
         if not config:
-            errors.append(f"Configuration {config_name} not found in pending directory")
+            errors.append(f"Configuration {config_name} not found in database")
             return False, errors, device_commands
         
-        # Convert YAML config to CLI commands for each device
+        # Convert YAML config to CLI commands for each device (exclude _metadata)
         for device_name, device_config in config.items():
+            # Skip _metadata - it's not a real device
+            if device_name == '_metadata':
+                continue
+                
             cli_commands = []
             
             # Start with configure terminal
@@ -229,21 +328,18 @@ class SSHPushManager:
         errors = []
         device_commands = {}
         
-        # Load config from deployed directory
-        config_path = self.deployed_dir / f"{config_name}.yaml"
-        if not config_path.exists():
-            errors.append(f"Configuration {config_name} not found in deployed directory")
+        # Load config from database
+        config = self.load_config(config_name)
+        if not config:
+            errors.append(f"Configuration {config_name} not found in database")
             return False, errors, device_commands
         
-        try:
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-        except Exception as e:
-            errors.append(f"Error loading config {config_name}: {e}")
-            return False, errors, device_commands
-        
-        # Convert YAML config to deletion CLI commands for each device
+        # Convert database config to deletion CLI commands for each device (exclude _metadata)
         for device_name, device_config in config.items():
+            # Skip _metadata - it's not a real device
+            if device_name == '_metadata':
+                continue
+                
             cli_commands = []
             
             # Start with configure terminal
@@ -270,11 +366,11 @@ class SSHPushManager:
             # Add deletion commands in reverse order (remove interfaces first, then bridge domain)
             # Remove interfaces
             for interface in sorted(interfaces_to_remove):
-                cli_commands.append(f"no interfaces {interface} ^")
+                cli_commands.append(f"no interfaces {interface}")
             
             # Remove bridge domain instances
             for instance in sorted(bridge_domain_instances):
-                cli_commands.append(f"no network-services bridge-domain instance {instance} ^")
+                cli_commands.append(f"no network-services bridge-domain instance {instance}")
             
             # End with commit
             cli_commands.append("commit")
@@ -285,7 +381,7 @@ class SSHPushManager:
 
     def _load_device_info(self, device_name: str) -> Optional[dict]:
         """Load SSH connection info for a device from devices.yaml."""
-        devices_file = Path("devices.yaml")
+        devices_file = Path(__file__).parent.parent / "devices.yaml"
         if not devices_file.exists():
             return None
         with open(devices_file, 'r') as f:
@@ -504,10 +600,31 @@ class SSHPushManager:
             ssh.close()
             log_f.write(f"Complete SSH output for {device_info['hostname']}:\n{output}\n")
             
-            # Check for "no configuration changes" message
-            already_exists = "no configuration changes were made" in output.lower()
+            # Debug logging for already_exists detection
+            log_f.write(f"🔍 Debug: Looking for 'no configuration changes were made' in output\n")
+            log_f.write(f"🔍 Debug: Output contains this pattern: {'no configuration changes were made' in output.lower()}\n")
+            
+            # Check for "no configuration changes" message - enhanced detection
+            already_exists_patterns = [
+                "no configuration changes were made",
+                "no configuration changes",
+                "configuration already exists",
+                "already exists",
+                "no changes needed",
+                "no changes required"
+            ]
+            
+            already_exists = any(pattern in output.lower() for pattern in already_exists_patterns)
+            
             if already_exists:
-                log_f.write(f"✅ Configuration already exists on device (no changes needed)\n")
+                # Find which pattern was matched
+                matched_pattern = None
+                for pattern in already_exists_patterns:
+                    if pattern in output.lower():
+                        matched_pattern = pattern
+                        break
+                
+                log_f.write(f"✅ Configuration already exists on device (matched pattern: '{matched_pattern}')\n")
                 return True, True, None
             
             # Check for error patterns
@@ -547,8 +664,13 @@ class SSHPushManager:
                     success_found = any(indicator in output.lower() for indicator in success_indicators)
                     
                     if success_found:
-                        log_f.write(f"✅ {stage.upper()} appears successful\n")
-                        return True, False, None
+                        # If this is a commit-check stage and it passed successfully, it means config already exists
+                        if stage == "check" and any(indicator in output.lower() for indicator in ['commit check passed successfully', 'commit check passed']):
+                            log_f.write(f"✅ Commit check passed successfully - configuration already exists\n")
+                            return True, True, None
+                        else:
+                            log_f.write(f"✅ {stage.upper()} appears successful\n")
+                            return True, False, None
                     else:
                         log_f.write(f"❌ {stage.upper()} command not found in output\n")
                         return False, False, f"{stage.upper()} command failed or not found in output"
@@ -569,6 +691,13 @@ class SSHPushManager:
         Returns (device_name, success, already_exists, error_message).
         """
         try:
+            # Handle None log_f by creating a dummy log file
+            if log_f is None:
+                class DummyLogFile:
+                    def write(self, text):
+                        pass  # Silently ignore log writes
+                log_f = DummyLogFile()
+            
             log_f.write(f"🔄 Starting {stage.upper()} on {device} ({device_info['hostname']})...\n")
             ok, already_exists, error_message = self._ssh_push_commands_two_stage(device_info, cli_commands, log_f, stage)
             
@@ -596,6 +725,13 @@ class SSHPushManager:
         Returns (device_name, success).
         """
         try:
+            # Handle None log_f by creating a dummy log file
+            if log_f is None:
+                class DummyLogFile:
+                    def write(self, text):
+                        pass  # Silently ignore log writes
+                log_f = DummyLogFile()
+            
             log_f.write(f"🔍 Verifying {device} ({device_info['hostname']}) for configuration '{service_name}'...\n")
             success = self._verify_config_deployment(device_info, service_name, log_f)
             
@@ -617,6 +753,13 @@ class SSHPushManager:
         Returns (device_name, success).
         """
         try:
+            # Handle None log_f by creating a dummy log file
+            if log_f is None:
+                class DummyLogFile:
+                    def write(self, text):
+                        pass  # Silently ignore log writes
+                log_f = DummyLogFile()
+            
             log_f.write(f"🔍 Verifying deletion on {device} ({device_info['hostname']})...\n")
             success = self._verify_deletion(device_info, service_name, log_f)
             
@@ -635,6 +778,13 @@ class SSHPushManager:
     def _verify_config_deployment(self, device_info: dict, service_name: str, log_f) -> bool:
         """Verify that the configuration was actually applied to the device."""
         try:
+            # Handle None log_f by creating a dummy log file
+            if log_f is None:
+                class DummyLogFile:
+                    def write(self, text):
+                        pass  # Silently ignore log writes
+                log_f = DummyLogFile()
+            
             print(f"🔍 Verifying {device_info['hostname']} for configuration '{service_name}'...")
             log_f.write(f"Verifying configuration on {device_info['hostname']}...\n")
             ssh = paramiko.SSHClient()
@@ -686,6 +836,12 @@ class SSHPushManager:
             log_f.write(f"Configuration check: {'✅ Found' if config_exists else '❌ Not found'}\n")
             log_f.write(f"Command output: {output}\n")
             
+            # Check for "Unknown word" error - this indicates the configuration doesn't exist
+            if "ERROR: Unknown word:" in output and service_name in output:
+                config_exists = False
+                print(f"   ❌ Not found (Unknown word error indicates no configuration)")
+                log_f.write(f"Configuration check: ❌ Not found (Unknown word error indicates no configuration)\n")
+            
             # Additional check for bridge domain format
             if not config_exists and "Bridge-Domain:" in output:
                 # Check if the service name appears after "Bridge-Domain:"
@@ -712,6 +868,14 @@ class SSHPushManager:
     def _verify_deletion(self, device_info: dict, service_name: str, log_f) -> bool:
         """Verify that the configuration was actually removed from the device."""
         try:
+            # Handle None log_f by creating a dummy log file
+            if log_f is None:
+                class DummyLogFile:
+                    def write(self, text):
+                        pass  # Silently ignore log writes
+                log_f = DummyLogFile()
+            
+            print(f"🔍 Verifying deletion on {device_info['hostname']} for configuration '{service_name}'...")
             log_f.write(f"Verifying deletion on {device_info['hostname']}...\n")
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -739,9 +903,11 @@ class SSHPushManager:
             except Exception as e:
                 log_f.write(f"Warning: Timeout getting initial output: {e}\n")
             
-            # Check if bridge domain instance still exists (should NOT exist)
+            # Check for specific configuration using the correct command
             command = f"show network-services bridge-domain {service_name}"
+            print(f"   📋 Running: {command}")
             log_f.write(f"Running command: {command}\n")
+            
             shell.send(command + '\n')
             time.sleep(2)
             
@@ -754,31 +920,40 @@ class SSHPushManager:
             
             ssh.close()
             
-            # Check for successful deletion indicators
-            # "ERROR: Unknown word" means the bridge domain doesn't exist (success!)
-            # "Invalid command" also means it doesn't exist
-            deletion_success_indicators = [
-                "ERROR: Unknown word",
-                "Invalid command",
-                "not found",
-                "does not exist"
-            ]
+            # Check if configuration still exists (should be False for successful deletion)
+            config_still_exists = service_name in output
             
-            for indicator in deletion_success_indicators:
-                if indicator.lower() in output.lower():
-                    log_f.write(f"✅ Deletion verification successful - bridge domain no longer exists\n")
-                    return True
+            # Check for "Unknown word" error - this indicates the configuration was successfully deleted
+            if "ERROR: Unknown word:" in output and service_name in output:
+                config_still_exists = False
+                print(f"   ✅ Successfully deleted (Unknown word error indicates deletion)")
+                log_f.write(f"Deletion check: ✅ Successfully deleted (Unknown word error indicates deletion)\n")
+            else:
+                print(f"   {'❌ Still exists' if config_still_exists else '✅ Successfully deleted'}")
+                log_f.write(f"Deletion check: {'❌ Still exists' if config_still_exists else '✅ Successfully deleted'}\n")
             
-            # If we see the service name in the output, it still exists (failure)
-            if service_name in output:
-                log_f.write(f"❌ Bridge domain instance {service_name} still exists on device\n")
-                return False
+            log_f.write(f"Command output: {output}\n")
             
-            # If we get here, assume deletion was successful
-            log_f.write(f"✅ Deletion verification successful for {device_info['hostname']}\n")
-            return True
+            # Additional check for bridge domain format
+            if not config_still_exists and "Bridge-Domain:" in output:
+                # Check if the service name appears after "Bridge-Domain:"
+                bridge_domain_line = [line for line in output.split('\n') if line.strip().startswith('Bridge-Domain:')]
+                if bridge_domain_line and service_name in bridge_domain_line[0]:
+                    config_still_exists = True
+                    print(f"   ❌ Still exists (in Bridge-Domain format)")
+                    log_f.write(f"Still exists in Bridge-Domain format: {bridge_domain_line[0]}\n")
+            
+            if not config_still_exists:
+                print(f"   ✅ Deletion verification successful for {device_info['hostname']}")
+                log_f.write(f"✅ Deletion verification successful for {device_info['hostname']}\n")
+            else:
+                print(f"   ❌ Deletion verification failed for {device_info['hostname']}")
+                log_f.write(f"❌ Deletion verification failed for {device_info['hostname']}\n")
+            
+            return not config_still_exists
             
         except Exception as e:
+            print(f"   ❌ SSH Error: {e}")
             log_f.write(f"❌ Deletion verification error for {device_info['hostname']}: {e}\n")
             return False
 
@@ -794,7 +969,7 @@ class SSHPushManager:
         # Load config
         config = self.load_config(config_name)
         if not config:
-            return False, ["Configuration not found in pending directory"]
+            return False, ["Configuration not found in database"]
         
         if dry_run:
             print(f"🔍 DRY RUN: Would deploy {config_name} to {len(config)} devices")
@@ -813,8 +988,21 @@ class SSHPushManager:
             # Prepare CLI commands for each device
             _, _, device_commands = self.preview_cli_commands(config_name)
             
-            # Extract service name for verification
-            service_name = config_name.replace('bridge_domain_', '')
+            # Extract service name for verification from the actual configuration
+            service_name = None
+            for device_config in config.values():
+                for command in device_config:
+                    if "network-services bridge-domain instance" in command:
+                        parts = command.split()
+                        if len(parts) >= 4:
+                            service_name = parts[3]  # Extract the actual service name
+                            break
+                if service_name:
+                    break
+            
+            if not service_name:
+                # Fallback to the old method if service name not found in config
+                service_name = config_name.replace('bridge_domain_', '')
             
             # Stage 1: Commit-check on all devices in parallel
             log_f.write("=== STAGE 1: Commit-Check (Validation) ===\n")
@@ -964,13 +1152,31 @@ class SSHPushManager:
                 print(f"📁 Deployment log saved to: {deployment_log_file}")
                 return False, verification_errors
             
-            # Move to deployed if all stages succeeded
-            source_path = self.pending_dir / f"{config_name}.yaml"
-            dest_path = self.deployed_dir / f"{config_name}.yaml"
+            # Update database status to deployed if all stages succeeded
             try:
-                shutil.move(str(source_path), str(dest_path))
+                # Import database manager
+                from database_manager import DatabaseManager
+                
+                # Initialize database manager with correct path
+                db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+                db_manager = DatabaseManager(str(db_path))
+                
+                # Update configuration status to 'deployed'
+                import sqlite3
+                conn = sqlite3.connect(db_manager.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE configurations 
+                    SET status = 'deployed', deployed_at = ?, deployed_by = ?
+                    WHERE service_name = ?
+                """, (datetime.utcnow().isoformat(), 1, config_name))  # Using user_id = 1 for CLI operations
+                
+                conn.commit()
+                conn.close()
+                
                 log_f.write("✅ Configuration deployment completed successfully\n")
-                log_f.write(f"Configuration moved from pending to deployed: {dest_path}\n")
+                log_f.write(f"Configuration status updated to 'deployed' in database\n")
                 
                 # Provide user feedback
                 if configs_already_exist:
@@ -979,7 +1185,7 @@ class SSHPushManager:
                 else:
                     print(f"✅ Configuration {config_name} deployed successfully!")
                 
-                print(f"📁 Configuration moved from pending to deployed")
+                print(f"📁 Configuration status updated to 'deployed' in database")
                 print(f"📁 Deployment log saved to: {deployment_log_file}")
                 return True, []
             except Exception as e:
@@ -988,24 +1194,21 @@ class SSHPushManager:
                 log_f.write(f"❌ {error_msg}\n")
                 return False, errors
     
-    def remove_config(self, config_name: str, dry_run: bool = False) -> Tuple[bool, List[str]]:
-        """Remove a deployed configuration using parallel execution."""
-        # Load config from deployed directory
-        config_path = self.deployed_dir / f"{config_name}.yaml"
-        if not config_path.exists():
-            return False, [f"Configuration {config_name} is not deployed"]
-        
-        try:
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-        except Exception as e:
-            return False, [f"Error loading config {config_name}: {e}"]
+    def remove_config(self, config_name: str, dry_run: bool = False, progress_callback=None) -> Tuple[bool, List[str]]:
+        """Remove a deployed configuration using parallel execution with optional progress tracking."""
+        # Load config from database
+        config = self.load_config(config_name)
+        if not config:
+            return False, [f"Configuration {config_name} not found in database"]
         
         if dry_run:
             print(f"🔍 DRY RUN: Would remove {config_name} from {len(config)} devices")
             return True, []
         
-        # Log deletion start
+        # Log removal start
+        if progress_callback:
+            progress_callback("🗑️ Starting configuration removal...")
+        
         deletion_log_file = self.logs_dir / f"{config_name}_deletion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         
         with open(deletion_log_file, 'w') as log_f:
@@ -1021,6 +1224,8 @@ class SSHPushManager:
             
             # Execute deletion on all devices in parallel
             log_f.write("=== Parallel Deletion ===\n")
+            if progress_callback:
+                progress_callback(f"🔄 Removing configuration from {len(config)} devices...")
             print(f"🔄 Removing configuration from {len(config)} devices...")
             print(f"   📋 Running deletion in parallel...")
             
@@ -1034,6 +1239,8 @@ class SSHPushManager:
                         msg = f"Missing SSH info for {device}"
                         log_f.write(f"❌ {msg}\n")
                         deletion_errors.append(msg)
+                        if progress_callback:
+                            progress_callback(f"❌ {msg}")
                         continue
                     
                     cli_commands = device_commands.get(device, [])
@@ -1041,6 +1248,8 @@ class SSHPushManager:
                         msg = f"No deletion commands generated for {device}"
                         log_f.write(f"❌ {msg}\n")
                         deletion_errors.append(msg)
+                        if progress_callback:
+                            progress_callback(f"❌ {msg}")
                         continue
                     
                     # Submit deletion task for parallel execution
@@ -1058,16 +1267,28 @@ class SSHPushManager:
                     
                     if not success:
                         if error_message:
-                            deletion_errors.append(f"Failed to remove from {device_name}: {error_message}")
+                            error_msg = f"Failed to remove from {device_name}: {error_message}"
+                            deletion_errors.append(error_msg)
+                            if progress_callback:
+                                progress_callback(f"❌ {error_msg}")
                         else:
-                            deletion_errors.append(f"Failed to remove from {device_name}")
+                            error_msg = f"Failed to remove from {device_name}"
+                            deletion_errors.append(error_msg)
+                            if progress_callback:
+                                progress_callback(f"❌ {error_msg}")
                     else:
                         log_f.write(f"✅ Removed config from {device_name}\n")
+                        if progress_callback:
+                            progress_callback(f"✅ {device_name}: Configuration removed successfully")
                     
                     # Show progress
                     print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    if progress_callback:
+                        progress_callback(f"📊 Progress: {completed_count}/{len(config)} devices completed")
             
             if deletion_errors:
+                if progress_callback:
+                    progress_callback("❌ Removal failed")
                 print(f"\n❌ Deletion failed. Config remains in deployed.")
                 print(f"📋 Deletion errors:")
                 for err in deletion_errors:
@@ -1077,6 +1298,8 @@ class SSHPushManager:
             
             # Verify deletion on all devices in parallel
             log_f.write("\n=== Verification ===\n")
+            if progress_callback:
+                progress_callback("🔍 Verifying deletion...")
             print(f"\n🔍 Verifying deletion on {len(config)} devices...")
             print(f"   📋 Running verification in parallel...")
             
@@ -1101,12 +1324,22 @@ class SSHPushManager:
                     completed_count += 1
                     
                     if not success:
-                        verification_errors.append(f"Deletion verification failed for {device_name}")
+                        error_msg = f"Deletion verification failed for {device_name}"
+                        verification_errors.append(error_msg)
+                        if progress_callback:
+                            progress_callback(f"❌ {error_msg}")
+                    else:
+                        if progress_callback:
+                            progress_callback(f"✅ {device_name}: Removal verified")
                     
                     # Show progress
                     print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    if progress_callback:
+                        progress_callback(f"📊 Verification Progress: {completed_count}/{len(config)} devices completed")
             
             if verification_errors:
+                if progress_callback:
+                    progress_callback("❌ Deletion verification failed")
                 print(f"\n❌ Deletion verification failed.")
                 print(f"📋 Verification errors:")
                 for err in verification_errors:
@@ -1114,77 +1347,91 @@ class SSHPushManager:
                 print(f"📁 Deletion log saved to: {deletion_log_file}")
                 return False, verification_errors
             
-            # Move the config file to the removed directory
+            # Update database status to removed if all stages succeeded
             try:
-                dest_path = self.removed_dir / f"{config_name}.yaml"
-                shutil.move(str(config_path), str(dest_path))
-                log_f.write("✅ Configuration moved to removed directory\n")
-                log_f.write(f"Configuration file moved: {dest_path}\n")
-                print(f"✅ Configuration {config_name} removed successfully")
-                print(f"📁 Configuration file moved to removed")
+                # Import database manager
+                from database_manager import DatabaseManager
+                
+                # Initialize database manager with correct path
+                db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+                db_manager = DatabaseManager(str(db_path))
+                
+                # Update configuration status to 'removed'
+                import sqlite3
+                conn = sqlite3.connect(db_manager.db_path)
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE configurations 
+                    SET status = 'deleted', deployed_at = NULL, deployed_by = NULL
+                    WHERE service_name = ?
+                """, (config_name,))
+                
+                conn.commit()
+                conn.close()
+                
+                log_f.write("✅ Configuration status updated to 'deleted' in database\n")
+                if progress_callback:
+                    progress_callback("✅ Database status updated to 'deleted'")
+                print(f"✅ Configuration {config_name} deleted successfully")
+                print(f"📁 Configuration status updated to 'deleted' in database")
                 print(f"📁 Deletion log saved to: {deletion_log_file}")
                 return True, []
             except Exception as e:
-                error_msg = f"Failed to move {config_name} to removed: {e}"
+                error_msg = f"Failed to remove {config_name}: {e}"
                 deletion_errors.append(error_msg)
                 log_f.write(f"❌ {error_msg}\n")
+                if progress_callback:
+                    progress_callback(f"❌ {error_msg}")
                 return False, deletion_errors
     
     def get_config_details(self, config_name: str) -> Optional[Dict]:
-        """Get detailed information about a configuration."""
-        # Check if config is in pending directory
-        config = self.load_config(config_name)
-        if config:
+        """Get detailed information about a configuration from the database."""
+        try:
+            # Import database manager
+            from database_manager import DatabaseManager
+            
+            # Initialize database manager with correct path
+            db_path = Path(__file__).parent.parent / "instance" / "lab_automation.db"
+            db_manager = DatabaseManager(str(db_path))
+            
+            # Get configuration from database
+            config_record = db_manager.get_configuration_by_service_name(config_name)
+            
+            if not config_record:
+                return None
+            
+            # Parse the config_data JSON string
+            config_data = None
+            if config_record.get('config_data'):
+                try:
+                    config_data = json.loads(config_record['config_data'])
+                except json.JSONDecodeError as e:
+                    print(f"Error parsing config data for {config_name}: {e}")
+                    return None
+            
+            if not config_data:
+                return None
+            
+            # Filter out _metadata from devices
+            actual_devices = {k: v for k, v in config_data.items() if k != '_metadata'}
+            
             details = {
                 "name": config_name,
-                "devices": list(config.keys()),
-                "device_count": len(config),
-                "vlan_id": self._extract_vlan_id(config),
-                "status": "pending"
+                "devices": list(actual_devices.keys()),
+                "device_count": len(actual_devices),
+                "vlan_id": self._extract_vlan_id(config_data),
+                "status": config_record.get('status', 'unknown'),
+                "created_at": config_record.get('created_at'),
+                "deployed_at": config_record.get('deployed_at'),
+                "deployed_by": config_record.get('deployed_by')
             }
+            
             return details
-        
-        # Check if config is in deployed directory
-        deployed_config_path = self.deployed_dir / f"{config_name}.yaml"
-        if deployed_config_path.exists():
-            try:
-                with open(deployed_config_path, 'r') as f:
-                    config = yaml.safe_load(f)
                 
-                details = {
-                    "name": config_name,
-                    "devices": list(config.keys()),
-                    "device_count": len(config),
-                    "vlan_id": self._extract_vlan_id(config),
-                    "status": "deployed",
-                    "deployed_at": datetime.fromtimestamp(deployed_config_path.stat().st_mtime).isoformat()
-                }
-                
-                return details
-            except Exception as e:
-                print(f"Error loading deployed config {config_name}: {e}")
-        
-        # Check if config is in removed directory
-        removed_config_path = self.removed_dir / f"{config_name}.yaml"
-        if removed_config_path.exists():
-            try:
-                with open(removed_config_path, 'r') as f:
-                    config = yaml.safe_load(f)
-                
-                details = {
-                    "name": config_name,
-                    "devices": list(config.keys()),
-                    "device_count": len(config),
-                    "vlan_id": self._extract_vlan_id(config),
-                    "status": "removed",
-                    "removed_at": datetime.fromtimestamp(removed_config_path.stat().st_mtime).isoformat()
-                }
-                
-                return details
-            except Exception as e:
-                print(f"Error loading removed config {config_name}: {e}")
-        
-        return None
+        except Exception as e:
+            print(f"Error getting config details for {config_name}: {e}")
+            return None
     
     def _extract_vlan_id(self, config: Dict) -> Optional[str]:
         """Extract VLAN ID from configuration."""

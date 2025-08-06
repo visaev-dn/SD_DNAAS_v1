@@ -7,7 +7,7 @@ Extends the original BridgeDomainBuilder to support superspine destinations.
 import yaml
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 import logging
 
 from .enhanced_device_types import (
@@ -207,7 +207,7 @@ class EnhancedBridgeDomainBuilder:
     
     def build_bridge_domain_config(self, service_name: str, vlan_id: int,
                                  source_device: str, source_interface: str,
-                                 dest_device: str, dest_interface: str) -> Dict:
+                                 dest_device: str, dest_interface: str) -> Union[Dict, Tuple[Dict, Dict]]:
         """
         Build bridge domain configuration using original builder logic.
         
@@ -220,7 +220,7 @@ class EnhancedBridgeDomainBuilder:
             dest_interface: Destination interface name
             
         Returns:
-            Bridge domain configuration dictionary
+            Bridge domain configuration dictionary, or tuple (config_data, metadata) for enhanced configs
         """
         source_type = self.get_device_type(source_device)
         dest_type = self.get_device_type(dest_device)
@@ -250,7 +250,7 @@ class EnhancedBridgeDomainBuilder:
     
     def _build_leaf_to_superspine_config(self, service_name: str, vlan_id: int,
                                         source_leaf: str, source_interface: str,
-                                        dest_superspine: str, dest_interface: str) -> Dict:
+                                        dest_superspine: str, dest_interface: str) -> Tuple[Dict, Dict]:
         """
         Build bridge domain configuration for leaf-to-superspine path using original builder's approach.
         
@@ -263,7 +263,7 @@ class EnhancedBridgeDomainBuilder:
             dest_interface: Destination interface name
             
         Returns:
-            Bridge domain configuration dictionary
+            Tuple of (config_data, metadata)
         """
         # Use the original builder's path calculation logic
         # For leaf-to-superspine, we need to create a 3-tier path: Leaf → Spine → Superspine
@@ -301,11 +301,10 @@ class EnhancedBridgeDomainBuilder:
             raise ValueError(f"Could not find spine connecting {source_leaf} to {dest_superspine}")
         
         # Find spine-to-superspine connection
-        spine_info = devices.get(source_spine, {})
         spine_superspine_conn = None
+        spine_info = devices.get(source_spine, {})
         for superspine_conn in spine_info.get('connected_superspines', []):
             if isinstance(superspine_conn, dict):
-                # Treat NCC0 and NCC1 as the same chassis
                 superspine_name = superspine_conn['name']
                 normalized_superspine = superspine_name.replace('-NCC0', '').replace('-NCC1', '')
                 normalized_dest = dest_superspine.replace('-NCC0', '').replace('-NCC1', '')
@@ -317,7 +316,7 @@ class EnhancedBridgeDomainBuilder:
         if not spine_superspine_conn:
             raise ValueError(f"Could not find superspine connection for {source_spine}")
         
-        # Create path segments like the original builder
+        # Build path segments for configuration
         segments = [
             {
                 'type': 'leaf_to_spine',
@@ -335,14 +334,14 @@ class EnhancedBridgeDomainBuilder:
             }
         ]
         
-        # Build configurations using original builder's methods
+        # Build configurations
         configs = {}
         
         # Source Leaf Configuration
         leaf_segment = next(seg for seg in segments if seg['type'] == 'leaf_to_spine')
         source_leaf_config = self._build_leaf_config_hybrid(
             service_name, vlan_id, source_leaf,
-            source_interface, leaf_segment['source_interface'],  # Use leaf interface, not spine interface
+            source_interface, leaf_segment['source_interface'],
             is_source=True
         )
         configs[source_leaf] = source_leaf_config
@@ -373,8 +372,8 @@ class EnhancedBridgeDomainBuilder:
         )
         configs[dest_superspine] = superspine_config
         
-        # Add metadata
-        configs['_metadata'] = {
+        # Create metadata separately
+        metadata = {
             'service_name': service_name,
             'vlan_id': vlan_id,
             'topology_type': 'P2P',
@@ -385,7 +384,7 @@ class EnhancedBridgeDomainBuilder:
             'path': [source_leaf, source_spine, dest_superspine]
         }
         
-        return configs
+        return configs, metadata
     
     def _build_leaf_config_hybrid(self, service_name: str, vlan_id: int,
                                  device: str, user_port: str, spine_interface: str,

@@ -12,16 +12,25 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+import time # Added for time.time()
 
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, current_app
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_sqlalchemy import SQLAlchemy
 
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import database models and authentication
+from models import db, User, Configuration, AuditLog
+from auth import token_required, permission_required, admin_required, user_ownership_required, create_audit_log
+from database_manager import DatabaseManager
+from deployment_manager import DeploymentManager
+
 # Import existing modules
 from config_engine.unified_bridge_domain_builder import UnifiedBridgeDomainBuilder
+from config_engine.device_scanner import DeviceScanner
 from scripts.ssh_push_menu import SSHPushMenu
 from scripts.inventory_manager import InventoryManager
 from scripts.device_status_viewer import DeviceStatusViewer
@@ -30,58 +39,275 @@ from scripts.device_status_viewer import DeviceStatusViewer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Version tracking
+VERSION = "1.0.2"
+logger.info(f"🚀 Starting Lab Automation API Server v{VERSION}")
+
 # Initialize Flask app
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'lab-automation-secret-key-2024'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'lab-automation-secret-key-2024')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lab_automation.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+
+# Initialize database manager
+db_manager = DatabaseManager()
+
 CORS(app, origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:8080"])
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
+# Initialize deployment manager
+deployment_manager = DeploymentManager(socketio)
+
 # Global instances
 builder = UnifiedBridgeDomainBuilder()
 inventory_manager = InventoryManager()
 device_viewer = DeviceStatusViewer()
+device_scanner = DeviceScanner()
 
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
 
-@app.route('/api/auth/login', methods=['POST'])
-def login():
-    """Simple authentication endpoint"""
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    """User registration endpoint"""
     try:
         data = request.get_json()
-        username = data.get('username', '')
+        username = data.get('username', '').strip()
+        email = data.get('email', '').strip()
         password = data.get('password', '')
         
-        # Simple validation (in production, use proper auth)
-        if username and password:
+        # Validate required fields
+        if not username or not email or not password:
             return jsonify({
-                "success": True,
-                "token": f"token_{username}_{datetime.now().timestamp()}",
-                "user": {
-                    "username": username,
-                    "role": "admin",
-                    "permissions": ["read", "write", "deploy"]
-                }
-            })
-        else:
-            return jsonify({"success": False, "error": "Invalid credentials"}), 401
-            
+                "success": False,
+                "error": "Username, email, and password are required"
+            }), 400
+        
+        # Check if user already exists
+        if User.query.filter_by(username=username).first():
+            return jsonify({
+                "success": False,
+                "error": "Username already exists"
+            }), 409
+        
+        if User.query.filter_by(email=email).first():
+            return jsonify({
+                "success": False,
+                "error": "Email already exists"
+            }), 409
+        
+        # Create new user (default role is 'user')
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        
+        # Create user directories
+        from auth import ensure_user_directories
+        ensure_user_directories(new_user.id)
+        
+        # Create audit log
+        create_audit_log(new_user.id, 'register', 'user', new_user.id, {
+            'username': username,
+            'email': email,
+            'role': new_user.role
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": "User registered successfully",
+            "user": new_user.to_dict()
+        }), 201
+        
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Registration failed"
+        }), 500
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    """User login endpoint"""
+    try:
+        data = request.get_json()
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return jsonify({
+                "success": False,
+                "error": "Username and password are required"
+            }), 400
+        
+        # Find user
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not user.check_password(password):
+            return jsonify({
+                "success": False,
+                "error": "Invalid username or password"
+            }), 401
+        
+        if not user.is_active:
+            return jsonify({
+                "success": False,
+                "error": "Account is deactivated"
+            }), 401
+        
+        # Update last login
+        user.last_login = datetime.utcnow()
+        db.session.commit()
+        
+        # Generate JWT token
+        token = user.generate_token()
+        
+        # Create audit log
+        create_audit_log(user.id, 'login', 'user', user.id, {
+            'username': username,
+            'ip_address': request.remote_addr
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": "Login successful",
+            "token": token,
+            "user": user.to_dict()
+        })
+        
     except Exception as e:
         logger.error(f"Login error: {e}")
-        return jsonify({"success": False, "error": "Internal server error"}), 500
+        return jsonify({
+            "success": False,
+            "error": "Login failed"
+        }), 500
+
+@app.route('/api/auth/logout', methods=['POST'])
+@token_required
+def logout(current_user):
+    """User logout endpoint"""
+    try:
+        # Create audit log
+        create_audit_log(current_user.id, 'logout', 'user', current_user.id, {
+            'username': current_user.username
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": "Logout successful"
+        })
+        
+    except Exception as e:
+        logger.error(f"Logout error: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Logout failed"
+        }), 500
+
+@app.route('/api/auth/refresh', methods=['POST'])
+@token_required
+def refresh_token(current_user):
+    """Refresh JWT token"""
+    try:
+        # Generate new token
+        new_token = current_user.generate_token()
+        
+        return jsonify({
+            "success": True,
+            "token": new_token,
+            "user": current_user.to_dict()
+        })
+        
+    except Exception as e:
+        logger.error(f"Token refresh error: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Token refresh failed"
+        }), 500
 
 @app.route('/api/auth/me', methods=['GET'])
-def get_current_user():
+@token_required
+def get_current_user(current_user):
     """Get current user information"""
-    # In production, validate JWT token
     return jsonify({
-        "username": "admin",
-        "role": "admin",
-        "permissions": ["read", "write", "deploy"]
+        "success": True,
+        "user": current_user.to_dict()
     })
+
+@app.route('/api/auth/change-password', methods=['POST'])
+@token_required
+def change_password(current_user):
+    """Change user password"""
+    try:
+        data = request.get_json()
+        current_password = data.get('currentPassword', '')
+        new_password = data.get('newPassword', '')
+        
+        if not current_password or not new_password:
+            return jsonify({
+                "success": False,
+                "error": "Current password and new password are required"
+            }), 400
+        
+        # Verify current password
+        if not current_user.check_password(current_password):
+            return jsonify({
+                "success": False,
+                "error": "Current password is incorrect"
+            }), 401
+        
+        # Validate new password strength
+        from auth import validate_password_strength
+        is_valid, message = validate_password_strength(new_password)
+        if not is_valid:
+            return jsonify({
+                "success": False,
+                "error": message
+            }), 400
+        
+        # Update password
+        current_user.set_password(new_password)
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'change_password', 'user', current_user.id, {
+            'username': current_user.username
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": "Password changed successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Change password error: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Password change failed"
+        }), 500
+
+@app.route('/api/test/db', methods=['GET'])
+def test_database():
+    """Test database connectivity"""
+    try:
+        users = User.query.all()
+        return jsonify({
+            "success": True,
+            "message": "Database connection successful",
+            "user_count": len(users),
+            "users": [{"username": u.username, "role": u.role} for u in users]
+        })
+    except Exception as e:
+        logger.error(f"Database test error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Database test failed: {str(e)}"
+        }), 500
 
 # ============================================================================
 # DASHBOARD ENDPOINTS
@@ -266,7 +492,7 @@ def get_interfaces(device):
         return jsonify({"error": "Failed to get interfaces"}), 500
 
 @app.route('/api/builder/validate', methods=['POST'])
-def validate_configuration():
+def validate_builder_configuration():
     """Validate bridge domain configuration"""
     try:
         data = request.get_json()
@@ -305,7 +531,7 @@ def validate_configuration():
         return jsonify({"valid": False, "errors": ["Internal validation error"]}), 500
 
 @app.route('/api/builder/generate', methods=['POST'])
-def generate_configuration():
+def generate_builder_configuration():
     """Generate bridge domain configuration"""
     try:
         data = request.get_json()
@@ -400,13 +626,22 @@ def generate_configuration():
         try:
             logger.info(f"Calling unified builder with: service_name={service_name}, vlan_id={vlan_id}, source_device={source_device}, source_interface={source_interface}, destinations={dest_list}")
             
-            config_data = builder.build_bridge_domain_config(
+            result = builder.build_bridge_domain_config(
                 service_name=service_name,
                 vlan_id=int(vlan_id),
                 source_device=source_device,
                 source_interface=source_interface,
                 destinations=dest_list
             )
+            
+            # Handle both old format (dict) and new format (tuple with metadata)
+            if isinstance(result, tuple):
+                config_data, metadata = result
+                logger.info(f"Unified builder returned config_data and metadata separately")
+            else:
+                config_data = result
+                metadata = None
+                logger.info(f"Unified builder returned config_data only (legacy format)")
             
             logger.info(f"Unified builder returned: {config_data}")
             
@@ -422,23 +657,48 @@ def generate_configuration():
             }), 500
         
         if config_data:
-            # Save configuration to file
-            config_filename = f"unified_bridge_domain_{service_name}.yaml"
-            config_path = Path("configs/pending") / config_filename
+            # Save configuration to database only (no file system)
+            logger.info("=" * 50)
+            logger.info("DATABASE SAVE DEBUG START")
+            logger.info("=" * 50)
             
-            # Ensure directory exists
-            config_path.parent.mkdir(parents=True, exist_ok=True)
+            # Get current count
+            current_count = db_manager.get_configuration_count()
+            logger.info(f"Current configurations in database: {current_count}")
             
-            with open(config_path, 'w') as f:
-                yaml.dump(config_data, f, default_flow_style=False)
+            # Save configuration to database only
+            save_success = db_manager.save_configuration(
+                service_name=service_name,
+                vlan_id=int(vlan_id),
+                config_data=config_data,
+                file_path=None,  # No file path needed
+                config_metadata=metadata  # Pass metadata separately
+            )
             
-            logger.info(f"Configuration saved to: {config_path}")
+            if save_success:
+                logger.info("✅ Database save successful")
+                
+                # Verify the save
+                if db_manager.verify_save(service_name):
+                    logger.info("✅ Database save verified")
+                else:
+                    logger.error("❌ Database save verification failed")
+            else:
+                logger.error("❌ Database save failed")
             
+            # Get new count
+            new_count = db_manager.get_configuration_count()
+            logger.info(f"New configurations count: {new_count}")
+            
+            logger.info("=" * 50)
+            logger.info("DATABASE SAVE DEBUG END")
+            logger.info("=" * 50)
+                
             return jsonify({
                 "success": True,
                 "config": config_data,
-                "filename": config_filename,
-                "serviceName": service_name
+                "serviceName": service_name,
+                "message": "Configuration saved to database successfully"
             })
         else:
             logger.error("Unified builder returned None/empty config")
@@ -781,7 +1041,7 @@ def delete_file(filepath):
         return jsonify({"error": "Failed to delete file"}), 500
 
 @app.route('/api/files/save-config', methods=['POST'])
-def save_configuration():
+def save_file_configuration():
     """Save generated configuration to pending directory"""
     try:
         data = request.get_json()
@@ -814,8 +1074,10 @@ def save_configuration():
         return jsonify({"error": "Failed to save configuration"}), 500
 
 # ============================================================================
-# DEPLOYMENT MANAGEMENT ENDPOINTS
+# DEPLOYMENT MANAGEMENT ENDPOINTS (LEGACY - REMOVED)
 # ============================================================================
+# Note: These endpoints have been replaced by the unified configuration endpoints
+# below. The old deployment endpoints caused function name conflicts.
 
 @app.route('/api/deployments/list', methods=['GET'])
 def list_deployments():
@@ -877,21 +1139,81 @@ def start_deployment():
         logger.error(f"Start deployment error: {e}")
         return jsonify({"error": "Failed to start deployment"}), 500
 
-@app.route('/api/deployments/<deployment_id>/status', methods=['GET'])
-def get_deployment_status(deployment_id):
-    """Get deployment status"""
+@app.route('/api/deployments/configurations', methods=['GET'])
+@token_required
+def get_user_configurations(current_user):
+    """Get user's configurations for deployment management"""
     try:
-        # Placeholder status
+        # Get configurations for the current user
+        configs = Configuration.query.filter_by(user_id=current_user.id).all()
+        
+        configurations = []
+        for config in configs:
+            config_dict = config.to_dict()
+            # Parse config_data if it's JSON
+            if config.config_data:
+                try:
+                    import json
+                    config_dict['config_data'] = json.dumps(json.loads(config.config_data), indent=2)
+                except:
+                    config_dict['config_data'] = config.config_data
+            
+            configurations.append(config_dict)
+        
         return jsonify({
-            "deploymentId": deployment_id,
-            "status": "in_progress",
-            "progress": 50,
-            "message": "Deploying to devices..."
+            "success": True,
+            "configurations": configurations
         })
         
     except Exception as e:
-        logger.error(f"Get deployment status error: {e}")
-        return jsonify({"error": "Failed to get deployment status"}), 500
+        logger.error(f"Get configurations error: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Failed to get configurations"
+        }), 500
+
+@app.route('/api/deployments/test', methods=['GET'])
+def test_deployments():
+    """Test route for deployments"""
+    return jsonify({
+        "success": True,
+        "message": "Deployments test route works"
+    })
+
+@app.route('/api/deployments/<deployment_id>/status', methods=['GET'])
+@token_required
+def get_deployment_status(current_user, deployment_id):
+    """Get current deployment or removal status"""
+    try:
+        # Use the global deployment manager instance
+        status = deployment_manager.get_deployment_status(deployment_id)
+        
+        if status:
+            return jsonify({
+                'success': True,
+                'deployment_id': deployment_id,
+                'status': status['status'],
+                'progress': status['progress'],
+                'stage': status['stage'],
+                'logs': status['logs'][-20:],  # Last 20 log entries
+                'errors': status.get('errors', []),
+                'device_results': status.get('device_results', {}),
+                'start_time': status['start_time'],
+                'end_time': status.get('end_time'),
+                'timestamp': status['timestamp']
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Deployment/removal not found'
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error getting deployment status: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get status: {str(e)}'
+        }), 500
 
 # ============================================================================
 # WEBSOCKET EVENTS
@@ -915,6 +1237,28 @@ def handle_subscription(data):
     if deployment_id:
         join_room(deployment_id)
         logger.info(f"Client {request.sid} subscribed to deployment {deployment_id}")
+        
+        # Send current status immediately
+        deployment_info = deployment_manager.get_deployment_status(deployment_id)
+        if deployment_info:
+            emit('deployment_update', {
+                'deployment_id': deployment_id,
+                'status': deployment_info['status'],
+                'progress': deployment_info['progress'],
+                'stage': deployment_info['stage'],
+                'logs': deployment_info['logs'][-10:],
+                'errors': deployment_info.get('errors', []),
+                'device_results': deployment_info.get('device_results', {}),
+                'timestamp': datetime.utcnow().isoformat()
+            })
+
+@socketio.on('unsubscribe')
+def handle_unsubscription(data):
+    """Handle deployment unsubscription"""
+    deployment_id = data.get('deploymentId')
+    if deployment_id:
+        leave_room(deployment_id)
+        logger.info(f"Client {request.sid} unsubscribed from deployment {deployment_id}")
 
 def emit_deployment_progress(deployment_id, progress_data):
     """Emit deployment progress to subscribed clients"""
@@ -930,8 +1274,613 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "version": "1.0.0"
+        "version": VERSION
     })
+
+@app.route('/api/database/health', methods=['GET'])
+def database_health_check():
+    """Check database health and test save operations"""
+    try:
+        # Perform database health check
+        health_result = db_manager.health_check()
+        
+        return jsonify({
+            "success": True,
+            **health_result
+        })
+        
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        return jsonify({
+            "success": False,
+            "database_healthy": False,
+            "error": str(e)
+        }), 500
+
+# ============================================================================
+# UNIFIED CONFIGURATION MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/configurations', methods=['GET'])
+@token_required
+def get_configurations(current_user):
+    """Get all configurations for the current user"""
+    try:
+        # Get configurations from database
+        configurations = Configuration.query.filter_by(user_id=current_user.id).order_by(Configuration.created_at.desc()).all()
+        
+        config_list = []
+        for config in configurations:
+            config_list.append({
+                'id': config.id,
+                'service_name': config.service_name,
+                'vlan_id': config.vlan_id,
+                'config_type': config.config_type,
+                'status': config.status,
+                'config_data': config.config_data,
+                'created_at': config.created_at.isoformat() if config.created_at else None,
+                'deployed_at': config.deployed_at.isoformat() if config.deployed_at else None,
+                'deployed_by': config.deployed_by
+            })
+        
+        return jsonify({
+            "success": True,
+            "configurations": config_list,
+            "total": len(config_list)
+        })
+        
+    except Exception as e:
+        logger.error(f"Get configurations error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get configurations: {str(e)}"
+        }), 500
+
+@app.route('/api/test/metadata', methods=['GET'])
+def test_metadata():
+    """Test endpoint for metadata"""
+    return jsonify({
+        "success": True,
+        "message": "Test metadata endpoint works"
+    })
+
+@app.route('/api/configurations/<int:config_id>/metadata', methods=['GET'])
+@token_required
+@user_ownership_required
+def get_configuration_metadata(current_user, config_id):
+    """Get metadata for a specific configuration"""
+    try:
+        # Get configuration from database
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Parse metadata if it exists
+        metadata = None
+        if config.config_metadata:
+            try:
+                metadata = json.loads(config.config_metadata)
+            except json.JSONDecodeError:
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid metadata format"
+                }), 500
+        
+        return jsonify({
+            "success": True,
+            "metadata": metadata,
+            "service_name": config.service_name,
+            "vlan_id": config.vlan_id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting configuration metadata: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get configuration metadata: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>/preview-deployment', methods=['GET'])
+@token_required
+@user_ownership_required
+def preview_deployment_commands(current_user, config_id):
+    """Preview deployment commands for a configuration"""
+    try:
+        # Get configuration details
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Import SSH push manager for preview
+        from config_engine.ssh_push_manager import SSHPushManager
+        push_manager = SSHPushManager()
+        
+        # Get deployment preview
+        success, errors, device_commands = push_manager.preview_cli_commands(config.service_name)
+        
+        if not success:
+            return jsonify({
+                "success": False,
+                "error": f"Failed to generate deployment preview: {'; '.join(errors)}"
+            }), 400
+        
+        # Format the preview for display
+        preview_data = {
+            "configuration": {
+                "id": config.id,
+                "service_name": config.service_name,
+                "vlan_id": config.vlan_id,
+                "status": config.status,
+                "devices": list(device_commands.keys())
+            },
+            "deployment_commands": device_commands,
+            "total_devices": len(device_commands),
+            "total_commands": sum(len(cmds) for cmds in device_commands.values())
+        }
+        
+        return jsonify({
+            "success": True,
+            "preview": preview_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error previewing deployment commands: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to preview deployment commands: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>', methods=['GET'])
+@token_required
+@user_ownership_required
+def get_configuration_details(current_user, config_id):
+    """Get detailed configuration information"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Parse configuration data
+        import json
+        config_data = json.loads(config.config_data) if config.config_data else {}
+        
+        return jsonify({
+            "success": True,
+            "configuration": {
+                'id': config.id,
+                'service_name': config.service_name,
+                'vlan_id': config.vlan_id,
+                'config_type': config.config_type,
+                'status': config.status,
+                'config_data': config_data,
+                'created_at': config.created_at.isoformat() if config.created_at else None,
+                'deployed_at': config.deployed_at.isoformat() if config.deployed_at else None,
+                'deployed_by': config.deployed_by
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Get configuration details error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get configuration details: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>/validate', methods=['POST'])
+@token_required
+@user_ownership_required
+def validate_unified_configuration(current_user, config_id):
+    """Validate a configuration"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Parse configuration data
+        import json
+        config_data = json.loads(config.config_data) if config.config_data else {}
+        
+        if not config_data:
+            return jsonify({
+                "success": False,
+                "error": "Configuration data is empty"
+            }), 400
+        
+        # Check that we have devices in the configuration
+        devices = list(config_data.keys())
+        if not devices:
+            return jsonify({
+                "success": False,
+                "error": "No devices found in configuration"
+            }), 400
+        
+        # Validate device connectivity
+        validation_errors = []
+        for device in devices:
+            # Check if device exists in devices.yaml
+            if not Path("devices.yaml").exists():
+                validation_errors.append("devices.yaml not found")
+                break
+            
+            with open("devices.yaml", 'r') as f:
+                devices_data = yaml.safe_load(f)
+            
+            if device not in devices_data:
+                validation_errors.append(f"Device '{device}' not found in devices.yaml")
+        
+        if validation_errors:
+            return jsonify({
+                "success": False,
+                "error": "Configuration validation failed",
+                "details": validation_errors
+            }), 400
+        
+        return jsonify({
+            "success": True,
+            "message": f"Configuration validated successfully for {len(devices)} devices",
+            "device_count": len(devices)
+        })
+        
+    except Exception as e:
+        logger.error(f"Validate configuration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Validation failed: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>/deploy', methods=['POST'])
+@token_required
+@user_ownership_required
+def deploy_unified_configuration(current_user, config_id):
+    """Deploy a configuration via SSH with real-time progress"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Generate deployment ID
+        deployment_id = f"deploy_{config_id}_{int(datetime.now().timestamp())}"
+        
+        # Parse configuration data
+        import json
+        config_data = json.loads(config.config_data) if config.config_data else {}
+        
+        if not config_data:
+            return jsonify({
+                "success": False,
+                "error": "Configuration data is empty"
+            }), 400
+        
+        # Start deployment with real-time progress
+        success = deployment_manager.start_deployment(
+            deployment_id=deployment_id,
+            config_id=config_id,
+            config_data=config_data,
+            user_id=current_user.id
+        )
+        
+        if not success:
+            return jsonify({
+                "success": False,
+                "error": "Failed to start deployment"
+            }), 500
+        
+        # Create audit log for deployment start
+        create_audit_log(current_user.id, 'deploy_start', 'configuration', config_id, {
+            'service_name': config.service_name,
+            'deployment_id': deployment_id
+        })
+        
+        return jsonify({
+            "success": True,
+            "deploymentId": deployment_id,
+            "message": "Deployment started with real-time progress monitoring"
+        })
+        
+    except Exception as e:
+        logger.error(f"Deploy configuration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Deployment failed: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>', methods=['DELETE'])
+@token_required
+@user_ownership_required
+def delete_unified_configuration(current_user, config_id):
+    """Delete a configuration"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Check if configuration is currently being deployed
+        deployment_info = deployment_manager.get_deployment_status(f"deploy_{config_id}_*")
+        if deployment_info and deployment_info.get('status') == 'running':
+            return jsonify({
+                "success": False,
+                "error": "Cannot delete configuration while deployment is in progress"
+            }), 400
+        
+        # Delete the configuration
+        db.session.delete(config)
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'delete', 'configuration', config_id, {
+            'service_name': config.service_name
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"Configuration '{config.service_name}' deleted successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Delete configuration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to delete configuration: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<int:config_id>/export', methods=['POST'])
+@token_required
+@user_ownership_required
+def export_configuration(current_user, config_id):
+    """Export configuration to file (optional feature)"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Parse configuration data
+        import json
+        config_data = json.loads(config.config_data) if config.config_data else {}
+        
+        # Create export directory
+        export_dir = Path("configs/exports")
+        export_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{config.service_name}_{timestamp}.yaml"
+        file_path = export_dir / filename
+        
+        # Save to file
+        with open(file_path, 'w') as f:
+            yaml.dump(config_data, f, default_flow_style=False)
+        
+        return jsonify({
+            "success": True,
+            "message": f"Configuration exported to {filename}",
+            "file_path": str(file_path)
+        })
+        
+    except Exception as e:
+        logger.error(f"Export configuration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to export configuration: {str(e)}"
+        }), 500
+
+# ============================================================================
+# DEPLOYMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/deployments/<int:config_id>/preview-deletion', methods=['GET'])
+@token_required
+@user_ownership_required
+def preview_deletion_commands(current_user, config_id):
+    """Preview deletion commands for a configuration"""
+    try:
+        # Get configuration details
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Import SSH push manager for preview
+        from config_engine.ssh_push_manager import SSHPushManager
+        push_manager = SSHPushManager()
+        
+        # Get deletion preview
+        success, errors, device_commands = push_manager.preview_deletion_commands(config.service_name)
+        
+        if not success:
+            return jsonify({
+                "success": False,
+                "error": f"Failed to generate deletion preview: {'; '.join(errors)}"
+            }), 400
+        
+        # Format the preview for display
+        preview_data = {
+            "configuration": {
+                "id": config.id,
+                "service_name": config.service_name,
+                "vlan_id": config.vlan_id,
+                "status": config.status,
+                "devices": list(device_commands.keys())
+            },
+            "deletion_commands": device_commands,
+            "total_devices": len(device_commands),
+            "total_commands": sum(len(cmds) for cmds in device_commands.values())
+        }
+        
+        return jsonify({
+            "success": True,
+            "preview": preview_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error previewing deletion commands: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to preview deletion commands: {str(e)}"
+        }), 500
+
+@app.route('/api/deployments/<int:config_id>/remove', methods=['POST'])
+@token_required
+@user_ownership_required
+def remove_from_devices(current_user, config_id):
+    """Remove a configuration from devices with progress tracking"""
+    try:
+        # Get configuration details
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Create a unique removal ID for tracking
+        removal_id = f"remove_{config_id}_{int(time.time())}"
+        
+        # Start removal in background with progress tracking
+        from deployment_manager import DeploymentManager
+        deployment_manager = DeploymentManager(socketio)
+        
+        # Start the removal process
+        success = deployment_manager.start_removal(
+            removal_id, config_id, config.config_data, current_user.id
+        )
+        
+        if success:
+            return jsonify({
+                'success': True, 
+                'message': 'Configuration removal started',
+                'removal_id': removal_id
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to start removal'}), 500
+        
+    except Exception as e:
+        logger.error(f"Error starting removal: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/deployments/<int:config_id>/restore', methods=['POST'])
+@token_required
+@user_ownership_required
+def restore_configuration(current_user, config_id):
+    """Restore a deleted configuration to pending status"""
+    try:
+        # Get configuration details
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found"
+            }), 404
+        
+        # Update configuration status to 'pending'
+        config.status = 'pending'
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'restore', 'configuration', config_id, {
+            'service_name': config.service_name
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"Configuration '{config.service_name}' restored successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error restoring configuration: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to restore configuration: {str(e)}"
+        }), 500
+
+# ============================================================================
+# DEVICE SCANNING ENDPOINTS
+# ============================================================================
+
+@app.route('/api/devices/scan', methods=['POST'])
+@token_required
+def scan_devices(current_user):
+    """Scan devices for existing bridge domains and sync to database"""
+    try:
+        data = request.get_json() or {}
+        sync_to_db = data.get('sync', True)
+        specific_device = data.get('device')
+        
+        if specific_device:
+            # Scan specific device
+            results = device_scanner.scan_device(specific_device)
+            return jsonify({
+                "success": True,
+                "message": f"Scanned device {specific_device}",
+                "device": specific_device,
+                "bridge_domains": results
+            })
+        else:
+            # Scan all devices
+            if sync_to_db:
+                # Scan and sync to database
+                result = device_scanner.scan_and_sync(current_user.id)
+                return jsonify(result)
+            else:
+                # Just scan without syncing
+                results = device_scanner.scan_all_devices()
+                return jsonify({
+                    "success": True,
+                    "message": "Device scan completed",
+                    "results": results
+                })
+                
+    except Exception as e:
+        logger.error(f"Device scanning error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to scan devices: {str(e)}"
+        }), 500
+
+@app.route('/api/devices/scan/preview', methods=['GET'])
+@token_required
+def preview_device_scan(current_user):
+    """Preview what would be discovered without syncing to database"""
+    try:
+        results = device_scanner.scan_all_devices()
+        consolidated = device_scanner.consolidate_bridge_domains(results)
+        
+        return jsonify({
+            "success": True,
+            "message": "Device scan preview",
+            "scanned_devices": list(results.keys()),
+            "found_domains": len(consolidated),
+            "configurations": consolidated
+        })
+        
+    except Exception as e:
+        logger.error(f"Device scan preview error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to preview device scan: {str(e)}"
+        }), 500
 
 # ============================================================================
 # MAIN ENTRY POINT

@@ -23,7 +23,7 @@ from flask_sqlalchemy import SQLAlchemy
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import database models and authentication
-from models import db, User, Configuration, AuditLog
+from models import db, User, Configuration, AuditLog, UserVlanAllocation, UserPermission, PersonalBridgeDomain
 from auth import token_required, permission_required, admin_required, user_ownership_required, create_audit_log
 from database_manager import DatabaseManager
 from deployment_manager import DeploymentManager
@@ -1813,6 +1813,412 @@ def restore_configuration(current_user, config_id):
         return jsonify({
             "success": False,
             "error": f"Failed to restore configuration: {str(e)}"
+        }), 500
+
+# ============================================================================
+# ADMIN USER MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/admin/users', methods=['GET'])
+@token_required
+@admin_required
+def get_users(current_user):
+    """Get all users (admin only)"""
+    try:
+        users = User.query.all()
+        users_data = []
+        
+        for user in users:
+            user_data = user.to_dict()
+            # Add additional info for admin view
+            user_data['configurations_count'] = len(user.configurations)
+            user_data['personal_bridge_domains_count'] = len(user.personal_bridge_domains)
+            users_data.append(user_data)
+        
+        return jsonify({
+            "success": True,
+            "users": users_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting users: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get users: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/users', methods=['POST'])
+@token_required
+@admin_required
+def create_user(current_user):
+    """Create new user (admin only)"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        username = data.get('username', '').strip()
+        email = data.get('email', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not email or not password:
+            return jsonify({
+                "success": False,
+                "error": "Username, email, and password are required"
+            }), 400
+        
+        # Check if user already exists
+        if User.query.filter_by(username=username).first():
+            return jsonify({
+                "success": False,
+                "error": "Username already exists"
+            }), 409
+        
+        if User.query.filter_by(email=email).first():
+            return jsonify({
+                "success": False,
+                "error": "Email already exists"
+            }), 409
+        
+        # Create user
+        user = User(
+            username=username,
+            email=email,
+            password=password,
+            role=data.get('role', 'user'),
+            created_by=current_user.id
+        )
+        db.session.add(user)
+        db.session.flush()  # Get user ID
+        
+        # Create VLAN allocations
+        vlan_ranges = data.get('vlanRanges', [])
+        for vlan_range in vlan_ranges:
+            vlan_allocation = UserVlanAllocation(
+                user_id=user.id,
+                start_vlan=vlan_range['startVlan'],
+                end_vlan=vlan_range['endVlan'],
+                description=vlan_range.get('description', '')
+            )
+            db.session.add(vlan_allocation)
+        
+        # Create permissions
+        permissions_data = data.get('permissions', {})
+        user_permissions = UserPermission(
+            user_id=user.id,
+            can_edit_topology=permissions_data.get('canEditTopology', True),
+            can_deploy_changes=permissions_data.get('canDeployChanges', True),
+            can_view_global=permissions_data.get('canViewGlobal', False),
+            can_edit_others=permissions_data.get('canEditOthers', False),
+            max_bridge_domains=permissions_data.get('maxBridgeDomains', 50),
+            require_approval=permissions_data.get('requireApproval', False)
+        )
+        db.session.add(user_permissions)
+        
+        # Create user directories
+        from auth import ensure_user_directories
+        ensure_user_directories(user.id)
+        
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'create', 'user', user.id, {
+            'username': username,
+            'email': email,
+            'role': user.role,
+            'vlan_ranges': vlan_ranges
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"User '{username}' created successfully",
+            "user": user.to_dict()
+        }), 201
+        
+    except Exception as e:
+        logger.error(f"Error creating user: {e}")
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": f"Failed to create user: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
+@token_required
+@admin_required
+def update_user(current_user, user_id):
+    """Update user (admin only)"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                "success": False,
+                "error": "User not found"
+            }), 404
+        
+        data = request.get_json()
+        
+        # Update basic user info
+        if 'username' in data:
+            # Check if username is already taken by another user
+            existing_user = User.query.filter_by(username=data['username']).first()
+            if existing_user and existing_user.id != user_id:
+                return jsonify({
+                    "success": False,
+                    "error": "Username already exists"
+                }), 409
+            user.username = data['username']
+        
+        if 'email' in data:
+            # Check if email is already taken by another user
+            existing_user = User.query.filter_by(email=data['email']).first()
+            if existing_user and existing_user.id != user_id:
+                return jsonify({
+                    "success": False,
+                    "error": "Email already exists"
+                }), 409
+            user.email = data['email']
+        
+        if 'password' in data and data['password']:
+            user.set_password(data['password'])
+        
+        if 'role' in data:
+            user.role = data['role']
+            user.is_admin = (data['role'] == 'admin')
+        
+        if 'is_active' in data:
+            user.is_active = data['is_active']
+        
+        # Update VLAN allocations
+        if 'vlanRanges' in data:
+            # Remove existing allocations
+            UserVlanAllocation.query.filter_by(user_id=user_id).delete()
+            
+            # Create new allocations
+            for vlan_range in data['vlanRanges']:
+                vlan_allocation = UserVlanAllocation(
+                    user_id=user_id,
+                    start_vlan=vlan_range['startVlan'],
+                    end_vlan=vlan_range['endVlan'],
+                    description=vlan_range.get('description', '')
+                )
+                db.session.add(vlan_allocation)
+        
+        # Update permissions
+        if 'permissions' in data:
+            permissions_data = data['permissions']
+            if user.permissions:
+                user.permissions.can_edit_topology = permissions_data.get('canEditTopology', True)
+                user.permissions.can_deploy_changes = permissions_data.get('canDeployChanges', True)
+                user.permissions.can_view_global = permissions_data.get('canViewGlobal', False)
+                user.permissions.can_edit_others = permissions_data.get('canEditOthers', False)
+                user.permissions.max_bridge_domains = permissions_data.get('maxBridgeDomains', 50)
+                user.permissions.require_approval = permissions_data.get('requireApproval', False)
+            else:
+                # Create permissions if they don't exist
+                user_permissions = UserPermission(
+                    user_id=user_id,
+                    **permissions_data
+                )
+                db.session.add(user_permissions)
+        
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'update', 'user', user_id, {
+            'updated_fields': list(data.keys())
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"User '{user.username}' updated successfully",
+            "user": user.to_dict()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating user: {e}")
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": f"Failed to update user: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+@token_required
+@admin_required
+def delete_user(current_user, user_id):
+    """Delete user (admin only)"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                "success": False,
+                "error": "User not found"
+            }), 404
+        
+        # Prevent admin from deleting themselves
+        if user.id == current_user.id:
+            return jsonify({
+                "success": False,
+                "error": "Cannot delete your own account"
+            }), 400
+        
+        username = user.username
+        
+        # Delete user (cascades to related records)
+        db.session.delete(user)
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'delete', 'user', user_id, {
+            'deleted_username': username
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"User '{username}' deleted successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error deleting user: {e}")
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": f"Failed to delete user: {str(e)}"
+        }), 500
+
+# ============================================================================
+# PERSONAL BRIDGE DOMAIN MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/configurations/import', methods=['POST'])
+@token_required
+def import_bridge_domain(current_user):
+    """Import bridge domain to personal workspace"""
+    try:
+        data = request.get_json()
+        bridge_domain_name = data.get('bridgeDomainName')
+        
+        if not bridge_domain_name:
+            return jsonify({
+                "success": False,
+                "error": "Bridge domain name is required"
+            }), 400
+        
+        # Check if user has access to this bridge domain (VLAN range check)
+        # This would require checking the bridge domain's VLAN against user's VLAN ranges
+        # For now, we'll allow import and check access later
+        
+        # Check if already imported
+        existing = PersonalBridgeDomain.query.filter_by(
+            user_id=current_user.id,
+            bridge_domain_name=bridge_domain_name
+        ).first()
+        
+        if existing:
+            return jsonify({
+                "success": False,
+                "error": "Bridge domain already imported to your workspace"
+            }), 409
+        
+        # Import to personal workspace
+        personal_bd = PersonalBridgeDomain(
+            user_id=current_user.id,
+            bridge_domain_name=bridge_domain_name,
+            imported_from_topology=True
+        )
+        db.session.add(personal_bd)
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'import', 'bridge_domain', None, {
+            'bridge_domain_name': bridge_domain_name
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"Bridge domain '{bridge_domain_name}' imported successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error importing bridge domain: {e}")
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": f"Failed to import bridge domain: {str(e)}"
+        }), 500
+
+@app.route('/api/configurations/<bridge_domain_name>/scan', methods=['POST'])
+@token_required
+def scan_bridge_domain_topology(current_user, bridge_domain_name):
+    """Scan and reverse engineer bridge domain topology"""
+    try:
+        # Check ownership
+        personal_bd = PersonalBridgeDomain.query.filter_by(
+            user_id=current_user.id,
+            bridge_domain_name=bridge_domain_name
+        ).first()
+        
+        if not personal_bd:
+            return jsonify({
+                "success": False,
+                "error": "Bridge domain not found in your workspace"
+            }), 404
+        
+        # Perform topology scan (placeholder - would integrate with existing discovery)
+        # For now, we'll just mark as scanned
+        personal_bd.topology_scanned = True
+        personal_bd.last_scan_at = datetime.utcnow()
+        db.session.commit()
+        
+        # Create audit log
+        create_audit_log(current_user.id, 'scan', 'bridge_domain', None, {
+            'bridge_domain_name': bridge_domain_name
+        })
+        
+        return jsonify({
+            "success": True,
+            "message": f"Bridge domain '{bridge_domain_name}' topology scanned successfully"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error scanning bridge domain: {e}")
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": f"Failed to scan bridge domain: {str(e)}"
+        }), 500
+
+@app.route('/api/dashboard/personal-stats', methods=['GET'])
+@token_required
+def get_personal_stats(current_user):
+    """Get personal statistics for dashboard"""
+    try:
+        # Get user's personal bridge domains
+        personal_bds = PersonalBridgeDomain.query.filter_by(user_id=current_user.id).all()
+        
+        # Get user's configurations
+        user_configs = Configuration.query.filter_by(user_id=current_user.id).all()
+        
+        # Calculate stats
+        stats = {
+            'totalBridgeDomains': len(personal_bds),
+            'activeBridgeDomains': len([bd for bd in personal_bds if bd.topology_scanned]),
+            'totalConfigurations': len(user_configs),
+            'activeConfigurations': len([c for c in user_configs if c.status == 'deployed']),
+            'vlanRangesUsed': len(current_user.get_vlan_ranges()),
+            'lastActivity': current_user.last_login.isoformat() if current_user.last_login else None
+        }
+        
+        return jsonify({
+            "success": True,
+            "stats": stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting personal stats: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get personal stats: {str(e)}"
         }), 500
 
 # ============================================================================

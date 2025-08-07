@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import os
 from typing import Optional
+import json
 
 db = SQLAlchemy()
 
@@ -25,6 +26,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default='user')  # admin, user, readonly
     is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)  # Additional admin flag
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # Admin who created this user
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     
@@ -36,11 +39,25 @@ class User(UserMixin, db.Model):
     deployed_configurations = db.relationship('Configuration', backref='deployer', lazy=True,
                                             foreign_keys='Configuration.deployed_by')
     
-    def __init__(self, username: str, email: str, password: str, role: str = 'user'):
+    # Relationship to VLAN allocations
+    vlan_allocations = db.relationship('UserVlanAllocation', backref='user', lazy=True,
+                                     cascade='all, delete-orphan')
+    
+    # Relationship to user permissions
+    permissions = db.relationship('UserPermission', backref='user', lazy=True,
+                                uselist=False, cascade='all, delete-orphan')
+    
+    # Relationship to personal bridge domains
+    personal_bridge_domains = db.relationship('PersonalBridgeDomain', backref='user', lazy=True,
+                                            cascade='all, delete-orphan')
+    
+    def __init__(self, username: str, email: str, password: str, role: str = 'user', created_by: Optional[int] = None):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
         self.role = role
+        self.is_admin = (role == 'admin')
+        self.created_by = created_by
     
     def set_password(self, password: str):
         """Set password with hashing"""
@@ -56,6 +73,7 @@ class User(UserMixin, db.Model):
             'user_id': self.id,
             'username': self.username,
             'role': self.role,
+            'is_admin': self.is_admin,
             'exp': datetime.utcnow() + timedelta(hours=24)
         }
         secret_key = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this')
@@ -75,12 +93,32 @@ class User(UserMixin, db.Model):
     
     def has_permission(self, permission: str) -> bool:
         """Check if user has specific permission"""
-        if self.role == 'admin':
+        if self.role == 'admin' or self.is_admin:
             return True
         elif self.role == 'user':
             return permission in ['read', 'write', 'deploy']
         elif self.role == 'readonly':
             return permission == 'read'
+        return False
+    
+    def get_vlan_ranges(self) -> list:
+        """Get user's VLAN ranges"""
+        ranges = []
+        for allocation in self.vlan_allocations:
+            if allocation.is_active:
+                ranges.append({
+                    'id': allocation.id,
+                    'startVlan': allocation.start_vlan,
+                    'endVlan': allocation.end_vlan,
+                    'description': allocation.description
+                })
+        return ranges
+    
+    def has_access_to_vlan(self, vlan_id: int) -> bool:
+        """Check if user has access to a specific VLAN"""
+        for allocation in self.vlan_allocations:
+            if allocation.is_active and allocation.start_vlan <= vlan_id <= allocation.end_vlan:
+                return True
         return False
     
     def to_dict(self) -> dict:
@@ -91,8 +129,108 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'role': self.role,
             'is_active': self.is_active,
+            'is_admin': self.is_admin,
+            'created_by': self.created_by,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'last_login': self.last_login.isoformat() if self.last_login else None
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'vlanRanges': self.get_vlan_ranges(),
+            'permissions': self.permissions.to_dict() if self.permissions else None
+        }
+
+class UserVlanAllocation(db.Model):
+    """User VLAN allocation model"""
+    
+    __tablename__ = 'user_vlan_allocations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    start_vlan = db.Column(db.Integer, nullable=False)
+    end_vlan = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(200))
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __init__(self, user_id: int, start_vlan: int, end_vlan: int, description: str = ''):
+        self.user_id = user_id
+        self.start_vlan = start_vlan
+        self.end_vlan = end_vlan
+        self.description = description
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'startVlan': self.start_vlan,
+            'endVlan': self.end_vlan,
+            'description': self.description,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class UserPermission(db.Model):
+    """User permissions model"""
+    
+    __tablename__ = 'user_permissions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    can_edit_topology = db.Column(db.Boolean, default=True)
+    can_deploy_changes = db.Column(db.Boolean, default=True)
+    can_view_global = db.Column(db.Boolean, default=False)
+    can_edit_others = db.Column(db.Boolean, default=False)
+    max_bridge_domains = db.Column(db.Integer, default=50)
+    require_approval = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __init__(self, user_id: int, **kwargs):
+        self.user_id = user_id
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'canEditTopology': self.can_edit_topology,
+            'canDeployChanges': self.can_deploy_changes,
+            'canViewGlobal': self.can_view_global,
+            'canEditOthers': self.can_edit_others,
+            'maxBridgeDomains': self.max_bridge_domains,
+            'requireApproval': self.require_approval,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class PersonalBridgeDomain(db.Model):
+    """Personal workspace bridge domains"""
+    
+    __tablename__ = 'personal_bridge_domains'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    bridge_domain_name = db.Column(db.String(100), nullable=False)
+    imported_from_topology = db.Column(db.Boolean, default=False)
+    topology_scanned = db.Column(db.Boolean, default=False)
+    last_scan_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __init__(self, user_id: int, bridge_domain_name: str, imported_from_topology: bool = False):
+        self.user_id = user_id
+        self.bridge_domain_name = bridge_domain_name
+        self.imported_from_topology = imported_from_topology
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'bridge_domain_name': self.bridge_domain_name,
+            'imported_from_topology': self.imported_from_topology,
+            'topology_scanned': self.topology_scanned,
+            'last_scan_at': self.last_scan_at.isoformat() if self.last_scan_at else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
 class Configuration(db.Model):
@@ -129,7 +267,7 @@ class Configuration(db.Model):
             'config_type': self.config_type,
             'status': self.status,
             'config_data': self.config_data,
-            'metadata': self.config_metadata,
+            'config_metadata': self.config_metadata,
             'file_path': self.file_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'deployed_at': self.deployed_at.isoformat() if self.deployed_at else None,
@@ -142,7 +280,9 @@ class Configuration(db.Model):
         if status == 'deployed':
             self.deployed_at = datetime.utcnow()
             self.deployed_by = deployed_by
-        db.session.commit()
+        elif status == 'deleted':
+            self.deployed_at = None
+            self.deployed_by = None
 
 class AuditLog(db.Model):
     """Audit log for tracking user actions"""
@@ -168,7 +308,7 @@ class AuditLog(db.Model):
         self.action = action
         self.resource_type = resource_type
         self.resource_id = resource_id
-        self.details = str(details) if details else None
+        self.details = json.dumps(details) if details else None
         self.ip_address = ip_address
         self.user_agent = user_agent
     

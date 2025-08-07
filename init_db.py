@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask
-from models import db, User, Configuration, AuditLog
+from models import db, User, Configuration, AuditLog, UserVlanAllocation, UserPermission, PersonalBridgeDomain
 from auth import ensure_user_directories
 
 def create_app():
@@ -47,14 +47,41 @@ def init_database():
                 username='admin',
                 email='admin@lab-automation.local',
                 password='Admin123!',
-                role='admin'
+                role='admin',
+                created_by=None  # Admin is self-created
             )
+            admin_user.is_admin = True
             db.session.add(admin_user)
+            db.session.commit()
+            
+            # Create admin VLAN allocations (full range for admin)
+            admin_vlan_allocation = UserVlanAllocation(
+                user_id=admin_user.id,
+                start_vlan=1,
+                end_vlan=4094,
+                description='Admin full VLAN range'
+            )
+            db.session.add(admin_vlan_allocation)
+            
+            # Create admin permissions (full access)
+            admin_permissions = UserPermission(
+                user_id=admin_user.id,
+                can_edit_topology=True,
+                can_deploy_changes=True,
+                can_view_global=True,
+                can_edit_others=True,
+                max_bridge_domains=1000,
+                require_approval=False
+            )
+            db.session.add(admin_permissions)
+            
             db.session.commit()
             print("✅ Admin user created successfully")
             print("   Username: admin")
             print("   Password: Admin123!")
             print("   Email: admin@lab-automation.local")
+            print("   VLAN Range: 1-4094 (Full access)")
+            print("   Permissions: Full admin access")
         else:
             print("ℹ️  Admin user already exists")
         
@@ -62,157 +89,208 @@ def init_database():
         ensure_user_directories(admin_user.id)
         print("✅ User directories created")
         
-        # Create additional test users
+        # Create additional test users with VLAN ranges
         test_users = [
             {
                 'username': 'user1',
                 'email': 'user1@lab-automation.local',
                 'password': 'User123!',
-                'role': 'user'
+                'role': 'user',
+                'vlan_ranges': [
+                    {'start': 100, 'end': 199, 'description': 'User1 VLAN Range 1'},
+                    {'start': 200, 'end': 299, 'description': 'User1 VLAN Range 2'}
+                ],
+                'permissions': {
+                    'can_edit_topology': True,
+                    'can_deploy_changes': True,
+                    'can_view_global': False,
+                    'can_edit_others': False,
+                    'max_bridge_domains': 50,
+                    'require_approval': False
+                }
+            },
+            {
+                'username': 'user2',
+                'email': 'user2@lab-automation.local',
+                'password': 'User123!',
+                'role': 'user',
+                'vlan_ranges': [
+                    {'start': 300, 'end': 399, 'description': 'User2 VLAN Range'}
+                ],
+                'permissions': {
+                    'can_edit_topology': True,
+                    'can_deploy_changes': True,
+                    'can_view_global': False,
+                    'can_edit_others': False,
+                    'max_bridge_domains': 30,
+                    'require_approval': True
+                }
             },
             {
                 'username': 'readonly1',
                 'email': 'readonly1@lab-automation.local',
                 'password': 'Read123!',
-                'role': 'readonly'
+                'role': 'readonly',
+                'vlan_ranges': [
+                    {'start': 400, 'end': 499, 'description': 'ReadOnly VLAN Range'}
+                ],
+                'permissions': {
+                    'can_edit_topology': False,
+                    'can_deploy_changes': False,
+                    'can_view_global': True,
+                    'can_edit_others': False,
+                    'max_bridge_domains': 10,
+                    'require_approval': True
+                }
             }
         ]
         
         for user_data in test_users:
             existing_user = User.query.filter_by(username=user_data['username']).first()
             if not existing_user:
-                user = User(**user_data)
+                # Create user
+                user = User(
+                    username=user_data['username'],
+                    email=user_data['email'],
+                    password=user_data['password'],
+                    role=user_data['role'],
+                    created_by=admin_user.id
+                )
                 db.session.add(user)
+                db.session.flush()  # Get user ID
+                
+                # Create VLAN allocations
+                for vlan_range in user_data['vlan_ranges']:
+                    vlan_allocation = UserVlanAllocation(
+                        user_id=user.id,
+                        start_vlan=vlan_range['start'],
+                        end_vlan=vlan_range['end'],
+                        description=vlan_range['description']
+                    )
+                    db.session.add(vlan_allocation)
+                
+                # Create permissions
+                permissions = UserPermission(
+                    user_id=user.id,
+                    **user_data['permissions']
+                )
+                db.session.add(permissions)
+                
+                # Create user directories
                 ensure_user_directories(user.id)
+                
                 print(f"✅ Created user: {user_data['username']} ({user_data['role']})")
+                vlan_ranges_str = ', '.join([f"{r['start']}-{r['end']}" for r in user_data['vlan_ranges']])
+                print(f"   VLAN Ranges: {vlan_ranges_str}")
         
         db.session.commit()
         print("\n🎉 Database initialization completed!")
         print("\n📋 Available users:")
-        print("   Admin: admin / Admin123!")
-        print("   User: user1 / User123!")
-        print("   Read-only: readonly1 / Read123!")
+        print("   Admin: admin / Admin123! (VLAN: 1-4094, Full access)")
+        print("   User1: user1 / User123! (VLAN: 100-199, 200-299)")
+        print("   User2: user2 / User123! (VLAN: 300-399)")
+        print("   ReadOnly: readonly1 / Read123! (VLAN: 400-499, Read-only)")
 
 def migrate_existing_configs():
     """Migrate existing configurations to user ownership"""
     app = create_app()
     
     with app.app_context():
-        from pathlib import Path
-        import yaml
-        import json
-        
         # Get admin user
         admin_user = User.query.filter_by(username='admin').first()
         if not admin_user:
-            print("❌ Admin user not found. Run init_database() first.")
+            print("❌ Admin user not found. Please run init_database() first.")
             return
         
-        # Migrate configs from configs/pending to admin user
-        pending_dir = Path("configs/pending")
-        if pending_dir.exists():
-            migrated_count = 0
-            for config_file in pending_dir.glob("*.yaml"):
-                try:
-                    # Read existing config
-                    with open(config_file, 'r') as f:
-                        config_data = yaml.safe_load(f)
-                    
-                    # Extract service name from filename
-                    service_name = config_file.stem.replace('unified_bridge_domain_', '')
-                    
-                    # Create configuration record
-                    config = Configuration(
-                        user_id=admin_user.id,
-                        service_name=service_name,
-                        vlan_id=0,  # Will be extracted from config data
-                        config_type='bridge_domain'
-                    )
-                    
-                    # Set config data
-                    config.config_data = json.dumps(config_data)
-                    config.file_path = str(config_file)
-                    
-                    # Extract VLAN ID if available
-                    if config_data and '_metadata' in config_data:
-                        metadata = config_data['_metadata']
-                        if 'vlan_id' in metadata:
-                            config.vlan_id = metadata['vlan_id']
-                    
-                    db.session.add(config)
-                    migrated_count += 1
-                    
-                    # Move file to admin user directory
-                    admin_pending_dir = Path(f"configs/users/{admin_user.id}/pending")
-                    admin_pending_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    new_path = admin_pending_dir / config_file.name
-                    config_file.rename(new_path)
-                    config.file_path = str(new_path)
-                    
-                except Exception as e:
-                    print(f"⚠️  Failed to migrate {config_file}: {e}")
-            
-            db.session.commit()
-            print(f"✅ Migrated {migrated_count} configurations to admin user")
+        # Find configurations without user_id and assign to admin
+        orphaned_configs = Configuration.query.filter_by(user_id=None).all()
         
-        # Migrate deployed configs
-        deployed_dir = Path("configs/deployed")
-        if deployed_dir.exists():
-            migrated_count = 0
-            for config_file in deployed_dir.glob("*.yaml"):
-                try:
-                    # Read existing config
-                    with open(config_file, 'r') as f:
-                        config_data = yaml.safe_load(f)
-                    
-                    # Extract service name from filename
-                    service_name = config_file.stem.replace('unified_bridge_domain_', '')
-                    
-                    # Create configuration record
-                    config = Configuration(
-                        user_id=admin_user.id,
-                        service_name=service_name,
-                        vlan_id=0,
-                        config_type='bridge_domain',
-                        status='deployed'
-                    )
-                    
-                    # Set config data
-                    config.config_data = json.dumps(config_data)
-                    config.file_path = str(config_file)
-                    
-                    # Extract VLAN ID if available
-                    if config_data and '_metadata' in config_data:
-                        metadata = config_data['_metadata']
-                        if 'vlan_id' in metadata:
-                            config.vlan_id = metadata['vlan_id']
-                    
-                    db.session.add(config)
-                    migrated_count += 1
-                    
-                    # Move file to admin user directory
-                    admin_deployed_dir = Path(f"configs/users/{admin_user.id}/deployed")
-                    admin_deployed_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    new_path = admin_deployed_dir / config_file.name
-                    config_file.rename(new_path)
-                    config.file_path = str(new_path)
-                    
-                except Exception as e:
-                    print(f"⚠️  Failed to migrate {config_file}: {e}")
+        if orphaned_configs:
+            print(f"🔄 Migrating {len(orphaned_configs)} orphaned configurations to admin user...")
+            
+            for config in orphaned_configs:
+                config.user_id = admin_user.id
+                print(f"   Migrated: {config.service_name}")
             
             db.session.commit()
-            print(f"✅ Migrated {migrated_count} deployed configurations to admin user")
+            print("✅ Migration completed successfully")
+        else:
+            print("ℹ️  No orphaned configurations found")
 
-if __name__ == "__main__":
+def create_user_with_vlan_ranges(username: str, email: str, password: str, vlan_ranges: list, 
+                                permissions: dict = None, created_by: int = None):
+    """Create a new user with VLAN ranges and permissions"""
+    app = create_app()
+    
+    with app.app_context():
+        # Check if user already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            print(f"❌ User {username} already exists")
+            return None
+        
+        # Create user
+        user = User(
+            username=username,
+            email=email,
+            password=password,
+            role='user',
+            created_by=created_by
+        )
+        db.session.add(user)
+        db.session.flush()  # Get user ID
+        
+        # Create VLAN allocations
+        for vlan_range in vlan_ranges:
+            vlan_allocation = UserVlanAllocation(
+                user_id=user.id,
+                start_vlan=vlan_range['start'],
+                end_vlan=vlan_range['end'],
+                description=vlan_range.get('description', '')
+            )
+            db.session.add(vlan_allocation)
+        
+        # Create permissions (use defaults if not provided)
+        if permissions is None:
+            permissions = {
+                'can_edit_topology': True,
+                'can_deploy_changes': True,
+                'can_view_global': False,
+                'can_edit_others': False,
+                'max_bridge_domains': 50,
+                'require_approval': False
+            }
+        
+        user_permissions = UserPermission(
+            user_id=user.id,
+            **permissions
+        )
+        db.session.add(user_permissions)
+        
+        # Create user directories
+        ensure_user_directories(user.id)
+        
+        db.session.commit()
+        
+        print(f"✅ Created user: {username}")
+        print(f"   Email: {email}")
+        vlan_ranges_str = ', '.join([f"{r['start']}-{r['end']}" for r in vlan_ranges])
+        print(f"   VLAN Ranges: {vlan_ranges_str}")
+        
+        return user
+
+if __name__ == '__main__':
     print("🚀 Initializing Lab Automation Database...")
     
     # Initialize database
     init_database()
     
     # Migrate existing configurations
-    print("\n📦 Migrating existing configurations...")
     migrate_existing_configs()
     
-    print("\n✅ Database setup completed successfully!") 
+    print("\n✨ Database setup complete!")
+    print("\n📝 Next steps:")
+    print("   1. Start the API server: python api_server.py")
+    print("   2. Access the web interface")
+    print("   3. Login with admin credentials")
+    print("   4. Create additional users through the admin interface") 

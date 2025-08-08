@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask
-from models import db, User, Configuration, AuditLog, UserVlanAllocation, UserPermission, PersonalBridgeDomain
+from models import db, User, Configuration, AuditLog, UserVlanAllocation, UserPermission, PersonalBridgeDomain, TopologyScan, DeviceInterface, TopologyPath
 from auth import ensure_user_directories
 
 def create_app():

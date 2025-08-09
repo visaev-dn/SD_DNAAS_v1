@@ -149,13 +149,15 @@ class BridgeDomainReverseEngineer:
                     existing.vlan_id = vlan_id
                     existing.config_data = json.dumps(config_data)
                     existing.config_metadata = json.dumps(metadata)
-                    existing.status = 'active'
+                    existing.status = 'deployed'  # Mark as deployed since it exists in the field
                     existing.is_reverse_engineered = True
                     existing.topology_data = json.dumps(topology_data)
                     existing.path_data = json.dumps(path_data)
                     existing.config_source = 'reverse_engineered'
                     existing.builder_type = (metadata or {}).get('builder_type') or 'unified'
                     existing.topology_type = (builder_config or {}).get('topology_type')
+                    existing.deployed_at = datetime.utcnow()  # Update deployment time
+                    existing.deployed_by = user_id  # Update deployer
                     try:
                         existing.builder_input = json.dumps(builder_input_final)
                     except Exception:
@@ -171,11 +173,13 @@ class BridgeDomainReverseEngineer:
                     )
                     configuration.config_data = json.dumps(config_data)
                     configuration.config_metadata = json.dumps(metadata)
-                    configuration.status = 'active'
+                    configuration.status = 'deployed'  # Mark as deployed since it exists in the field
                     configuration.is_reverse_engineered = True
                     configuration.topology_data = json.dumps(topology_data)
                     configuration.path_data = json.dumps(path_data)
                     configuration.created_at = datetime.utcnow()
+                    configuration.deployed_at = datetime.utcnow()  # Set deployment time to now
+                    configuration.deployed_by = user_id  # Set deployer to current user
                     configuration.config_source = 'reverse_engineered'
                     configuration.builder_type = (metadata or {}).get('builder_type') or 'unified'
                     configuration.topology_type = (builder_config or {}).get('topology_type')
@@ -270,11 +274,13 @@ class BridgeDomainReverseEngineer:
                 )
                 configuration.config_data = json.dumps(config_data)
                 configuration.config_metadata = json.dumps(metadata)
-                configuration.status = 'active'
+                configuration.status = 'deployed'  # Mark as deployed since it exists in the field
                 configuration.is_reverse_engineered = True
                 configuration.topology_data = json.dumps(topology_data)
                 configuration.path_data = json.dumps(path_data)
                 configuration.created_at = datetime.utcnow()
+                configuration.deployed_at = datetime.utcnow()  # Set deployment time to now
+                configuration.deployed_by = user_id  # Set deployer to current user
                 
                 logger.info("Configuration object created, adding to session...")
                 db.session.add(configuration)

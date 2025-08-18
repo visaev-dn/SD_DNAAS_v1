@@ -61,4 +61,7 @@ backups/
 *.temp
 
 # Large archive files
-*.tar.gz 
+*.tar.gz
+
+# Cleanup folder
+for_deletion/ 

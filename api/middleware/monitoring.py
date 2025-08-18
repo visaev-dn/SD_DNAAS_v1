@@ -10,8 +10,15 @@ import time
 import threading
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
-import psutil
 import logging
+
+# Try to import psutil, but make it optional
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    psutil = None
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +124,7 @@ class MetricsCollector:
                 return dict(self.endpoint_metrics)
     
     def get_user_metrics(self, user_id=None):
-        """Get metrics for specific user or all users"""
+        """Get user metrics for specific user or all users"""
         with self.lock:
             if user_id:
                 return self.user_metrics.get(user_id, {})
@@ -126,6 +133,13 @@ class MetricsCollector:
     
     def get_system_metrics(self):
         """Get current system metrics"""
+        if not PSUTIL_AVAILABLE:
+            return {
+                'error': 'psutil not available - system metrics disabled',
+                'psutil_available': False,
+                'timestamp': datetime.utcnow().isoformat()
+            }
+        
         try:
             cpu_percent = psutil.cpu_percent(interval=1)
             memory = psutil.virtual_memory()
@@ -140,11 +154,16 @@ class MetricsCollector:
                 'disk_free_gb': round(disk.free / (1024**3), 2),
                 'network_bytes_sent': network.bytes_sent,
                 'network_bytes_recv': network.bytes_recv,
+                'psutil_available': True,
                 'timestamp': datetime.utcnow().isoformat()
             }
         except Exception as e:
             logger.error(f"Failed to collect system metrics: {e}")
-            return {'error': str(e)}
+            return {
+                'error': str(e),
+                'psutil_available': True,
+                'timestamp': datetime.utcnow().isoformat()
+            }
     
     def get_summary_stats(self):
         """Get summary statistics"""
@@ -166,6 +185,7 @@ class MetricsCollector:
                 'avg_response_time_ms': round(avg_response_time * 1000, 2),
                 'unique_endpoints': len(self.endpoint_metrics),
                 'unique_users': len(self.user_metrics),
+                'psutil_available': PSUTIL_AVAILABLE,
                 'timestamp': datetime.utcnow().isoformat()
             }
     
@@ -275,17 +295,20 @@ def health_check():
         is_healthy = True
         issues = []
         
-        if system_metrics.get('cpu_usage_percent', 0) > 90:
+        if PSUTIL_AVAILABLE and system_metrics.get('cpu_usage_percent', 0) > 90:
             is_healthy = False
             issues.append('High CPU usage')
         
-        if system_metrics.get('memory_usage_percent', 0) > 90:
+        if PSUTIL_AVAILABLE and system_metrics.get('memory_usage_percent', 0) > 90:
             is_healthy = False
             issues.append('High memory usage')
         
-        if system_metrics.get('disk_usage_percent', 0) > 90:
+        if PSUTIL_AVAILABLE and system_metrics.get('disk_usage_percent', 0) > 90:
             is_healthy = False
             issues.append('High disk usage')
+        
+        if not PSUTIL_AVAILABLE:
+            issues.append('System monitoring disabled (psutil not available)')
         
         status_code = 200 if is_healthy else 503
         
@@ -293,7 +316,8 @@ def health_check():
             'status': 'healthy' if is_healthy else 'unhealthy',
             'timestamp': datetime.utcnow().isoformat(),
             'system_metrics': system_metrics,
-            'issues': issues
+            'issues': issues,
+            'psutil_available': PSUTIL_AVAILABLE
         }), status_code
         
     except Exception as e:
@@ -317,7 +341,8 @@ def detailed_health_check():
             'summary_stats': summary_stats,
             'system_metrics': system_metrics,
             'endpoint_count': len(metrics_collector.get_endpoint_metrics()),
-            'user_count': len(metrics_collector.get_user_metrics())
+            'user_count': len(metrics_collector.get_user_metrics()),
+            'psutil_available': PSUTIL_AVAILABLE
         })
         
     except Exception as e:

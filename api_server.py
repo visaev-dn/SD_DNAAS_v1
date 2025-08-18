@@ -38,6 +38,12 @@ from scripts.device_status_viewer import DeviceStatusViewer
 # Import the enhanced topology scanner
 from config_engine.enhanced_topology_scanner import EnhancedTopologyScanner
 
+# Import smart deployment components
+from config_engine.smart_deployment_manager import SmartDeploymentManager
+from config_engine.configuration_diff_engine import ConfigurationDiffEngine
+from config_engine.rollback_manager import RollbackManager
+from config_engine.validation_framework import ValidationFramework
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -109,6 +115,14 @@ builder = UnifiedBridgeDomainBuilder()
 inventory_manager = InventoryManager()
 device_viewer = DeviceStatusViewer()
 device_scanner = DeviceScanner()
+
+# Initialize smart deployment components
+smart_deployment_manager = SmartDeploymentManager(
+    topology_dir="topology",
+    deployment_manager=deployment_manager
+)
+# Note: ConfigurationDiffEngine, RollbackManager, and ValidationFramework are 
+# already initialized within SmartDeploymentManager, so we don't need separate instances
 
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
@@ -3404,6 +3418,512 @@ def regenerate_from_builder_input(current_user, config_id):
         })
     except Exception as e:
         logger.error(f"Regenerate from builder_input error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ============================================================================
+# SMART DEPLOYMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/configurations/<int:config_id>/smart-deploy/analyze', methods=['POST'])
+@token_required
+@user_ownership_required
+def analyze_configuration_changes(current_user, config_id):
+    """Analyze changes between current and new configuration for smart deployment"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({"success": False, "error": "Configuration not found"}), 404
+
+        payload = request.get_json() or {}
+        new_config_data = payload.get('new_config_data')
+        
+        if not new_config_data:
+            return jsonify({"success": False, "error": "New configuration data is required"}), 400
+
+        # Get current configuration from devices (if deployed)
+        current_config = None
+        if config.status == 'deployed':
+            # This would typically involve retrieving current device configurations
+            # For now, we'll use the stored config_data as a proxy
+            try:
+                current_config = json.loads(config.config_data) if config.config_data else {}
+            except:
+                current_config = {}
+        else:
+            current_config = {}
+
+        # Analyze changes using the smart deployment manager
+        try:
+            deployment_diff = smart_deployment_manager.analyzeChanges(
+                current_config=current_config,
+                new_config=new_config_data
+            )
+            
+            # Convert dataclass to dict for JSON serialization
+            diff_dict = {
+                'devices_to_add': [
+                    {
+                        'device_name': d.device_name,
+                        'change_type': d.change_type,
+                        'affected_interfaces': d.affected_interfaces,
+                        'vlan_changes': d.vlan_changes
+                    } for d in deployment_diff.devices_to_add
+                ],
+                'devices_to_modify': [
+                    {
+                        'device_name': d.device_name,
+                        'change_type': d.change_type,
+                        'affected_interfaces': d.affected_interfaces,
+                        'vlan_changes': d.vlan_changes
+                    } for d in deployment_diff.devices_to_modify
+                ],
+                'devices_to_remove': [
+                    {
+                        'device_name': d.device_name,
+                        'change_type': d.change_type,
+                        'affected_interfaces': d.affected_interfaces,
+                        'vlan_changes': d.vlan_changes
+                    } for d in deployment_diff.devices_to_remove
+                ],
+                'unchanged_devices': deployment_diff.unchanged_devices,
+                'vlan_changes': [
+                    {
+                        'vlan_id': v.vlan_id,
+                        'change_type': v.change_type,
+                        'affected_devices': v.affected_devices
+                    } for v in deployment_diff.vlan_changes
+                ],
+                'estimated_impact': {
+                    'affected_device_count': deployment_diff.estimated_impact.affected_device_count,
+                    'estimated_duration': deployment_diff.estimated_impact.estimated_duration,
+                    'risk_level': deployment_diff.estimated_impact.risk_level.value,
+                    'potential_conflicts': deployment_diff.estimated_impact.potential_conflicts,
+                    'rollback_complexity': deployment_diff.estimated_impact.rollback_complexity
+                }
+            }
+
+            return jsonify({
+                "success": True,
+                "deployment_diff": diff_dict,
+                "message": "Configuration changes analyzed successfully"
+            })
+
+        except Exception as e:
+            logger.error(f"Error analyzing configuration changes: {e}")
+            return jsonify({"success": False, "error": f"Analysis failed: {str(e)}"}), 500
+
+    except Exception as e:
+        logger.error(f"Analyze configuration changes error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/configurations/<int:config_id>/smart-deploy/plan', methods=['POST'])
+@token_required
+@user_ownership_required
+def generate_smart_deployment_plan(current_user, config_id):
+    """Generate a smart deployment plan for configuration changes"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({"success": False, "error": "Configuration not found"}), 404
+
+        payload = request.get_json() or {}
+        deployment_diff = payload.get('deployment_diff')
+        strategy = payload.get('strategy', 'aggressive')  # 'conservative' or 'aggressive'
+        
+        if not deployment_diff:
+            return jsonify({"success": False, "error": "Deployment diff is required"}), 400
+
+        # Convert strategy string to enum
+        from config_engine.smart_deployment_types import DeploymentStrategy
+        deployment_strategy = DeploymentStrategy.AGGRESSIVE if strategy == 'aggressive' else DeploymentStrategy.CONSERVATIVE
+
+        # Convert diff dict back to dataclass
+        try:
+            from config_engine.smart_deployment_types import (
+                DeploymentDiff, DeviceChange, VlanChange, ImpactAssessment, RiskLevel
+            )
+            
+            # Convert the dictionary back to dataclass objects
+            devices_to_add = [
+                DeviceChange(
+                    device_name=d['device_name'],
+                    change_type=d['change_type'],
+                    old_commands=[],  # We don't have old commands in the diff
+                    new_commands=[],  # We don't have new commands in the diff
+                    affected_interfaces=d['affected_interfaces'],
+                    vlan_changes=d['vlan_changes']
+                ) for d in deployment_diff['devices_to_add']
+            ]
+            
+            devices_to_modify = [
+                DeviceChange(
+                    device_name=d['device_name'],
+                    change_type=d['change_type'],
+                    old_commands=[],
+                    new_commands=[],
+                    affected_interfaces=d['affected_interfaces'],
+                    vlan_changes=d['vlan_changes']
+                ) for d in deployment_diff['devices_to_modify']
+            ]
+            
+            devices_to_remove = [
+                DeviceChange(
+                    device_name=d['device_name'],
+                    change_type=d['change_type'],
+                    old_commands=[],
+                    new_commands=[],
+                    affected_interfaces=d['affected_interfaces'],
+                    vlan_changes=d['vlan_changes']
+                ) for d in deployment_diff['devices_to_remove']
+            ]
+            
+            vlan_changes = [
+                VlanChange(
+                    vlan_id=v['vlan_id'],
+                    change_type=v['change_type'],
+                    affected_devices=v['affected_devices'],
+                    old_config={},
+                    new_config={}
+                ) for v in deployment_diff['vlan_changes']
+            ]
+            
+            estimated_impact = ImpactAssessment(
+                affected_device_count=deployment_diff['estimated_impact']['affected_device_count'],
+                estimated_duration=deployment_diff['estimated_impact']['estimated_duration'],
+                risk_level=RiskLevel(deployment_diff['estimated_impact']['risk_level']),
+                potential_conflicts=deployment_diff['estimated_impact']['potential_conflicts'],
+                rollback_complexity=deployment_diff['estimated_impact']['rollback_complexity']
+            )
+            
+            diff_dataclass = DeploymentDiff(
+                devices_to_add=devices_to_add,
+                devices_to_modify=devices_to_modify,
+                devices_to_remove=devices_to_remove,
+                unchanged_devices=deployment_diff['unchanged_devices'],
+                vlan_changes=vlan_changes,
+                estimated_impact=estimated_impact
+            )
+            
+            # Generate deployment plan
+            deployment_plan = smart_deployment_manager.generateDeploymentPlan(
+                diff=diff_dataclass,
+                strategy=deployment_strategy,
+                config_id=config_id
+            )
+        except Exception as e:
+            logger.error(f"Error generating deployment plan: {e}")
+            return jsonify({"success": False, "error": f"Plan generation failed: {str(e)}"}), 500
+
+        return jsonify({
+            "success": True,
+            "deployment_plan": deployment_plan.to_dict(),
+            "message": "Smart deployment plan generated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Generate deployment plan error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/configurations/<int:config_id>/smart-deploy/execute', methods=['POST'])
+@token_required
+@user_ownership_required
+def execute_smart_deployment(current_user, config_id):
+    """Execute a smart deployment plan"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({"success": False, "error": "Configuration not found"}), 404
+
+        payload = request.get_json() or {}
+        deployment_plan = payload.get('deployment_plan')
+        new_config_data = payload.get('new_config_data')
+        
+        if not deployment_plan or not new_config_data:
+            return jsonify({"success": False, "error": "Deployment plan and new configuration data are required"}), 400
+
+        # Generate a unique deployment ID
+        deployment_id = f"smart_deploy_{config_id}_{int(time.time())}"
+        
+        try:
+            # Convert the deployment plan back to dataclass if needed
+            from config_engine.smart_deployment_types import (
+                DeploymentPlan, ExecutionGroup, RollbackConfig, ValidationStep, DeploymentStrategy
+            )
+            
+            # Convert strategy string back to enum
+            strategy_str = deployment_plan.get('strategy', 'conservative')
+            strategy = DeploymentStrategy.CONSERVATIVE if strategy_str == 'conservative' else DeploymentStrategy.AGGRESSIVE
+            
+            # Convert execution groups back to dataclasses
+            execution_groups = []
+            for group_data in deployment_plan.get('execution_groups', []):
+                execution_group = ExecutionGroup(
+                    group_id=group_data['group_id'],
+                    operations=group_data['operations'],
+                    dependencies=group_data.get('dependencies', []),
+                    estimated_duration=group_data.get('estimated_duration', 0),
+                    can_parallel=group_data.get('can_parallel', False)
+                )
+                execution_groups.append(execution_group)
+            
+            # Convert validation steps back to dataclasses
+            validation_steps = []
+            for step_data in deployment_plan.get('validation_steps', []):
+                validation_step = ValidationStep(
+                    step_id=step_data['step_id'],
+                    name=step_data['name'],
+                    description=step_data['description'],
+                    validation_type=step_data['validation_type'],
+                    required=step_data.get('required', True)
+                )
+                validation_steps.append(validation_step)
+            
+            # Create rollback config
+            rollback_config = RollbackConfig(
+                deployment_id=deployment_id,
+                original_config_id=config_id,
+                rollback_commands=deployment_plan.get('rollback_config', {}).get('rollback_commands', []),
+                created_at=datetime.utcnow().isoformat()
+            )
+            
+            # Reconstruct the deployment plan dataclass
+            plan_dataclass = DeploymentPlan(
+                deployment_id=deployment_id,
+                strategy=strategy,
+                execution_groups=execution_groups,
+                rollback_config=rollback_config,
+                estimated_duration=deployment_plan.get('estimated_duration', 0),
+                risk_level=deployment_plan.get('risk_level', 'medium'),
+                validation_steps=validation_steps
+            )
+            
+            # Execute the deployment using the smart deployment manager
+            deployment_result = smart_deployment_manager.executeDeployment(
+                deployment_plan=plan_dataclass,
+                new_config_data=new_config_data
+            )
+            
+            if deployment_result.success:
+                # Update the configuration with new data
+                config.config_data = json.dumps(new_config_data)
+                config.status = 'deployed'
+                config.deployed_at = datetime.utcnow().isoformat()
+                config.deployed_by = current_user.id
+                
+                # Create audit log
+                create_audit_log(
+                    current_user.id, 
+                    'smart_deploy', 
+                    'configuration', 
+                    config_id, 
+                    {
+                        'deployment_id': deployment_id,
+                        'deployment_type': 'smart_incremental',
+                        'strategy': strategy.value,
+                        'result': 'success'
+                    }
+                )
+                
+                db.session.commit()
+                
+                return jsonify({
+                    "success": True,
+                    "deployment_id": deployment_id,
+                    "message": "Smart deployment completed successfully",
+                    "status": "completed",
+                    "result": {
+                        'success': deployment_result.success,
+                        'execution_time': deployment_result.execution_time,
+                        'devices_processed': deployment_result.devices_processed,
+                        'validation_results': [
+                            {
+                                'step_id': result.step_id,
+                                'success': result.success,
+                                'details': result.details
+                            } for result in deployment_result.validation_results
+                        ]
+                    }
+                })
+            else:
+                # Deployment failed, create audit log for failure
+                create_audit_log(
+                    current_user.id, 
+                    'smart_deploy', 
+                    'configuration', 
+                    config_id, 
+                    {
+                        'deployment_id': deployment_id,
+                        'deployment_type': 'smart_incremental',
+                        'strategy': strategy.value,
+                        'result': 'failed',
+                        'error': deployment_result.error_message
+                    }
+                )
+                
+                db.session.commit()
+                
+                return jsonify({
+                    "success": False,
+                    "deployment_id": deployment_id,
+                    "error": "Smart deployment failed",
+                    "details": deployment_result.error_message
+                }), 500
+
+        except Exception as e:
+            logger.error(f"Error executing smart deployment: {e}")
+            db.session.rollback()
+            return jsonify({"success": False, "error": f"Deployment execution failed: {str(e)}"}), 500
+
+    except Exception as e:
+        logger.error(f"Execute smart deployment error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/configurations/<int:config_id>/smart-deploy/rollback', methods=['POST'])
+@token_required
+@user_ownership_required
+def rollback_smart_deployment(current_user, config_id):
+    """Rollback a smart deployment to previous configuration"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({"success": False, "error": "Configuration not found"}), 404
+
+        payload = request.get_json() or {}
+        deployment_id = payload.get('deployment_id')
+        
+        if not deployment_id:
+            return jsonify({"success": False, "error": "Deployment ID is required for rollback"}), 400
+
+        # Get rollback configuration
+        try:
+            rollback_config = rollback_manager.get_rollback_config_for_deployment(deployment_id)
+            
+            if not rollback_config:
+                return jsonify({"success": False, "error": "No rollback configuration found"}), 404
+
+            # Execute rollback using the rollback manager
+            rollback_result = rollback_manager.execute_rollback(deployment_id)
+            
+            if rollback_result['success']:
+                # Update configuration status
+                config.status = 'rolled_back'
+                config.deployed_at = None
+                config.deployed_by = None
+                
+                # Create audit log
+                create_audit_log(
+                    current_user.id, 
+                    'rollback', 
+                    'configuration', 
+                    config_id, 
+                    {
+                        'rollback_id': rollback_config.deployment_id,
+                        'reason': 'user_requested',
+                        'result': 'success'
+                    }
+                )
+                
+                db.session.commit()
+                
+                return jsonify({
+                    "success": True,
+                    "message": "Rollback executed successfully",
+                    "rollback_result": rollback_result
+                })
+            else:
+                # Rollback failed, create audit log
+                create_audit_log(
+                    current_user.id, 
+                    'rollback', 
+                    'configuration', 
+                    config_id, 
+                    {
+                        'rollback_id': rollback_config.deployment_id,
+                        'reason': 'user_requested',
+                        'result': 'failed',
+                        'error': rollback_result.get('error', 'Unknown error')
+                    }
+                )
+                
+                db.session.commit()
+                
+                return jsonify({
+                    "success": False, 
+                    "error": "Rollback failed", 
+                    "details": rollback_result.get('errors', [])
+                }), 500
+
+        except Exception as e:
+            logger.error(f"Error executing rollback: {e}")
+            return jsonify({"success": False, "error": f"Rollback execution failed: {str(e)}"}), 500
+
+    except Exception as e:
+        logger.error(f"Rollback smart deployment error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/configurations/<int:config_id>/smart-deploy/status', methods=['GET'])
+@token_required
+@user_ownership_required
+def get_smart_deployment_status(current_user, config_id):
+    """Get the status of a smart deployment"""
+    try:
+        config = Configuration.query.get(config_id)
+        if not config:
+            return jsonify({"success": False, "error": "Configuration not found"}), 404
+
+        # Get deployment status from smart deployment manager
+        try:
+            # Get the most recent deployment for this configuration
+            deployment_id = request.args.get('deployment_id')
+            
+            if not deployment_id:
+                # Try to find the most recent deployment ID from audit logs
+                # For now, we'll use a placeholder approach
+                deployment_id = f"smart_deploy_{config_id}_latest"
+            
+            # Get deployment status from smart deployment manager
+            status_info = smart_deployment_manager.getDeploymentStatus(deployment_id)
+            
+            if status_info:
+                return jsonify({
+                    "success": True,
+                    "deployment_status": status_info
+                })
+            else:
+                # Fallback to basic status information
+                status_info = {
+                    'config_id': config_id,
+                    'deployment_id': deployment_id,
+                    'status': config.status,
+                    'deployed_at': config.deployed_at,
+                    'deployed_by': config.deployed_by,
+                    'last_updated': config.deployed_at or config.created_at,
+                    'config_type': 'smart_incremental' if config.status == 'deployed' else 'pending'
+                }
+                
+                return jsonify({
+                    "success": True,
+                    "deployment_status": status_info
+                })
+
+        except Exception as e:
+            logger.error(f"Error getting deployment status: {e}")
+            # Return basic status on error
+            status_info = {
+                'config_id': config_id,
+                'status': config.status,
+                'deployed_at': config.deployed_at,
+                'deployed_by': config.deployed_by,
+                'last_updated': config.deployed_at or config.created_at,
+                'error': f"Status retrieval failed: {str(e)}"
+            }
+            
+            return jsonify({
+                "success": True,
+                "deployment_status": status_info
+            })
+
+    except Exception as e:
+        logger.error(f"Get deployment status error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ============================================================================

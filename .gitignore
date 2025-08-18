@@ -53,7 +53,8 @@ logs/
 # Sensitive data
 devices.yaml
 configs/
-topology/
+# Ignore root topology directory, but allow config_engine/topology/
+/topology/
 backups/
 
 # Temporary files

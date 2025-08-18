@@ -10,13 +10,12 @@ from flask import Blueprint
 api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
 
 # Import only the modules that exist
-from . import auth, bridge_domains
-
-# TODO: Create these modules in future iterations
-# from . import configurations, deployments, files, devices, dashboard, admin
+from . import auth, bridge_domains, files, dashboard
 
 __all__ = [
     'api_v1',
     'auth',
-    'bridge_domains'
+    'bridge_domains',
+    'files',
+    'dashboard'
 ]

@@ -36,7 +36,14 @@ ANSI_ESCAPE = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
 
 def strip_ansi_codes(text):
     """Remove ANSI escape sequences from text."""
-    return ANSI_ESCAPE.sub('', text)
+    # First remove real ANSI escape sequences
+    text = ANSI_ESCAPE.sub('', text)
+    
+    # Then remove literal ANSI-like patterns (e.g., \e[91mvlan\e[0m)
+    # Common pattern: \e[<numbers>m<text>\e[0m
+    text = re.sub(r'\\e\[\d+m([^\\]*?)\\e\[0m', r'\1', text)
+    
+    return text
 
 RAW_CONFIG_DIR = Path('topology/configs/raw-config')
 RAW_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -738,40 +745,186 @@ def parse_bridge_domain_instance(cli_output):
         return []
 
 def parse_vlan_configuration(cli_output):
-    """Parse VLAN Configuration CLI output."""
+    """Parse VLAN Configuration CLI output with enhanced QinQ support."""
     vlan_configs = []
     
     try:
         lines = cli_output.split('\n')
+        
+        # Track current interface context for multi-line configurations
+        current_interface = None
+        current_config = {}
         
         for line in lines:
             line = line.strip()
             if not line:
                 continue
             
-            # Look for VLAN ID configurations
-            # Example: interfaces bundle-447.447 vlan-id 447
-            vlan_id_match = re.search(r'interfaces ([^\s]+) vlan-id (\d+)', line)
-            if vlan_id_match:
-                interface_name = vlan_id_match.group(1)
-                vlan_id = int(vlan_id_match.group(2))
-                vlan_configs.append({
-                    'interface': interface_name,
-                    'vlan_id': vlan_id,
-                    'type': 'subinterface'
-                })
+            # Strip ANSI color codes for robust parsing
+            clean_line = strip_ansi_codes(line)
             
-            # Look for VLAN manipulation configurations
-            # Example: interfaces bundle-1204 vlan-manipulation egress-mapping action pop
-            elif 'vlan-manipulation' in line:
-                interface_match = re.search(r'interfaces ([^\s]+) vlan-manipulation', line)
+            # Check for interface line
+            interface_match = re.search(r'interfaces ([^\s]+)', clean_line)
                 if interface_match:
-                    interface_name = interface_match.group(1)
-                    vlan_configs.append({
-                        'interface': interface_name,
-                        'type': 'manipulation',
-                        'configuration': line.strip()
-                    })
+                # Save previous interface config if exists
+                if current_interface and current_config:
+                    vlan_configs.append(current_config.copy())
+                
+                # Start new interface
+                current_interface = interface_match.group(1)
+                current_config = {
+                    'interface': current_interface,
+                    'type': 'subinterface' if '.' in current_interface else 'physical',
+                    'vlan_id': None,
+                    'outer_vlan': None,
+                    'inner_vlan': None,
+                    'vlan_range': None,
+                    'vlan_list': None,
+                    'vlan_manipulation': None,
+                    'l2_service': False,
+                    'description': None,
+                    'raw_config': []
+                }
+                current_config['raw_config'].append(line)
+                # Also parse VLAN info from this same line (common DNOS style)
+                # vlan-id <num>
+                _m = re.search(r'\bvlan-id\s+(\d+)\b', clean_line)
+                if _m:
+                    current_config['vlan_id'] = int(_m.group(1))
+                # vlan-id list <...>
+                _r = re.search(r'\bvlan-id\s+list\s+([0-9\-\s]+)$', clean_line)
+                if _r:
+                    list_spec = _r.group(1).strip()
+                    tokens = list_spec.split()
+                    ranges = [tok for tok in tokens if '-' in tok]
+                    singles = [tok for tok in tokens if tok.isdigit()]
+                    if ranges:
+                        current_config['vlan_range'] = ranges[0]
+                    if singles:
+                        current_config['vlan_list'] = [int(v) for v in singles]
+                # vlan-manipulation ingress/egress
+                if 'vlan-manipulation' in clean_line:
+                    if current_config['vlan_manipulation'] is None:
+                        current_config['vlan_manipulation'] = {}
+                    _ing = re.search(r'ingress-mapping\s+action\s+push\s+outer-tag\s+(\d+)', clean_line)
+                    if _ing:
+                        current_config['vlan_manipulation']['ingress'] = f"push outer-tag {_ing.group(1)}"
+                        current_config['outer_vlan'] = int(_ing.group(1))
+                    if 'egress-mapping action pop' in clean_line:
+                        current_config['vlan_manipulation']['egress'] = 'pop outer-tag'
+                # vlan-tags outer-tag X inner-tag-list Y
+                _q = re.search(r'\bvlan-tags\s+outer-tag\s+(\d+)\s+inner-tag(?:-list)?\s+([\d\-\s]+)', clean_line)
+                if _q:
+                    outer_vlan, inner_tag_spec = _q.groups()
+                    current_config['outer_vlan'] = int(outer_vlan)
+                    if '-' in inner_tag_spec:
+                        parts = inner_tag_spec.strip().split('-')
+                        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+                            current_config['inner_vlan'] = int(parts[0])
+                            current_config['vlan_range'] = f"{parts[0]}-{parts[1]}"
+                        else:
+                            nums = re.findall(r'\d+', inner_tag_spec)
+                            if nums:
+                                current_config['inner_vlan'] = int(nums[0])
+                    else:
+                        nums = re.findall(r'\d+', inner_tag_spec)
+                        if nums:
+                            current_config['inner_vlan'] = int(nums[0])
+                            if len(nums) > 1:
+                                current_config['vlan_list'] = [int(n) for n in nums]
+                            else:
+                                current_config['vlan_id'] = int(nums[0])
+                continue
+            
+            # Add line to current config
+            if current_interface:
+                current_config['raw_config'].append(line)
+            
+            # Parse VLAN ID configurations
+            vlan_id_plain = re.search(r'\bvlan-id\s+(\d+)\b', clean_line)
+            if vlan_id_plain and current_interface:
+                current_config['vlan_id'] = int(vlan_id_plain.group(1))
+                continue
+            
+            # Parse VLAN range configurations
+            vlan_range_plain = re.search(r'\bvlan-id\s+list\s+(\d+)-(\d+)\b', clean_line)
+            if vlan_range_plain and current_interface:
+                vlan_start, vlan_end = vlan_range_plain.groups()
+                current_config['vlan_range'] = f"{vlan_start}-{vlan_end}"
+                continue
+            
+            # Parse VLAN list configurations (supports ranges and singles)
+            vlan_list_plain = re.search(r'\bvlan-id\s+list\s+([0-9\-\s]+)$', clean_line)
+            if vlan_list_plain and current_interface:
+                list_spec = vlan_list_plain.group(1).strip()
+                tokens = list_spec.split()
+                ranges = [tok for tok in tokens if '-' in tok]
+                singles = [tok for tok in tokens if tok.isdigit()]
+                if ranges:
+                    current_config['vlan_range'] = ranges[0]
+                if singles:
+                    current_config['vlan_list'] = [int(v) for v in singles]
+                continue
+            
+            # Parse VLAN manipulation configurations (QinQ)
+            # Example: vlan-manipulation ingress-mapping action push outer-tag 100
+            if 'vlan-manipulation' in clean_line and current_interface:
+                if current_config['vlan_manipulation'] is None:
+                    current_config['vlan_manipulation'] = {}
+                
+                # Parse ingress mapping
+                ingress_match = re.search(r'ingress-mapping\s+action\s+push\s+outer-tag\s+(\d+)', clean_line)
+                if ingress_match:
+                    current_config['vlan_manipulation']['ingress'] = f"push outer-tag {ingress_match.group(1)}"
+                    current_config['outer_vlan'] = int(ingress_match.group(1))
+                    continue
+                
+                # Parse egress mapping
+                if 'egress-mapping action pop' in clean_line:
+                    current_config['vlan_manipulation']['egress'] = 'pop outer-tag'
+                    continue
+            
+            # Parse QinQ outer/inner tag configurations
+            # Example: vlan-tags outer-tag 100 inner-tag-list 200
+            qinq_match = re.search(r'\bvlan-tags\s+outer-tag\s+(\d+)\s+inner-tag(?:-list)?\s+([\d\-\s]+)', clean_line)
+            if qinq_match and current_interface:
+                outer_vlan, inner_tag_spec = qinq_match.groups()
+                current_config['outer_vlan'] = int(outer_vlan)
+                
+                # Parse inner tag specification (could be single value, range, or list)
+                if '-' in inner_tag_spec:
+                    inner_parts = inner_tag_spec.strip().split('-')
+                    if len(inner_parts) == 2 and inner_parts[0].isdigit() and inner_parts[1].isdigit():
+                        current_config['inner_vlan'] = int(inner_parts[0])
+                        current_config['vlan_range'] = f"{inner_parts[0]}-{inner_parts[1]}"
+                    else:
+                        nums = re.findall(r'\d+', inner_tag_spec)
+                        if nums:
+                            current_config['inner_vlan'] = int(nums[0])
+                else:
+                    nums = re.findall(r'\d+', inner_tag_spec)
+                    if nums:
+                        current_config['inner_vlan'] = int(nums[0])
+                        if len(nums) > 1:
+                            current_config['vlan_list'] = [int(n) for n in nums]
+                        else:
+                            current_config['vlan_id'] = int(nums[0])
+                continue
+            
+            # Parse L2 service enablement
+            if 'l2-service enabled' in line and current_interface:
+                current_config['l2_service'] = True
+                continue
+            
+            # Parse interface descriptions
+            description_match = re.search(r'description (.+)', line)
+            if description_match and current_interface:
+                current_config['description'] = description_match.group(1)
+                continue
+        
+        # Save last interface config
+        if current_interface and current_config:
+            vlan_configs.append(current_config.copy())
         
         return vlan_configs
     except Exception as e:

@@ -65,8 +65,11 @@ class BridgeDomainDiscovery:
         """
         Extract VLAN ID from interface name.
         
+        WARNING: This function should NOT be used to extract VLAN IDs from subinterface numbers
+        as the subinterface number (e.g., bundle-3700.8101) is NOT the same as the VLAN ID.
+        
         Args:
-            interface_name: Interface name (e.g., 'bundle-60000.998')
+            interface_name: Interface name (e.g., 'bundle-60000.998', 'ge100-0/0/13.1360')
             
         Returns:
             VLAN ID if found, None otherwise
@@ -75,15 +78,17 @@ class BridgeDomainDiscovery:
         if not isinstance(interface_name, str):
             return None
         
-        # Pattern for subinterface with VLAN: bundle-60000.998, ge100-0/0/13.1360
-        match = re.search(r'\.(\d+)$', interface_name)
-        if match:
-            try:
-                return int(match.group(1))
-            except ValueError:
-                pass
+        # ❌ REMOVED: Pattern for subinterface with VLAN: bundle-60000.998, ge100-0/0/13.1360
+        # This was INCORRECT - subinterface numbers are NOT VLAN IDs
+        # match = re.search(r'\.(\d+)$', interface_name)
+        # if match:
+        #     try:
+        #         return int(match.group(1))
+        #     except ValueError:
+        #         pass
         
         # Pattern for VLAN in interface name: vlan123, vlan-123
+        # This is still valid as these are explicitly named VLAN interfaces
         match = re.search(r'vlan[_-]?(\d+)', interface_name, re.IGNORECASE)
         if match:
             try:
@@ -91,6 +96,8 @@ class BridgeDomainDiscovery:
             except ValueError:
                 pass
         
+        # Return None for all other cases
+        # VLAN IDs should be extracted from actual device configuration, not interface names
         return None
     
     def determine_interface_role(self, interface_name: str, device_type: str) -> str:
@@ -436,25 +443,21 @@ class BridgeDomainDiscovery:
         
         return consolidated_bridge_domains
     
-    def create_comprehensive_mapping(self, analyzed_data: Dict[str, Dict]) -> Dict:
+    def create_bridge_domain_mapping(self, parsed_data: Dict[str, Dict]) -> Dict:
         """
-        Create comprehensive bridge domain mapping with bridge-domain-centric structure.
+        Create comprehensive bridge domain mapping from parsed data.
         
         Args:
-            analyzed_data: Analyzed bridge domain data from all devices
+            parsed_data: Parsed data from all devices
             
         Returns:
-            Comprehensive mapping structure with bridge domains consolidated by service name
+            Complete bridge domain mapping
         """
-        # Initialize the new structure
         mapping = {
             'discovery_metadata': {
                 'timestamp': datetime.now().isoformat(),
-                'devices_scanned': len(analyzed_data),
-                'bridge_domains_found': sum(
-                    len(device_data.get('bridge_domains', [])) 
-                    for device_data in analyzed_data.values()
-                ),
+                'devices_scanned': len(parsed_data),
+                'bridge_domains_found': 0,
                 'confidence_threshold': 70
             },
             'bridge_domains': {},
@@ -465,38 +468,28 @@ class BridgeDomainDiscovery:
                 'unknown_topology': 0,
                 'total_high_confidence': 0,
                 'total_unmapped': 0
-            },
-            'device_summary': {}
+            }
         }
         
-        # Collect all bridge domains by service name
-        bridge_domain_collections = defaultdict(lambda: {
-            'devices': {},
-            'service_name': None,
-            'detected_username': None,
-            'detected_vlan': None,
-            'confidence': 0,
-            'detection_method': None,
-            'scope': 'unknown',
-            'scope_description': 'Unknown scope - unable to determine'
-        })
+        # First, analyze all bridge domains to get proper VLAN configurations
+        analyzed_data = self.analyze_bridge_domains(parsed_data)
         
-        # Process each device
+        # Create consolidated bridge domain collections
+        bridge_domain_collections = {}
+        
         for device_name, device_data in analyzed_data.items():
-            device_type = self.detect_device_type(device_name)
             bridge_domains = device_data.get('bridge_domains', [])
             vlan_manipulation_configs = device_data.get('vlan_manipulation_configs', [])
             
-            # Add device summary
-            mapping['device_summary'][device_name] = {
-                'total_bridge_domains': len(bridge_domains),
-                'high_confidence': len([
-                    bd for bd in bridge_domains 
-                    if bd.get('confidence', 0) >= 70
-                ]),
-                'device_type': device_type,
-                'vlan_manipulation_configs': len(vlan_manipulation_configs)
-            }
+            # Get device type
+            device_type = 'leaf'  # Default to leaf
+            if 'spine' in device_name.lower():
+                device_type = 'spine'
+            elif 'superspine' in device_name.lower():
+                device_type = 'superspine'
+            
+            # Update discovery metadata
+            mapping['discovery_metadata']['bridge_domains_found'] += len(bridge_domains)
             
             # Process bridge domains
             for bridge_domain in bridge_domains:
@@ -506,38 +499,52 @@ class BridgeDomainDiscovery:
                 if confidence >= 70:
                     # High confidence - consolidate by service name
                     if service_name not in bridge_domain_collections:
-                        bridge_domain_collections[service_name].update({
-                            'service_name': service_name,
-                            'detected_username': bridge_domain['detected_username'],
-                            'detected_vlan': bridge_domain['detected_vlan'],
-                            'confidence': confidence,
-                            'detection_method': bridge_domain['detection_method'],
-                            'scope': bridge_domain.get('scope', 'unknown'),
-                            'scope_description': bridge_domain.get('scope_description', 'Unknown scope - unable to determine')
-                        })
+                        bridge_domain_collections[service_name] = {
+                            'devices': {},
+                            'high_confidence': len([
+                                bd for bd in bridge_domains 
+                                if bd.get('confidence', 0) >= 70
+                            ]),
+                            'device_type': device_type,
+                            'vlan_manipulation_configs': len(vlan_manipulation_configs)
+                        }
                     
-                    # Add device information
+                    bridge_domain_collections[service_name].update({
+                        'service_name': service_name,
+                        'detected_username': bridge_domain['detected_username'],
+                        'detected_vlan': bridge_domain['detected_vlan'],
+                        'confidence': confidence,
+                        'detection_method': bridge_domain['detection_method'],
+                        'scope': bridge_domain.get('scope', 'unknown'),
+                        'scope_description': bridge_domain.get('scope_description', 'Unknown scope - unable to determine')
+                    })
+                    
+                    # Add device information with CORRECT VLAN IDs from analyzed data
                     device_info = {
                         'interfaces': [],
                         'admin_state': bridge_domain['admin_state'],
                         'device_type': device_type
                     }
                     
-                    # Process interfaces with enhanced information
+                    # Process interfaces using the CORRECT VLAN configurations from analyze_bridge_domains
                     for interface in bridge_domain['interfaces']:
                         # Handle both string and dict interface formats
                         if isinstance(interface, dict):
                             interface_name = interface.get('name', '')
+                            # Use the VLAN ID that was already analyzed and corrected
+                            vlan_id = interface.get('vlan_id')
                         else:
                             interface_name = str(interface)
+                            # For string interfaces, we need to look up the VLAN ID
+                            # This should be rare since analyze_bridge_domains should handle most cases
+                            vlan_id = None
                         
-                        vlan_id = self.extract_vlan_from_interface(interface_name)
                         role = self.determine_interface_role(interface_name, device_type)
                         
                         device_info['interfaces'].append({
                             'name': interface_name,
                             'type': 'subinterface' if '.' in interface_name else 'physical',
-                            'vlan_id': vlan_id,
+                            'vlan_id': vlan_id,  # ✅ Use the CORRECT VLAN ID from analyzed data
                             'role': role
                         })
                     
@@ -736,13 +743,9 @@ class BridgeDomainDiscovery:
         parsed_data = self.load_parsed_data()
         logger.info(f"Loaded data from {len(parsed_data)} devices")
         
-        # Analyze bridge domains
-        logger.info("Analyzing bridge domains...")
-        analyzed_data = self.analyze_bridge_domains(parsed_data)
-        
         # Create comprehensive mapping
         logger.info("Creating comprehensive mapping...")
-        mapping = self.create_comprehensive_mapping(analyzed_data)
+        mapping = self.create_bridge_domain_mapping(parsed_data)
         
         # Save mapping
         logger.info("Saving bridge domain mapping...")

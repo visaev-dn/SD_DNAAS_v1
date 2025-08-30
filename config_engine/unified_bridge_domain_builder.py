@@ -150,8 +150,8 @@ class UnifiedBridgeDomainBuilder:
         return devices
     
     def build_bridge_domain_config(self, service_name: str, vlan_id: int,
-                                 source_device: str, source_interface: str,
-                                 destinations: List[Dict]) -> Union[Dict, Tuple[Dict, Dict]]:
+                                  source_device: str, source_interface: str,
+                                  destinations: List[Dict]) -> Dict:
         """
         Build bridge domain configuration for any scenario.
         
@@ -163,18 +163,38 @@ class UnifiedBridgeDomainBuilder:
             destinations: List of destination dictionaries with 'device' and 'port' keys
             
         Returns:
-            Bridge domain configuration dictionary, or tuple (config_data, metadata) for P2MP or enhanced P2P
+            Bridge domain configuration dictionary with a unified `_metadata` key
         """
         # Determine configuration type based on destination count
         if len(destinations) == 1:
             result = self._build_p2p_config(service_name, vlan_id, source_device, source_interface, destinations[0])
-            # Handle both dict and tuple returns
+            # Normalize dict and (dict, metadata) to dict with _metadata
             if isinstance(result, tuple):
-                return result
+                configs, metadata = result
+                configs_dict = dict(configs) if isinstance(configs, dict) else {}
+                configs_dict['_metadata'] = metadata or {}
+                return configs_dict
             else:
-                return result
+                configs_dict = dict(result) if isinstance(result, dict) else {}
+                # Attach minimal metadata for consistency
+                dest_device = None
+                try:
+                    dest_device = destinations[0].get('device')
+                except Exception:
+                    dest_device = None
+                configs_dict['_metadata'] = {
+                    'service_name': service_name,
+                    'vlan_id': vlan_id,
+                    'topology_type': 'P2P',
+                    'source_device': source_device,
+                    'dest_device': dest_device
+                }
+                return configs_dict
         else:
-            return self._build_p2mp_config(service_name, vlan_id, source_device, source_interface, destinations)
+            configs, metadata = self._build_p2mp_config(service_name, vlan_id, source_device, source_interface, destinations)
+            configs_dict = dict(configs) if isinstance(configs, dict) else {}
+            configs_dict['_metadata'] = metadata or {}
+            return configs_dict
     
     def _build_p2p_config(self, service_name: str, vlan_id: int,
                           source_device: str, source_interface: str,
@@ -524,17 +544,10 @@ class UnifiedBridgeDomainBuilder:
             config.append(f"interfaces {in_interface}.{vlan_id} l2-service enabled")
             config.append(f"interfaces {in_interface}.{vlan_id} vlan-id {vlan_id}")
         
-        # Try to get bundle for out_interface (user port)
-        out_bundle = self._get_bundle_for_superspine_interface(device, out_interface)
-        if out_bundle:
-            config.append(f"network-services bridge-domain instance {service_name} interface {out_bundle}.{vlan_id}")
-            config.append(f"interfaces {out_bundle}.{vlan_id} l2-service enabled")
-            config.append(f"interfaces {out_bundle}.{vlan_id} vlan-id {vlan_id}")
-        else:
-            # Use direct interface
-            config.append(f"network-services bridge-domain instance {service_name} interface {out_interface}.{vlan_id}")
-            config.append(f"interfaces {out_interface}.{vlan_id} l2-service enabled")
-            config.append(f"interfaces {out_interface}.{vlan_id} vlan-id {vlan_id}")
+        # Always use the physical requested AC interface (no bundle lookup)
+        config.append(f"network-services bridge-domain instance {service_name} interface {out_interface}.{vlan_id}")
+        config.append(f"interfaces {out_interface}.{vlan_id} l2-service enabled")
+        config.append(f"interfaces {out_interface}.{vlan_id} vlan-id {vlan_id}")
         
         return config
     

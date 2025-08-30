@@ -1,0 +1,28 @@
+
+================================================================================
+📊 PROBE + PARSE SUMMARY REPORT
+================================================================================
+
+⏱️  TIMING:
+   Total duration: 0.00 seconds
+
+📋 DEVICE STATISTICS:
+   Total devices in devices.yaml: 0
+   Available devices (valid mgmt_ip): 0
+   Invalid devices (missing/invalid mgmt_ip): 0
+   Successful devices: 0
+   Failed devices: 0
+
+🔍 COLLECTION RESULTS:
+   LACP XML collection: 0 successful, 0 failed
+   LLDP CLI collection: 0 successful, 0 failed
+
+📝 PARSE RESULTS:
+   LACP parsing: 0 successful, 0 failed
+   LLDP parsing: 0 successful, 0 failed
+   Total bundles extracted: 0
+   Total neighbors extracted: 0
+
+💡 RECOMMENDATIONS:
+
+================================================================================

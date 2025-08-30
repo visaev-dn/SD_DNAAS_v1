@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-28T17:37:54.554350",
+  "summary": {
+    "total_devices": 0,
+    "available_devices": 0,
+    "successful_devices": 0,
+    "failed_devices": 0,
+    "invalid_devices": 0,
+    "lacp_successful": 0,
+    "lacp_failed": 0,
+    "lldp_successful": 0,
+    "lldp_failed": 0,
+    "bridge_domain_successful": 0,
+    "bridge_domain_failed": 0,
+    "parse_lacp_successful": 0,
+    "parse_lacp_failed": 0,
+    "parse_lldp_successful": 0,
+    "parse_lldp_failed": 0,
+    "parse_bridge_domain_successful": 0,
+    "parse_bridge_domain_failed": 0,
+    "total_bundles": 0,
+    "total_neighbors": 0,
+    "total_bridge_domains": 0
+  },
+  "devices": {}
+}

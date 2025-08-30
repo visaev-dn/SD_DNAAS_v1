@@ -185,8 +185,10 @@ class DeploymentManager:
                 commit_results = {}
                 commit_errors = []
                 
-                for i, device in enumerate(device_commands.keys()):
-                    device_progress = 70 + (i / len(device_commands)) * 20  # 70-90%
+                # Filter out _metadata key - only process actual devices
+                actual_devices = [d for d in device_commands.keys() if d != '_metadata']
+                for i, device in enumerate(actual_devices):
+                    device_progress = 70 + (i / len(actual_devices)) * 20  # 70-90%
                     deployment_info['progress'] = int(device_progress)
                     deployment_info['stage'] = f'committing_device_{device}'
                     self._log_deployment(deployment_id, f"🚀 Committing {device}...")
@@ -441,7 +443,8 @@ class DeploymentManager:
         """Execute deployment with detailed progress reporting"""
         try:
             deployment_info = self.active_deployments[deployment_id]
-            devices = list(device_commands.keys())
+            # Filter out _metadata key - only process actual devices
+            devices = [device for device in device_commands.keys() if device != '_metadata']
             total_devices = len(devices)
             
             self._log_deployment(deployment_id, f"📱 Deploying to {total_devices} devices...")
@@ -566,6 +569,8 @@ class DeploymentManager:
         try:
             removal_info = self.active_deployments[removal_id]
             devices = list(device_commands.keys())
+            # Filter out _metadata key - only process actual devices
+            devices = [device for device in device_commands.keys() if device != '_metadata']
             total_devices = len(devices)
             
             self._log_deployment(removal_id, f"🗑️ Removing from {total_devices} devices...")
@@ -668,6 +673,8 @@ class DeploymentManager:
             deployment_info = self.active_deployments[deployment_id]
             
             devices = list(config_data.keys())
+            # Filter out _metadata key - only process actual devices
+            devices = [device for device in config_data.keys() if device != '_metadata']
             total_devices = len(devices)
             
             self._log_deployment(deployment_id, f"🔍 Verifying deployment on {total_devices} devices...")
@@ -736,6 +743,8 @@ class DeploymentManager:
                 return False
             
             devices = list(config.keys())
+            # Filter out _metadata key - only process actual devices
+            devices = [device for device in config.keys() if device != '_metadata']
             total_devices = len(devices)
             
             self._log_deployment(deployment_id, f"🔍 Verifying deployment on {total_devices} devices...")

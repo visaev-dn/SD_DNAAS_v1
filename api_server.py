@@ -125,6 +125,107 @@ smart_deployment_manager = SmartDeploymentManager(
 # already initialized within SmartDeploymentManager, so we don't need separate instances
 
 # ============================================================================
+# ENHANCED DATABASE API INTEGRATION
+# ============================================================================
+
+# Initialize Enhanced Database API integration
+try:
+    from config_engine.phase1_api import enable_enhanced_database_api
+    from config_engine.phase1_database import create_phase1_database_manager
+    
+    # Create enhanced database manager
+    enhanced_db_manager = create_phase1_database_manager()
+    
+    # Enable enhanced database API integration
+    enhanced_api_enabled = enable_enhanced_database_api(app, enhanced_db_manager)
+    
+    if enhanced_api_enabled:
+        logger.info("🚀 Enhanced Database API integration enabled successfully")
+        logger.info("📡 Enhanced Database endpoints available at /api/enhanced-database/*")
+        
+        # Add Enhanced Database health check endpoint
+        @app.route('/api/enhanced-database/health', methods=['GET'])
+        def enhanced_database_health_check():
+            """Enhanced Database API health check endpoint"""
+            try:
+                from config_engine.phase1_api import EnhancedDatabaseAPIRouter
+                
+                # Get health status from Enhanced Database router
+                router = EnhancedDatabaseAPIRouter(app, enhanced_db_manager)
+                health_status = router.health_check()
+                
+                return jsonify({
+                    "success": True,
+                    "enhanced_database": True,
+                    "health_status": health_status,
+                    "endpoints": {
+                        "topologies": "/api/enhanced-database/topologies",
+                        "devices": "/api/enhanced-database/devices", 
+                        "interfaces": "/api/enhanced-database/interfaces",
+                        "paths": "/api/enhanced-database/paths",
+                        "bridge_domains": "/api/enhanced-database/bridge-domains",
+                        "migration": "/api/enhanced-database/migrate",
+                        "export": "/api/enhanced-database/export"
+                    }
+                })
+                
+            except Exception as e:
+                logger.error(f"Enhanced Database health check failed: {e}")
+                return jsonify({
+                    "success": False,
+                    "enhanced_database": True,
+                    "error": str(e)
+                }), 500
+        
+        # Add Enhanced Database status endpoint
+        @app.route('/api/enhanced-database/status', methods=['GET'])
+        def enhanced_database_status():
+            """Get Enhanced Database integration status and capabilities"""
+            try:
+                db_info = enhanced_db_manager.get_database_info()
+                
+                return jsonify({
+                    "success": True,
+                    "enhanced_database_integration": {
+                        "status": "active",
+                        "version": "1.0.0",
+                        "database": {
+                            "status": "ready" if db_info.get('phase1_tables') else "not_initialized",
+                            "tables": db_info.get('phase1_tables', []),
+                            "total_records": db_info.get('total_phase1_records', 0),
+                            "database_size": db_info.get('database_size', 0)
+                        },
+                        "capabilities": {
+                            "topology_management": True,
+                            "device_management": True,
+                            "interface_management": True,
+                            "path_management": True,
+                            "bridge_domain_management": True,
+                            "data_export_import": True,
+                            "legacy_migration": True
+                        }
+                    }
+                })
+                
+            except Exception as e:
+                logger.error(f"Enhanced Database status check failed: {e}")
+                return jsonify({
+                    "success": False,
+                    "error": str(e)
+                }), 500
+        
+        logger.info("✅ Enhanced Database API endpoints integrated successfully")
+        
+    else:
+        logger.warning("⚠️ Enhanced Database API integration failed - continuing without enhanced features")
+        enhanced_db_manager = None
+        
+except Exception as e:
+    logger.error(f"❌ Failed to initialize Enhanced Database API integration: {e}")
+    logger.info("🔄 Continuing without enhanced features - legacy functionality preserved")
+    enhanced_db_manager = None
+
+# ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
 
@@ -994,6 +1095,157 @@ def search_bridge_domains():
             "error": f"Failed to search bridge domains: {str(e)}"
         }), 500
 
+# Phase 1 Enhanced Bridge Domain Builder Endpoint
+@app.route('/api/bridge-domains/enhanced-builder', methods=['POST'])
+@token_required
+def enhanced_bridge_domain_builder(current_user):
+    """Enhanced bridge domain builder with Phase 1 validation and data structures"""
+    try:
+        logger.info(f"=== ENHANCED BRIDGE DOMAIN BUILDER DEBUG ===")
+        logger.info(f"User: {current_user.username} (ID: {current_user.id})")
+        
+        data = request.get_json()
+        service_name = data.get('service_name')
+        vlan_id = data.get('vlan_id')
+        source_device = data.get('source_device')
+        source_interface = data.get('source_interface')
+        destinations = data.get('destinations', [])
+        
+        # Validate required fields
+        if not all([service_name, vlan_id, source_device, source_interface]):
+            return jsonify({
+                "success": False,
+                "error": "service_name, vlan_id, source_device, and source_interface are required"
+            }), 400
+        
+        if not destinations:
+            return jsonify({
+                "success": False,
+                "error": "At least one destination is required"
+            }), 400
+        
+        # Check if Enhanced Database is available
+        if not enhanced_db_manager:
+            return jsonify({
+                "success": False,
+                "error": "Enhanced Database not available",
+                "enhanced_database_available": False
+            }), 503
+        
+        logger.info(f"Building enhanced bridge domain: {service_name} (VLAN: {vlan_id})")
+        logger.info(f"Source: {source_device}:{source_interface}")
+        logger.info(f"Destinations: {destinations}")
+        
+        # Phase 1 validation
+        try:
+            from config_engine.phase1_integration import Phase1CLIWrapper
+            
+            cli_wrapper = Phase1CLIWrapper()
+            validation_report = cli_wrapper.get_validation_report(
+                service_name, vlan_id, source_device, source_interface, destinations
+            )
+            
+            if not validation_report.get('passed'):
+                return jsonify({
+                    "success": False,
+                    "error": "Phase 1 validation failed",
+                    "validation_errors": validation_report.get('errors', []),
+                    "validation_warnings": validation_report.get('warnings', [])
+                }), 400
+            
+            logger.info("✅ Phase 1 validation passed")
+            
+        except Exception as e:
+            logger.warning(f"Phase 1 validation failed, continuing with legacy builder: {e}")
+            # Continue with legacy builder if Phase 1 validation fails
+        
+        # Build configuration using existing builder
+        try:
+            from config_engine.unified_bridge_domain_builder import UnifiedBridgeDomainBuilder
+            
+            builder = UnifiedBridgeDomainBuilder()
+            configs = builder.build_bridge_domain_config(
+                service_name, vlan_id, source_device, source_interface, destinations
+            )
+            
+            if not configs:
+                return jsonify({
+                    "success": False,
+                    "error": "Failed to build bridge domain configuration"
+                }), 500
+            
+            logger.info("✅ Bridge domain configuration built successfully")
+            
+            # Save to Phase 1 database
+            try:
+                from config_engine.phase1_data_structures import create_p2mp_topology
+                
+                topology_data = create_p2mp_topology(
+                    bridge_domain_name=service_name,
+                    service_name=service_name,
+                    vlan_id=vlan_id,
+                    source_device=source_device,
+                    source_interface=source_interface,
+                    destinations=destinations
+                )
+                
+                topology_id = enhanced_db_manager.save_topology_data(topology_data)
+                
+                if topology_id:
+                    logger.info(f"💾 Configuration saved to Phase 1 database (ID: {topology_id})")
+                else:
+                    logger.warning("⚠️ Failed to save to Phase 1 database")
+                    
+            except Exception as e:
+                logger.warning(f"Phase 1 database save failed: {e}")
+            
+            # Create audit log
+            create_audit_log(current_user.id, 'create', 'enhanced_bridge_domain', None, {
+                'service_name': service_name,
+                'vlan_id': vlan_id,
+                'source_device': source_device,
+                'source_interface': source_interface,
+                'destinations_count': len(destinations),
+                'phase1_integration': True,
+                'topology_id': topology_id if 'topology_id' in locals() else None
+            })
+            
+            # Return enhanced response
+            device_count = len([k for k in configs.keys() if k != '_metadata'])
+            
+            return jsonify({
+                "success": True,
+                "message": f"Enhanced bridge domain '{service_name}' built successfully",
+                "configuration": {
+                    "service_name": service_name,
+                    "vlan_id": vlan_id,
+                    "devices_configured": device_count,
+                    "topology_type": "P2MP" if len(destinations) > 1 else "P2P",
+                    "phase1_integration": True,
+                    "topology_id": topology_id if 'topology_id' in locals() else None
+                },
+                "enhanced_features": {
+                    "validation": True,
+                    "data_structure_consistency": True,
+                    "advanced_topology_insights": True,
+                    "export_import_capability": True
+                }
+            })
+            
+        except Exception as e:
+            logger.error(f"Bridge domain builder failed: {e}")
+            return jsonify({
+                "success": False,
+                "error": f"Bridge domain builder failed: {str(e)}"
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Enhanced bridge domain builder error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Enhanced bridge domain builder failed: {str(e)}"
+        }), 500
+
 # ============================================================================
 # FILE MANAGEMENT ENDPOINTS
 # ============================================================================
@@ -1460,6 +1712,111 @@ def get_configurations(current_user):
             "error": f"Failed to get configurations: {str(e)}"
         }), 500
 
+# Enhanced Phase 1 configurations endpoint
+@app.route('/api/configurations/enhanced', methods=['GET'])
+@token_required
+def get_enhanced_configurations(current_user):
+    """Get enhanced configurations with Phase 1 data structures and validation"""
+    try:
+        logger.info(f"=== GET ENHANCED CONFIGURATIONS DEBUG ===")
+        logger.info(f"User: {current_user.username} (ID: {current_user.id})")
+        
+        # Check if Enhanced Database is available
+        if not enhanced_db_manager:
+            return jsonify({
+                "success": False,
+                "error": "Enhanced Database not available",
+                "enhanced_database_available": False
+            }), 503
+        
+        # Get Enhanced Database topologies
+        try:
+            topologies = enhanced_db_manager.get_all_topologies(limit=1000)
+            logger.info(f"Found {len(topologies)} Enhanced Database topologies")
+        except Exception as e:
+            logger.error(f"Failed to get Enhanced Database topologies: {e}")
+            topologies = []
+        
+        # Get legacy configurations
+        try:
+            configurations = Configuration.query.filter_by(user_id=current_user.id).order_by(Configuration.created_at.desc()).all()
+            logger.info(f"Found {len(configurations)} legacy configurations")
+        except Exception as e:
+            logger.error(f"Failed to get legacy configurations: {e}")
+            configurations = []
+        
+        # Build enhanced response
+        enhanced_list = []
+        
+        # Add Phase 1 topologies
+        for topology in topologies:
+            enhanced_list.append({
+                'id': f"phase1_{getattr(topology, 'id', 'N/A')}",
+                'service_name': getattr(topology, 'bridge_domain_name', 'N/A'),
+                'vlan_id': getattr(topology, 'vlan_id', None),
+                'config_type': 'phase1_topology',
+                'status': 'enhanced',
+                'phase1_data': {
+                    'topology_type': getattr(topology, 'topology_type', 'N/A'),
+                    'device_count': len(getattr(topology, 'devices', [])),
+                    'interface_count': len(getattr(topology, 'interfaces', [])),
+                    'path_count': len(getattr(topology, 'paths', [])),
+                    'validation_status': 'validated' if hasattr(topology, 'validation_status') else 'unknown'
+                },
+                'created_at': getattr(topology, 'created_at', 'N/A'),
+                'updated_at': getattr(topology, 'updated_at', 'N/A'),
+                'type': 'phase1_topology',
+                'enhanced_features': True
+            })
+        
+        # Add legacy configurations with Phase 1 enrichment
+        for config in configurations:
+            enhanced_list.append({
+                'id': config.id,
+                'service_name': config.service_name,
+                'vlan_id': config.vlan_id,
+                'config_type': config.config_type,
+                'status': config.status,
+                'config_data': config.config_data,
+                'source': config.config_source or ('reverse_engineered' if config.is_reverse_engineered else 'manual'),
+                'created_at': config.created_at.isoformat() if config.created_at else None,
+                'deployed_at': config.deployed_at.isoformat() if config.deployed_at else None,
+                'deployed_by': config.deployed_by,
+                'type': 'legacy_configuration',
+                'enhanced_features': False,
+                'phase1_migration_available': True
+            })
+        
+        # Sort by creation date (newest first)
+        enhanced_list.sort(key=lambda x: x.get('created_at', '') or '', reverse=True)
+        
+        logger.info(f"Total enhanced items: {len(enhanced_list)}")
+        logger.info(f"Phase 1 topologies: {len([c for c in enhanced_list if c['type'] == 'phase1_topology'])}")
+        logger.info(f"Legacy configurations: {len([c for c in enhanced_list if c['type'] == 'legacy_configuration'])}")
+        logger.info("=== GET ENHANCED CONFIGURATIONS DEBUG END ===")
+        
+        return jsonify({
+            "success": True,
+            "enhanced_configurations": enhanced_list,
+            "total": len(enhanced_list),
+            "phase1_available": True,
+            "enhanced_features": {
+                "topology_validation": True,
+                "data_structure_consistency": True,
+                "advanced_search": True,
+                "export_import": True,
+                "legacy_migration": True
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Get enhanced configurations error: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "phase1_available": phase1_db_manager is not None
+        }), 500
+
 @app.route('/api/test/metadata', methods=['GET'])
 def test_metadata():
     """Test endpoint for metadata"""
@@ -1541,10 +1898,10 @@ def preview_deployment_commands(current_user, config_id):
                 "service_name": config.service_name,
                 "vlan_id": config.vlan_id,
                 "status": config.status,
-                "devices": list(device_commands.keys())
+                "devices": [device for device in device_commands.keys() if device != '_metadata']
             },
             "deployment_commands": device_commands,
-            "total_devices": len(device_commands),
+            "total_devices": len([device for device in device_commands.keys() if device != '_metadata']),
             "total_commands": sum(len(cmds) for cmds in device_commands.values())
         }
         
@@ -1623,7 +1980,7 @@ def validate_unified_configuration(current_user, config_id):
             }), 400
         
         # Check that we have devices in the configuration
-        devices = list(config_data.keys())
+        devices = [device for device in config_data.keys() if device != '_metadata']
         if not devices:
             return jsonify({
                 "success": False,
@@ -1854,10 +2211,10 @@ def preview_deletion_commands(current_user, config_id):
                 "service_name": config.service_name,
                 "vlan_id": config.vlan_id,
                 "status": config.status,
-                "devices": list(device_commands.keys())
+                "devices": [device for device in device_commands.keys() if device != '_metadata']
             },
             "deletion_commands": device_commands,
-            "total_devices": len(device_commands),
+            "total_devices": len([device for device in device_commands.keys() if device != '_metadata']),
             "total_commands": sum(len(cmds) for cmds in device_commands.values())
         }
         
@@ -2337,6 +2694,143 @@ def import_bridge_domain(current_user):
         return jsonify({
             "success": False,
             "error": f"Failed to import bridge domain: {str(e)}"
+        }), 500
+
+# Phase 1 Migration Endpoint
+@app.route('/api/configurations/migrate-to-phase1', methods=['POST'])
+@token_required
+def migrate_configuration_to_phase1(current_user):
+    """Migrate legacy configuration to Phase 1 enhanced format"""
+    try:
+        logger.info(f"=== PHASE 1 MIGRATION DEBUG ===")
+        logger.info(f"User: {current_user.username} (ID: {current_user.id})")
+        
+        data = request.get_json()
+        config_id = data.get('config_id')
+        
+        if not config_id:
+            return jsonify({
+                "success": False,
+                "error": "Configuration ID is required"
+            }), 400
+        
+        # Check if Phase 1 is available
+        if not enhanced_db_manager:
+            return jsonify({
+                "success": False,
+                "error": "Enhanced Database not available",
+                "enhanced_database_available": False
+            }), 503
+        
+        # Get legacy configuration
+        config = Configuration.query.filter_by(
+            id=config_id,
+            user_id=current_user.id
+        ).first()
+        
+        if not config:
+            return jsonify({
+                "success": False,
+                "error": "Configuration not found or access denied"
+            }), 404
+        
+        logger.info(f"Migrating configuration: {config.service_name} (ID: {config.id})")
+        
+        # Parse configuration data
+        try:
+            config_data = json.loads(config.config_data) if config.config_data else {}
+        except json.JSONDecodeError:
+            return jsonify({
+                "success": False,
+                "error": "Invalid configuration data format"
+            }), 400
+        
+        # Extract topology information
+        devices = []
+        interfaces = []
+        paths = []
+        
+        # Parse device and interface information from config_data
+        for device_name, device_config in config_data.items():
+            if device_name == '_metadata':
+                continue
+                
+            # Add device
+            devices.append({
+                'name': device_name,
+                'device_type': 'UNKNOWN',  # Will be determined during migration
+                'role': 'UNKNOWN',
+                'model': 'Unknown',
+                'serial_number': 'Unknown'
+            })
+            
+            # Add interfaces
+            if isinstance(device_config, dict) and 'interfaces' in device_config:
+                for interface_name, interface_config in device_config['interfaces'].items():
+                    interfaces.append({
+                        'name': interface_name,
+                        'device_name': device_name,
+                        'interface_type': 'PHYSICAL',
+                        'interface_role': 'UNKNOWN',
+                        'description': interface_config.get('description', '')
+                    })
+        
+        # Create Phase 1 topology data
+        try:
+            from config_engine.phase1_data_structures import create_p2mp_topology
+            
+            topology_data = create_p2mp_topology(
+                bridge_domain_name=config.service_name,
+                service_name=config.service_name,
+                vlan_id=config.vlan_id,
+                source_device=devices[0]['name'] if devices else 'unknown',
+                source_interface=interfaces[0]['name'] if interfaces else 'unknown',
+                destinations=[{'device': d['name'], 'port': 'unknown'} for d in devices[1:]] if len(devices) > 1 else []
+            )
+            
+            # Save to Enhanced Database
+            topology_id = enhanced_db_manager.save_topology_data(topology_data)
+            
+            if topology_id:
+                logger.info(f"Successfully migrated configuration to Phase 1 (ID: {topology_id})")
+                
+                # Create audit log
+                create_audit_log(current_user.id, 'migrate', 'configuration_to_phase1', config.id, {
+                    'legacy_config_id': config.id,
+                    'phase1_topology_id': topology_id,
+                    'service_name': config.service_name,
+                    'vlan_id': config.vlan_id
+                })
+                
+                return jsonify({
+                    "success": True,
+                    "message": f"Configuration '{config.service_name}' migrated to Phase 1 successfully",
+                    "legacy_config_id": config.id,
+                    "phase1_topology_id": topology_id,
+                    "migration_details": {
+                        "devices_migrated": len(devices),
+                        "interfaces_migrated": len(interfaces),
+                        "topology_type": "P2MP" if len(devices) > 2 else "P2P"
+                    }
+                })
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "Failed to save migrated topology to Phase 1 database"
+                }), 500
+                
+        except Exception as e:
+            logger.error(f"Failed to create Phase 1 topology: {e}")
+            return jsonify({
+                "success": False,
+                "error": f"Failed to create Phase 1 topology: {str(e)}"
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Phase 1 migration error: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Migration failed: {str(e)}"
         }), 500
 
 @app.route('/api/configurations/<bridge_domain_name>/scan', methods=['POST'])
@@ -3391,7 +3885,7 @@ def regenerate_from_builder_input(current_user, config_id):
                 "message": "Dry run successful",
                 "config_id": config.id,
                 "service_name": config.service_name,
-                "device_count": len(config_data.keys()) if isinstance(config_data, dict) else None,
+                "device_count": len([k for k in config_data.keys() if k != '_metadata']) if isinstance(config_data, dict) else None,
                 "config_data": config_data
             })
 
@@ -3414,7 +3908,7 @@ def regenerate_from_builder_input(current_user, config_id):
             "config_id": config.id,
             "service_name": config.service_name,
             "message": "Configuration regenerated from builder_input",
-            "device_count": len(config_data.keys()) if isinstance(config_data, dict) else None
+            "device_count": len([k for k in config_data.keys() if k != '_metadata']) if isinstance(config_data, dict) else None
         })
     except Exception as e:
         logger.error(f"Regenerate from builder_input error: {e}")

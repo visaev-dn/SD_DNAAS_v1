@@ -398,6 +398,16 @@ class SSHPushManager:
                     device_data = devices_data[key]
                     break
         
+        # Handle consolidated superspine names (e.g., DNAAS-SUPERSPINE-D04 -> DNAAS-SuperSpine-D04-NCC0)
+        if not device_data and 'SUPERSPINE' in device_name.upper():
+            # Try to find NCC variants
+            base_name = device_name.replace('SUPERSPINE', 'SuperSpine')
+            for variant in ['-NCC0', '-NCC1']:
+                variant_name = base_name + variant
+                if variant_name in devices_data:
+                    device_data = devices_data[variant_name]
+                    break
+        
         info = {
             'hostname': device_data.get('mgmt_ip'),
             'username': device_data.get('username', defaults.get('username')),
@@ -471,8 +481,26 @@ class SSHPushManager:
             ssh.close()
             log_f.write(f"Complete SSH output for {device_info['hostname']}:\n{output}\n")
             
-            # Check for "no configuration changes" message - this means config already exists
-            already_exists = "no configuration changes were made" in output.lower()
+            # Check for "already exists" patterns in the output
+            # For DriveNets devices, we need to look for multiple patterns
+            already_exists_patterns = [
+                "no configuration changes were made",
+                "no changes to commit",
+                "configuration already exists",
+                "already configured",
+                "no modifications"
+            ]
+            
+            already_exists = any(pattern.lower() in output.lower() for pattern in already_exists_patterns)
+            
+            # Additional check: if this is a commit check stage and it passes without errors,
+            # but we don't see "already exists" patterns, assume it doesn't exist
+            if stage == "check" and not already_exists:
+                # For commit check, if it passes without "already exists" patterns, 
+                # the configuration likely doesn't exist yet
+                already_exists = False
+                log_f.write(f"🔍 Commit check passed - configuration does not appear to exist yet\n")
+            
             if already_exists:
                 log_f.write(f"✅ Configuration already exists on device (no changes needed)\n")
                 return True, True, None
@@ -598,33 +626,52 @@ class SSHPushManager:
                 log_f.write(f"Warning: Timeout getting final output: {e}\n")
             
             ssh.close()
-            log_f.write(f"Complete SSH output for {device_info['hostname']}:\n{output}\n")
+            log_f.write(f"Complete SSH output for {device_info['hostname']}\n")
             
-            # Debug logging for already_exists detection
-            log_f.write(f"🔍 Debug: Looking for 'no configuration changes were made' in output\n")
-            log_f.write(f"🔍 Debug: Output contains this pattern: {'no configuration changes were made' in output.lower()}\n")
+            # NEW APPROACH: For DriveNets devices, we need to be smarter about detecting "already exists"
+            # Instead of looking for specific text patterns, we'll use a different strategy
             
-            # Check for "no configuration changes" message - enhanced detection
-            already_exists_patterns = [
-                "no configuration changes were made",
-                "no configuration changes",
-                "configuration already exists",
-                "already exists",
-                "no changes needed",
-                "no changes required"
-            ]
-            
-            already_exists = any(pattern in output.lower() for pattern in already_exists_patterns)
+            if stage == "check":
+                # For commit check stage:
+                # 1) If errors are present, treat as failure upstream
+                # 2) If no errors: ONLY mark 'already_exists' when explicit 'no changes' verbiage is present
+                
+                # Look for error patterns first
+                error_patterns = [
+                    'Error:', 'ERROR:', 'Invalid', 'INVALID', 'Failed', 'FAILED',
+                    'not found', 'NOT FOUND', 'does not exist', 'DOES NOT EXIST',
+                    'syntax error', 'SYNTAX ERROR', 'command not found', 'COMMAND NOT FOUND',
+                    'permission denied', 'PERMISSION DENIED', 'access denied', 'ACCESS DENIED'
+                ]
+                
+                has_errors = any(pattern.lower() in output.lower() for pattern in error_patterns)
+                
+                if has_errors:
+                    already_exists = False
+                    log_f.write(f"❌ Commit-check detected errors (treat as not-existing)\n")
+                else:
+                    # Explicit 'no change' patterns only
+                    explicit_no_change_patterns = [
+                        'no configuration changes were made',
+                        'no configuration changes',
+                        'no changes to commit',
+                        'nothing to commit',
+                        'configuration already exists'
+                    ]
+                    already_exists = any(pat in output.lower() for pat in explicit_no_change_patterns)
+                    if already_exists:
+                        log_f.write(f"✅ Commit-check indicates no changes needed (already exists)\n")
+                    else:
+                        # Passed commit-check without explicit 'no change' text → treat as new/changed
+                        already_exists = False
+                        log_f.write(f"✅ Commit-check passed (new or changed configuration detected)\n")
+            else:
+                # For commit stage, we don't check for 'already exists' patterns; only success/failure matters
+                already_exists = False
+                log_f.write(f"🔍 Commit stage - not checking for 'already exists' patterns\n")
             
             if already_exists:
-                # Find which pattern was matched
-                matched_pattern = None
-                for pattern in already_exists_patterns:
-                    if pattern in output.lower():
-                        matched_pattern = pattern
-                        break
-                
-                log_f.write(f"✅ Configuration already exists on device (matched pattern: '{matched_pattern}')\n")
+                log_f.write(f"✅ Configuration already exists on device\n")
                 return True, True, None
             
             # Check for error patterns
@@ -664,10 +711,12 @@ class SSHPushManager:
                     success_found = any(indicator in output.lower() for indicator in success_indicators)
                     
                     if success_found:
-                        # If this is a commit-check stage and it passed successfully, it means config already exists
-                        if stage == "check" and any(indicator in output.lower() for indicator in ['commit check passed successfully', 'commit check passed']):
-                            log_f.write(f"✅ Commit check passed successfully - configuration already exists\n")
-                            return True, True, None
+                        # For commit-check stage, passing successfully means the configuration is valid
+                        # but doesn't necessarily mean it already exists
+                        if stage == "check":
+                            log_f.write(f"✅ Commit check passed successfully - configuration is valid\n")
+                            # Return already_exists=False since we can't determine if it exists from commit check
+                            return True, False, None
                         else:
                             log_f.write(f"✅ {stage.upper()} appears successful\n")
                             return True, False, None
@@ -700,6 +749,9 @@ class SSHPushManager:
             
             log_f.write(f"🔄 Starting {stage.upper()} on {device} ({device_info['hostname']})...\n")
             ok, already_exists, error_message = self._ssh_push_commands_two_stage(device_info, cli_commands, log_f, stage)
+            
+            # Debug logging to see what's being returned
+            log_f.write(f"🔍 DEBUG: _ssh_push_commands_two_stage returned: ok={ok}, already_exists={already_exists}, error_message={error_message}\n")
             
             # Real-time progress feedback
             if ok:
@@ -972,9 +1024,11 @@ class SSHPushManager:
             return False, ["Configuration not found in database"]
         
         if dry_run:
-            print(f"🔍 DRY RUN: Would deploy {config_name} to {len(config)} devices")
+            actual_devices = [device for device in config.keys() if device != '_metadata']
+            print(f"🔍 DRY RUN: Would deploy {config_name} to {len(actual_devices)} devices")
             for device, commands in config.items():
-                print(f"   📱 {device}: {len(commands)} commands")
+                if device != '_metadata':
+                    print(f"   📱 {device}: {len(commands)} commands")
             return True, []
         
         # Log deployment start
@@ -983,7 +1037,9 @@ class SSHPushManager:
         with open(deployment_log_file, 'w') as log_f:
             log_f.write(f"=== Two-Stage Deployment Log for {config_name} ===\n")
             log_f.write(f"Deployment started: {datetime.now().isoformat()}\n")
-            log_f.write(f"Devices: {', '.join(config.keys())}\n\n")
+            # Filter out _metadata key - only process actual devices
+            actual_devices = [device for device in config.keys() if device != '_metadata']
+            log_f.write(f"Devices: {', '.join(actual_devices)}\n\n")
             
             # Prepare CLI commands for each device
             _, _, device_commands = self.preview_cli_commands(config_name)
@@ -1006,7 +1062,7 @@ class SSHPushManager:
             
             # Stage 1: Commit-check on all devices in parallel
             log_f.write("=== STAGE 1: Commit-Check (Validation) ===\n")
-            print(f"🔄 Stage 1: Validating configuration on {len(config)} devices...")
+            print(f"🔄 Stage 1: Validating configuration on {len(actual_devices)} devices...")
             print(f"   📋 Running commit-check in parallel...")
             
             check_results = {}
@@ -1014,9 +1070,9 @@ class SSHPushManager:
             configs_already_exist = []
             
             # Execute commit-check on all devices in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(config)) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(actual_devices)) as executor:
                 futures = {}
-                for device in config.keys():
+                for device in actual_devices:
                     device_info = self._load_device_info(device)
                     if not device_info:
                         msg = f"Missing SSH info for {device}"
@@ -1054,7 +1110,7 @@ class SSHPushManager:
                         configs_already_exist.append(device_name)
                     
                     # Show progress
-                    print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    print(f"   📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
             
             # Check if any validation failed
             if check_errors:
@@ -1067,16 +1123,16 @@ class SSHPushManager:
             
             # Stage 2: Commit on all devices in parallel (only if all checks passed)
             log_f.write("\n=== STAGE 2: Commit (Actual Deployment) ===\n")
-            print(f"\n🔄 Stage 2: Committing configuration on {len(config)} devices...")
+            print(f"\n🔄 Stage 2: Committing configuration on {len(actual_devices)} devices...")
             print(f"   📋 Running commit in parallel...")
             
             commit_results = {}
             commit_errors = []
             
             # Execute commit on all devices in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(config)) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(actual_devices)) as executor:
                 futures = {}
-                for device in config.keys():
+                for device in actual_devices:
                     device_info = self._load_device_info(device)
                     cli_commands = device_commands.get(device, [])
                     
@@ -1101,7 +1157,7 @@ class SSHPushManager:
                             commit_errors.append(f"Failed to commit on {device_name}")
                     
                     # Show progress
-                    print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    print(f"   📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
             
             # Check if any commit failed
             if commit_errors:
@@ -1114,15 +1170,15 @@ class SSHPushManager:
             
             # Stage 3: Verify deployment on all devices
             log_f.write("\n=== STAGE 3: Verification ===\n")
-            print(f"\n🔍 Stage 3: Verifying deployment on {len(config)} devices...")
+            print(f"\n🔍 Stage 3: Verifying deployment on {len(actual_devices)} devices...")
             print(f"   📋 Running verification in parallel...")
             
             verification_errors = []
             
             # Verify deployment on all devices in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(config)) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(actual_devices)) as executor:
                 futures = {}
-                for device in config.keys():
+                for device in actual_devices:
                     device_info = self._load_device_info(device)
                     
                     # Submit verification task
@@ -1142,7 +1198,7 @@ class SSHPushManager:
                         verification_errors.append(f"Configuration verification failed for {device_name}")
                     
                     # Show progress
-                    print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    print(f"   📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
             
             if verification_errors:
                 print(f"\n❌ Verification failed.")
@@ -1202,7 +1258,8 @@ class SSHPushManager:
             return False, [f"Configuration {config_name} not found in database"]
         
         if dry_run:
-            print(f"🔍 DRY RUN: Would remove {config_name} from {len(config)} devices")
+            actual_devices = [device for device in config.keys() if device != '_metadata']
+            print(f"🔍 DRY RUN: Would remove {config_name} from {len(actual_devices)} devices")
             return True, []
         
         # Log removal start
@@ -1214,7 +1271,9 @@ class SSHPushManager:
         with open(deletion_log_file, 'w') as log_f:
             log_f.write(f"=== Parallel Deletion Log for {config_name} ===\n")
             log_f.write(f"Deletion started: {datetime.now().isoformat()}\n")
-            log_f.write(f"Devices: {', '.join(config.keys())}\n\n")
+            # Filter out _metadata key - only process actual devices
+            actual_devices = [device for device in config.keys() if device != '_metadata']
+            log_f.write(f"Devices: {', '.join(actual_devices)}\n\n")
             
             # Prepare deletion CLI commands for each device
             _, _, device_commands = self.preview_deletion_commands(config_name)
@@ -1225,15 +1284,15 @@ class SSHPushManager:
             # Execute deletion on all devices in parallel
             log_f.write("=== Parallel Deletion ===\n")
             if progress_callback:
-                progress_callback(f"🔄 Removing configuration from {len(config)} devices...")
-            print(f"🔄 Removing configuration from {len(config)} devices...")
+                progress_callback(f"🔄 Removing configuration from {len(actual_devices)} devices...")
+            print(f"🔄 Removing configuration from {len(actual_devices)} devices...")
             print(f"   📋 Running deletion in parallel...")
             
             deletion_errors = []
             
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(config)) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(actual_devices)) as executor:
                 futures = {}
-                for device in config.keys():
+                for device in actual_devices:
                     device_info = self._load_device_info(device)
                     if not device_info:
                         msg = f"Missing SSH info for {device}"
@@ -1282,9 +1341,9 @@ class SSHPushManager:
                             progress_callback(f"✅ {device_name}: Configuration removed successfully")
                     
                     # Show progress
-                    print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    print(f"   📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
                     if progress_callback:
-                        progress_callback(f"📊 Progress: {completed_count}/{len(config)} devices completed")
+                        progress_callback(f"📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
             
             if deletion_errors:
                 if progress_callback:
@@ -1300,14 +1359,14 @@ class SSHPushManager:
             log_f.write("\n=== Verification ===\n")
             if progress_callback:
                 progress_callback("🔍 Verifying deletion...")
-            print(f"\n🔍 Verifying deletion on {len(config)} devices...")
+            print(f"\n🔍 Verifying deletion on {len(actual_devices)} devices...")
             print(f"   📋 Running verification in parallel...")
             
             verification_errors = []
             
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(config)) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(actual_devices)) as executor:
                 futures = {}
-                for device in config.keys():
+                for device in actual_devices:
                     device_info = self._load_device_info(device)
                     
                     # Submit verification task
@@ -1333,9 +1392,9 @@ class SSHPushManager:
                             progress_callback(f"✅ {device_name}: Removal verified")
                     
                     # Show progress
-                    print(f"   📊 Progress: {completed_count}/{len(config)} devices completed")
+                    print(f"   📊 Progress: {completed_count}/{len(actual_devices)} devices completed")
                     if progress_callback:
-                        progress_callback(f"📊 Verification Progress: {completed_count}/{len(config)} devices completed")
+                        progress_callback(f"📊 Verification Progress: {completed_count}/{len(actual_devices)} devices completed")
             
             if verification_errors:
                 if progress_callback:

@@ -315,8 +315,8 @@ class SimplifiedBridgeDomainDiscovery:
         # Analyze VLAN configurations across all interfaces
         vlan_analysis = self._analyze_vlan_configurations(cbd.all_interfaces)
         
-        # Determine DNAAS type based on VLAN patterns
-        dnaas_type = self._determine_dnaas_type(vlan_analysis)
+        # Determine DNAAS type based on VLAN patterns with reasoning
+        dnaas_type, classification_reason = self._determine_dnaas_type(vlan_analysis)
         
         # Analyze encapsulation
         encapsulation = self._determine_encapsulation(vlan_analysis)
@@ -326,6 +326,7 @@ class SimplifiedBridgeDomainDiscovery:
         
         return {
             "dnaas_type": dnaas_type,
+            "classification_reason": classification_reason,  # NEW: Why this type was chosen
             "encapsulation": encapsulation,
             "service_type": service_type,
             "vlan_analysis": vlan_analysis,
@@ -341,8 +342,8 @@ class SimplifiedBridgeDomainDiscovery:
         # Analyze VLAN configurations
         vlan_analysis = self._analyze_vlan_configurations(ibd.interfaces)
         
-        # Determine DNAAS type
-        dnaas_type = self._determine_dnaas_type(vlan_analysis)
+        # Determine DNAAS type with reasoning
+        dnaas_type, classification_reason = self._determine_dnaas_type(vlan_analysis)
         
         # Analyze encapsulation
         encapsulation = self._determine_encapsulation(vlan_analysis)
@@ -352,6 +353,7 @@ class SimplifiedBridgeDomainDiscovery:
         
         return {
             "dnaas_type": dnaas_type,
+            "classification_reason": classification_reason,  # NEW: Why this type was chosen
             "encapsulation": encapsulation,
             "service_type": service_type,
             "vlan_analysis": vlan_analysis,
@@ -403,30 +405,46 @@ class SimplifiedBridgeDomainDiscovery:
         
         return analysis
     
-    def _determine_dnaas_type(self, vlan_analysis: Dict[str, Any]) -> str:
-        """Determine DNAAS type based on VLAN analysis"""
+    def _determine_dnaas_type(self, vlan_analysis: Dict[str, Any]) -> tuple[str, str]:
+        """Determine DNAAS type based on VLAN analysis - WITH CLASSIFICATION REASONING"""
         
         has_qinq = vlan_analysis.get("has_qinq", False)
+        has_manipulation = vlan_analysis.get("has_vlan_manipulation", False)
         vlan_ids = vlan_analysis.get("vlan_ids", [])
         outer_vlans = vlan_analysis.get("outer_vlans", [])
         inner_vlans = vlan_analysis.get("inner_vlans", [])
         
-        if has_qinq:
-            if len(outer_vlans) == 1 and len(inner_vlans) > 1:
-                return "DNAAS_TYPE_4_QINQ_MULTI_BD"  # Multiple BDs under one service VLAN
-            elif len(outer_vlans) == 1 and len(inner_vlans) == 1:
-                return "DNAAS_TYPE_3_QINQ_SINGLE_BD"  # Single BD with QinQ
+        # PRIORITY 1: VLAN manipulation indicates QinQ behavior (Type 2A/3)
+        if has_manipulation:
+            if has_qinq and len(outer_vlans) == 1 and len(inner_vlans) > 1:
+                return "DNAAS_TYPE_2B_QINQ_MULTI_BD", f"VLAN manipulation detected with explicit QinQ ({len(inner_vlans)} inner VLANs)"
+            elif has_qinq and len(outer_vlans) == 1 and len(inner_vlans) == 1:
+                return "DNAAS_TYPE_2A_QINQ_SINGLE_BD", f"VLAN manipulation detected with explicit QinQ (outer: {outer_vlans[0]}, inner: {inner_vlans[0]})"
+            elif len(outer_vlans) == 1 or len(vlan_ids) == 1:
+                vlan_ref = outer_vlans[0] if outer_vlans else vlan_ids[0] if vlan_ids else "unknown"
+                return "DNAAS_TYPE_2A_QINQ_SINGLE_BD", f"VLAN manipulation detected (push outer-tag {vlan_ref}) - implies QinQ behavior"
             else:
-                return "DNAAS_TYPE_5_QINQ_COMPLEX"  # Complex QinQ configuration
+                return "DNAAS_TYPE_3_HYBRID", f"Complex VLAN manipulation patterns detected"
         
+        # PRIORITY 2: Explicit QinQ without manipulation (Type 1)
+        elif has_qinq:
+            if len(outer_vlans) == 1 and len(inner_vlans) > 1:
+                return "DNAAS_TYPE_1_DOUBLE_TAGGED_MULTI", f"Explicit QinQ without manipulation (outer: {outer_vlans[0]}, {len(inner_vlans)} inner VLANs)"
+            elif len(outer_vlans) == 1 and len(inner_vlans) == 1:
+                return "DNAAS_TYPE_1_DOUBLE_TAGGED", f"Explicit QinQ without manipulation (outer: {outer_vlans[0]}, inner: {inner_vlans[0]})"
+            else:
+                return "DNAAS_TYPE_1_DOUBLE_TAGGED_COMPLEX", f"Complex QinQ configuration without manipulation"
+        
+        # PRIORITY 3: Simple single VLAN (Type 4A)
         elif len(vlan_ids) == 1:
-            return "DNAAS_TYPE_1_SINGLE_TAGGED"  # Standard single-tagged
+            return "DNAAS_TYPE_4A_SINGLE_TAGGED", f"Single VLAN ID detected (VLAN {vlan_ids[0]}) without manipulation"
         
+        # PRIORITY 4: Multiple VLANs (Type 4B)
         elif len(vlan_ids) > 1:
-            return "DNAAS_TYPE_2_MULTI_TAGGED"  # Multiple VLANs in one BD
+            return "DNAAS_TYPE_4B_VLAN_RANGE", f"Multiple VLAN IDs detected ({len(vlan_ids)} VLANs: {vlan_ids})"
         
         else:
-            return "DNAAS_TYPE_UNTAGGED"  # Untagged/unknown
+            return "DNAAS_TYPE_UNTAGGED", "No VLAN configuration detected - untagged/port-mode interface"
     
     def _determine_encapsulation(self, vlan_analysis: Dict[str, Any]) -> str:
         """Determine encapsulation type"""
@@ -727,12 +745,20 @@ class SimplifiedBridgeDomainDiscovery:
         # Convert raw interfaces to structured format
         for interface_data in bd.interfaces:
             try:
+                # Clean raw CLI configuration first
+                cleaned_raw_config = self._clean_raw_config(interface_data.get('raw_config', []))
+                
+                # Update interface data with cleaned raw config for VLAN extraction
+                interface_data['raw_config'] = cleaned_raw_config
+                
+                # Extract VLAN configuration with cleaned raw CLI parsing
                 vlan_config = self._extract_vlan_configuration(interface_data)
+                
                 interface_info = InterfaceInfo(
                     name=interface_data.get('interface', 'unknown'),
                     device_name=interface_data.get('device', 'unknown'),
                     vlan_config=vlan_config,
-                    raw_config=self._clean_raw_config(interface_data.get('raw_config', []))  # Clean and add raw CLI configuration
+                    raw_config=cleaned_raw_config
                 )
                 processed_bd.interfaces.append(interface_info)
             except Exception as e:
@@ -746,15 +772,83 @@ class SimplifiedBridgeDomainDiscovery:
     def _extract_vlan_configuration(self, interface_data: Dict[str, Any]) -> VLANConfiguration:
         """Extract VLAN configuration from interface data - ONLY from actual config, not names"""
         
+        # First, get the pre-extracted values
+        vlan_id = interface_data.get('vlan_id')
+        outer_vlan = interface_data.get('outer_vlan')
+        inner_vlan = interface_data.get('inner_vlan')
+        vlan_manipulation = interface_data.get('vlan_manipulation')
+        
+        # Parse raw CLI configuration to extract additional VLAN information
+        raw_config = interface_data.get('raw_config', [])
+        if raw_config:
+            parsed_vlan_info = self._parse_raw_cli_for_vlan_info(raw_config)
+            
+            # Prioritize raw CLI parsing over pre-extracted values
+            # This ensures we get the most accurate VLAN information from actual CLI commands
+            if parsed_vlan_info.get('vlan_id'):
+                vlan_id = parsed_vlan_info['vlan_id']
+            if parsed_vlan_info.get('outer_vlan'):
+                outer_vlan = parsed_vlan_info['outer_vlan']
+            if parsed_vlan_info.get('inner_vlan'):
+                inner_vlan = parsed_vlan_info['inner_vlan']
+            if parsed_vlan_info.get('vlan_manipulation'):
+                vlan_manipulation = parsed_vlan_info['vlan_manipulation']
+        
         return VLANConfiguration(
-            vlan_id=interface_data.get('vlan_id'),  # Only from actual config
-            outer_vlan=interface_data.get('outer_vlan'),  # Only from actual config
-            inner_vlan=interface_data.get('inner_vlan'),
+            vlan_id=vlan_id,
+            outer_vlan=outer_vlan,
+            inner_vlan=inner_vlan,
             vlan_range_start=interface_data.get('vlan_range_start'),
             vlan_range_end=interface_data.get('vlan_range_end'),
             vlan_list=interface_data.get('vlan_list', []),
-            vlan_manipulation=interface_data.get('vlan_manipulation')
+            vlan_manipulation=vlan_manipulation
         )
+    
+    def _parse_raw_cli_for_vlan_info(self, raw_config: List[str]) -> Dict[str, Any]:
+        """Parse raw CLI configuration to extract VLAN information"""
+        import re
+        
+        vlan_info = {}
+        
+        for config_line in raw_config:
+            config_line = config_line.strip()
+            if not config_line:
+                continue
+            
+            # Parse vlan-manipulation ingress-mapping action push outer-tag
+            # Example: interfaces ge100-0/0/6 vlan-manipulation ingress-mapping action push outer-tag 210 outer-tpid 0x8100
+            push_match = re.search(r'vlan-manipulation\s+ingress-mapping\s+action\s+push\s+outer-tag\s+(\d+)', config_line)
+            if push_match:
+                vlan_id = int(push_match.group(1))
+                vlan_info['outer_vlan'] = vlan_id
+                vlan_info['vlan_manipulation'] = config_line
+                # For push outer-tag, the outer VLAN becomes the service VLAN
+                vlan_info['vlan_id'] = vlan_id
+                continue
+            
+            # Parse vlan-manipulation egress-mapping action pop
+            # Example: interfaces ge100-0/0/6 vlan-manipulation egress-mapping action pop
+            pop_match = re.search(r'vlan-manipulation\s+egress-mapping\s+action\s+pop', config_line)
+            if pop_match:
+                vlan_info['vlan_manipulation'] = config_line
+                continue
+            
+            # Parse standard vlan-id assignment
+            # Example: interfaces bundle-60000.210 vlan-id 210
+            vlan_id_match = re.search(r'vlan-id\s+(\d+)', config_line)
+            if vlan_id_match:
+                vlan_info['vlan_id'] = int(vlan_id_match.group(1))
+                continue
+            
+            # Parse QinQ outer-tag and inner-tag
+            # Example: interfaces bundle-60000.210 vlan-tags outer-tag 100 inner-tag 200
+            qinq_match = re.search(r'vlan-tags\s+outer-tag\s+(\d+)\s+inner-tag\s+(\d+)', config_line)
+            if qinq_match:
+                vlan_info['outer_vlan'] = int(qinq_match.group(1))
+                vlan_info['inner_vlan'] = int(qinq_match.group(2))
+                continue
+        
+        return vlan_info
     
     def _bd_proc_phase2_classification(self, bd: ProcessedBridgeDomain) -> ProcessedBridgeDomain:
         """Phase 2: DNAAS Type Classification"""
@@ -766,15 +860,20 @@ class SimplifiedBridgeDomainDiscovery:
         has_physical_only = all(iface.is_physical_interface() and not iface.vlan_config.vlan_id 
                                for iface in bd.interfaces)
         
-        # Classify according to DNAAS types
+        # Classify according to DNAAS types - CORRECTED LOGIC
         if has_physical_only:
             bd.bridge_domain_type = BridgeDomainType.PORT_MODE  # Type 5
-        elif has_manipulation and has_qinq_tags:
-            bd.bridge_domain_type = BridgeDomainType.QINQ_SINGLE_BD  # Type 2A (simplified)
+        elif has_manipulation:
+            # ANY VLAN manipulation indicates QinQ behavior (Type 2A/3)
+            # vlan-manipulation push outer-tag creates QinQ even without explicit inner VLAN
+            if has_qinq_tags:
+                bd.bridge_domain_type = BridgeDomainType.QINQ_SINGLE_BD  # Type 2A - explicit QinQ + manipulation
+            else:
+                bd.bridge_domain_type = BridgeDomainType.QINQ_SINGLE_BD  # Type 2A - manipulation implies QinQ
         elif has_qinq_tags:
-            bd.bridge_domain_type = BridgeDomainType.DOUBLE_TAGGED  # Type 1
+            bd.bridge_domain_type = BridgeDomainType.DOUBLE_TAGGED  # Type 1 - QinQ without manipulation
         elif has_single_vlan:
-            bd.bridge_domain_type = BridgeDomainType.SINGLE_TAGGED  # Type 4A
+            bd.bridge_domain_type = BridgeDomainType.SINGLE_TAGGED  # Type 4A - simple single VLAN
         else:
             bd.bridge_domain_type = BridgeDomainType.SINGLE_TAGGED  # Default fallback
         
@@ -793,6 +892,10 @@ class SimplifiedBridgeDomainDiscovery:
                           if iface.vlan_config.outer_vlan is not None]
             if outer_vlans:
                 bd.global_identifier = max(set(outer_vlans), key=outer_vlans.count)
+            else:
+                # NO fallback for mixed VLAN scenarios - keep them separate
+                # Mixed VLANs indicate different services that should not be consolidated
+                bd.global_identifier = None
         
         elif bd.bridge_domain_type == BridgeDomainType.SINGLE_TAGGED:
             # Single-tagged: Use VLAN ID as broadcast domain identifier
@@ -918,24 +1021,46 @@ class SimplifiedBridgeDomainDiscovery:
         return "access"
     
     def _bd_proc_phase7_consolidation_key(self, bd: ProcessedBridgeDomain) -> ProcessedBridgeDomain:
-        """Phase 7: Consolidation Key Generation - ONLY from CLI config data"""
+        """Phase 7: Consolidation Key Generation - STRICT RULES for clean consolidation"""
         
-        # Generate consolidation key based on username and VLAN ID from actual config
-        if bd.username and bd.global_identifier:
-            # Global consolidation by username + VLAN ID (from actual config only)
+        # STRICT consolidation rules: Only consolidate when VLAN configuration is clean
+        if bd.username and bd.global_identifier and self._has_clean_vlan_configuration(bd):
+            # Global consolidation by username + VLAN ID (only for clean configurations)
             bd.consolidation_key = f"{bd.username}_{bd.global_identifier}"
             bd.can_consolidate = True
-        elif bd.username:
-            # Local consolidation by username only (for local bridge domains)
-            bd.consolidation_key = f"local_{bd.username}"
-            bd.can_consolidate = True
         else:
-            # No consolidation - individual bridge domain (follow Golden Rule)
+            # No consolidation for mixed/complex VLAN scenarios
+            # This preserves network engineering intent and prevents incorrect grouping
             bd.consolidation_key = f"individual_{bd.name}"
             bd.can_consolidate = False
         
         bd.processing_phase = "complete"
         return bd
+    
+    def _has_clean_vlan_configuration(self, bd: ProcessedBridgeDomain) -> bool:
+        """Check if bridge domain has clean, consistent VLAN configuration suitable for consolidation"""
+        
+        # Get all VLAN IDs and outer VLANs
+        vlan_ids = [iface.vlan_config.vlan_id for iface in bd.interfaces 
+                   if iface.vlan_config.vlan_id is not None]
+        outer_vlans = [iface.vlan_config.outer_vlan for iface in bd.interfaces 
+                      if iface.vlan_config.outer_vlan is not None]
+        
+        # For QinQ types: All outer VLANs must be the same
+        if bd.bridge_domain_type in [BridgeDomainType.DOUBLE_TAGGED, 
+                                    BridgeDomainType.QINQ_SINGLE_BD,
+                                    BridgeDomainType.QINQ_MULTI_BD]:
+            if outer_vlans:
+                return len(set(outer_vlans)) == 1  # All outer VLANs must be identical
+            else:
+                return len(set(vlan_ids)) == 1 if vlan_ids else False  # Fallback to VLAN IDs
+        
+        # For single-tagged: All VLAN IDs must be the same
+        elif bd.bridge_domain_type == BridgeDomainType.SINGLE_TAGGED:
+            return len(set(vlan_ids)) == 1 if vlan_ids else False
+        
+        # Other types: No consolidation
+        return False
     
     def _create_error_bridge_domain(self, bd: RawBridgeDomain, error: str) -> ProcessedBridgeDomain:
         """Create an error bridge domain for tracking processing failures"""

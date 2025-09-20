@@ -25,6 +25,7 @@ from config_engine.simplified_discovery.simplified_bridge_domain_discovery impor
     run_simplified_discovery,
     DiscoveryResults
 )
+from config_engine.simplified_discovery.data_sync_manager import DataSyncManager
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class SimplifiedDiscoveryCLI:
         """Initialize CLI interface"""
         self.discovery_system = None
         self.last_results = None
+        self.sync_manager = DataSyncManager()
     
     def show_discovery_menu(self):
         """
@@ -169,6 +171,32 @@ class SimplifiedDiscoveryCLI:
             print()
         
         print("💾 Results saved to: topology/simplified_discovery_results/")
+        
+        # Synchronize data between database and JSON files
+        print("🔄 Synchronizing data...")
+        try:
+            # Load the latest JSON results for sync
+            output_dir = Path("topology/simplified_discovery_results")
+            latest_file = max(output_dir.glob("bridge_domain_mapping_*.json"), key=lambda f: f.stat().st_mtime)
+            with open(latest_file, 'r') as f:
+                discovery_results = json.load(f)
+            
+            # Use sync manager for proper synchronization
+            sync_result = self.sync_manager.sync_discovery_data(discovery_results)
+            
+            print(f"✅ Data synchronization completed:")
+            print(f"   • Database: {sync_result['database_saved']} bridge domains")
+            print(f"   • JSON: {sync_result['json_saved']} bridge domains")
+            print(f"   • Status: {sync_result['sync_status']['status']}")
+            
+            if sync_result['sync_status']['sync_percentage'] < 100:
+                print(f"   ⚠️  Sync warning: {sync_result['sync_status']['sync_percentage']:.1f}% synchronized")
+        
+        except Exception as e:
+            print(f"⚠️  Data sync failed: {e}")
+            print("📁 Results are still available in JSON files")
+        
+        print()
         print("📋 Use option 2 to view detailed results")
         print("📁 Use option 4 to browse output files")
     

@@ -11,6 +11,14 @@ from datetime import datetime
 # Add the current directory to Python path for imports
 sys.path.append(str(Path(__file__).parent))
 
+# Import enhanced simplified discovery display
+try:
+    from config_engine.simplified_discovery.enhanced_cli_display import run_enhanced_simplified_discovery_display
+except ImportError:
+    def run_enhanced_simplified_discovery_display():
+        print("❌ Enhanced Simplified Discovery Display not available")
+        print("💡 Please ensure the enhanced_cli_display.py file is in the correct location")
+
 def show_main_menu():
     """Main menu for lab automation framework"""
     print("\n" + "🚀" + "=" * 68)
@@ -23,7 +31,8 @@ def show_main_menu():
     print("4. 📊 Reports & Analytics")
     print("5. ⚙️  Configuration")
     print("6. 🗄️  Enhanced Database Operations")
-    print("7. ❌ Exit")
+    print("7. 🎯 Enhanced Simplified Discovery Database")
+    print("8. ❌ Exit")
     print()
 
 def show_discovery_menu():
@@ -1581,7 +1590,7 @@ def main():
     
     while True:
         show_main_menu()
-        choice = input("Select an option [1-7]: ").strip()
+        choice = input("Select an option [1-8]: ").strip()
         
         if choice == '1':
             run_discovery_menu()
@@ -1596,11 +1605,13 @@ def main():
         elif choice == '6':
             show_enhanced_database_menu()
         elif choice == '7':
+            run_enhanced_simplified_discovery_display()
+        elif choice == '8':
             print("\n👋 Thank you for using Lab Automation Framework!")
             print("🚀 Goodbye!")
             break
         else:
-            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, or 7.")
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, 7, or 8.")
 
 def _calculate_scope_statistics(topologies):
     """Calculate scope compliance statistics"""

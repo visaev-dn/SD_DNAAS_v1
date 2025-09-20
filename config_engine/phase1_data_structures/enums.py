@@ -87,6 +87,23 @@ class OuterTagImposition(Enum):
     LEAF = "leaf"       # outer-tag push/pop at leaf
 
 
+class ConsolidationDecision(Enum):
+    """Consolidation decision types for bulletproof validation"""
+    APPROVE = "approve"
+    REJECT = "reject"
+    REVIEW_REQUIRED = "review_required"
+    APPROVE_EXACT = "approve_exact"
+    APPROVE_HIGH_CONFIDENCE = "approve_high_confidence"
+    APPROVE_PARTIAL = "approve_partial"
+
+
+class ComplexityLevel(Enum):
+    """Service complexity levels for topology analysis"""
+    SIMPLE = "simple"          # 1-2 devices, basic configuration
+    MODERATE = "moderate"      # 3-10 devices, moderate complexity
+    COMPLEX = "complex"        # 11+ devices, high complexity
+
+
 class BridgeDomainScope(Enum):
     """Bridge domain scope classification based on naming convention and deployment pattern"""
     LOCAL = "local"           # l_ prefix - leaf-only, VLAN ID locally significant

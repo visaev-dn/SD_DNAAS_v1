@@ -62,7 +62,7 @@ class TopologyData:
         if not isinstance(self.validation_status, ValidationStatus):
             raise ValueError("Validation status must be a valid ValidationStatus enum")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
         
         if not self.devices:

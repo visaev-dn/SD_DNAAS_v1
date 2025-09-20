@@ -77,7 +77,7 @@ class BridgeDomainConfig:
         if not isinstance(self.outer_tag_imposition, OuterTagImposition):
             raise ValueError("Outer tag imposition must be a valid OuterTagImposition enum")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
         
         # Validate VLAN configuration based on bridge domain type

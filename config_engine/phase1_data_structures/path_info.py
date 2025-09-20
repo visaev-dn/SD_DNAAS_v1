@@ -33,6 +33,10 @@ class PathSegment:
     bundle_id: Optional[int] = None
     confidence_score: float = field(default=1.0, metadata={'min': 0.0, 'max': 1.0})
     
+    # Performance metrics
+    bandwidth: Optional[float] = None  # Bandwidth in Mbps
+    latency: Optional[float] = None    # Latency in milliseconds
+    
     # Metadata with defaults
     discovered_at: datetime = field(default_factory=datetime.now)
     segment_id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -58,7 +62,7 @@ class PathSegment:
         if not self.segment_type:
             raise ValueError("Segment type cannot be empty")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
         
         if self.bundle_id is not None and (self.bundle_id < 1 or self.bundle_id > 64):
@@ -95,6 +99,8 @@ class PathSegment:
             'segment_type': self.segment_type,
             'connection_type': self.connection_type,
             'bundle_id': self.bundle_id,
+            'bandwidth': self.bandwidth,
+            'latency': self.latency,
             'discovered_at': self.discovered_at.isoformat(),
             'confidence_score': self.confidence_score
         }
@@ -158,7 +164,7 @@ class PathInfo:
         if not self.segments:
             raise ValueError("Path must have at least one segment")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
         
         # Validate path continuity

@@ -99,7 +99,7 @@ class InterfaceInfo:
         if self.mtu is not None and (self.mtu < 64 or self.mtu > 9216):
             raise ValueError("MTU must be between 64 and 9216")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
     
     @property

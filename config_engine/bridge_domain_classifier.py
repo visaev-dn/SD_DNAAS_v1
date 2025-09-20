@@ -385,15 +385,16 @@ class BridgeDomainClassifier:
         
         # CONSERVATIVE QinQ Detection - Require definitive evidence
         
-        # 1.1: DEFINITIVE: VLAN manipulation (push/pop operations) + Multiple VLANs + Actual QinQ evidence
+        # 1.1: DEFINITIVE: VLAN manipulation (push/pop operations) + QinQ evidence
+        # FIXED: Don't require multiple VLANs - Type 2B QinQ can have single outer VLAN with ranges
         if (analysis['push_outer_tag_count'] > 0 and 
             analysis['pop_operations_count'] > 0 and
-            len(analysis['unique_vlan_ids']) > 1 and
-            (len(analysis['outer_inner_tag_pairs']) > 0 or  # Has actual double tags, OR
-             len(analysis['vlan_ranges']) > 0)):             # Has VLAN ranges (Type 2A/2B pattern)
+            (len(analysis['outer_inner_tag_pairs']) > 0 or    # Has actual double tags, OR
+             len(analysis['vlan_ranges']) > 0 or              # Has VLAN ranges (Type 2A/2B pattern), OR
+             analysis['full_ranges_1_4094'] > 0)):            # Has full range (Type 2A pattern)
             has_legitimate_qinq = True
             qinq_confidence = 95
-            self.logger.debug("QinQ detected: VLAN manipulation with push/pop operations + multiple VLANs + QinQ evidence")
+            self.logger.debug("QinQ detected: VLAN manipulation with push/pop operations + QinQ evidence (ranges/tags)")
         
         # 1.2: DEFINITIVE: Outer/inner tag pairs with different values (don't require multiple VLANs)
         elif len(analysis['outer_inner_tag_pairs']) > 0:

@@ -147,6 +147,9 @@ class EnhancedDataConverter:
                         )
                         path_segments.append(segment)
                     
+                    # Deduplicate path segments to prevent database duplicates
+                    path_segments = self._deduplicate_path_segments(path_segments)
+                    
                     # Create path info
                     bundle_path = PathInfo(
                         path_name=f"LACP-Bundle-{bundle_id}",
@@ -425,6 +428,9 @@ class EnhancedDataConverter:
                         )
                         path_segments.append(segment)
                     
+                    # Deduplicate path segments to prevent database duplicates
+                    path_segments = self._deduplicate_path_segments(path_segments)
+                    
                     # Create path info
                     bd_path = PathInfo(
                         path_name=f"BD-{service_name}",
@@ -476,6 +482,46 @@ class EnhancedDataConverter:
                 target_format='topology_structures',
                 context={'bd_data': bd_data}
             )
+    
+    def _deduplicate_path_segments(self, segments: List) -> List:
+        """
+        Remove duplicate path segments based on source/dest device and interface.
+        
+        Args:
+            segments: List of PathSegment objects
+            
+        Returns:
+            List: Deduplicated segments with highest confidence scores
+        """
+        if not segments:
+            return segments
+        
+        # Create a dictionary to track unique segments
+        unique_segments = {}
+        
+        for segment in segments:
+            # Create a key based on source/dest device and interface
+            segment_key = (
+                segment.source_device,
+                segment.dest_device,
+                segment.source_interface,
+                segment.dest_interface,
+                segment.segment_type
+            )
+            
+            # If this is a new segment or has higher confidence, keep it
+            if (segment_key not in unique_segments or 
+                segment.confidence_score > unique_segments[segment_key].confidence_score):
+                unique_segments[segment_key] = segment
+        
+        # Return deduplicated segments
+        deduplicated = list(unique_segments.values())
+        
+        if len(deduplicated) < len(segments):
+            self.logger.info(f"🔄 Deduplicated path segments: {len(segments)} → {len(deduplicated)} "
+                           f"(removed {len(segments) - len(deduplicated)} duplicates)")
+        
+        return deduplicated
     
     def _extract_bundle_id(self, bundle_name: str) -> Optional[str]:
         """Extract bundle ID from bundle name using patterns"""

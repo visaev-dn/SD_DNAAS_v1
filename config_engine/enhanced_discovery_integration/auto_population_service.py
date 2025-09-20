@@ -62,17 +62,10 @@ class EnhancedDatabasePopulationService:
                 iface.get('inner_vlan')
             ]
             
-            # For interfaces without explicit VLAN config, try to extract from interface name
-            interface_name = iface.get('interface', '')
-            if not any(vlan_sources) and interface_name:
-                # Check if it's a subinterface with VLAN in the name (e.g., bundle-961.123)
-                if '.' in interface_name:
-                    try:
-                        vlan_from_name = int(interface_name.split('.')[-1])
-                        if self.validate_vlan_range(vlan_from_name):
-                            vlan_sources.append(vlan_from_name)
-                    except (ValueError, IndexError):
-                        pass
+            # GOLDEN RULE: NEVER extract VLAN from interface names
+            # Interface names can be misleading due to configuration drift
+            # ONLY use actual device VLAN configuration data
+            # If no VLAN sources found, the interface lacks proper config parsing
             
             for vlan_id in vlan_sources:
                 if vlan_id and isinstance(vlan_id, int):
@@ -633,33 +626,111 @@ class EnhancedDatabasePopulationService:
                 return InterfaceRole.ACCESS
 
             def create_virtual_destinations(service_name: str, source_device: str, devices_map: dict) -> List[Dict[str, str]]:
-                """Create virtual destinations for single-device bridge domains"""
+                """Create virtual destinations for bridge domains, ensuring all LEAF devices are included"""
                 
-                # First try to use actual discovered devices
                 destinations = []
+                
+                # Include all devices that are NOT the source device as destinations
                 for device_name, device_info in devices_map.items():
                     if device_name != source_device:
                         interfaces = device_info.get('interfaces', [])
                         if interfaces:
+                            # Use the first interface for this device
                             destinations.append({
                                 'device': device_name,
                                 'port': interfaces[0]['name']
                             })
+                        else:
+                            # Even if no interfaces, include the device as a destination
+                            destinations.append({
+                                'device': device_name,
+                                'port': 'unknown'
+                            })
                 
-                # If no destinations found, create virtual ones based on service type
+                # If no destinations found (single device bridge domain), create internal switching
                 if not destinations:
-                    service_lower = service_name.lower()
+                    # Use the source device for internal switching
+                    source_info = devices_map.get(source_device, {})
+                    source_interfaces = source_info.get('interfaces', [])
                     
-                    if 'double_tag' in service_lower or 'qinq' in service_lower:
-                        destinations.append({'device': 'EXTERNAL_QINQ_DESTINATION', 'port': 'qinq_interface'})
-                    elif 'ixia' in service_lower:
-                        destinations.append({'device': 'IXIA_TEST_EQUIPMENT', 'port': 'test_interface'})
-                    elif 'spirent' in service_lower:
-                        destinations.append({'device': 'SPIRENT_TEST_EQUIPMENT', 'port': 'test_interface'})
+                    if source_interfaces:
+                        destinations.append({
+                            'device': source_device,  # Same device (internal switching)
+                            'port': source_interfaces[0]['name']
+                        })
                     else:
-                        destinations.append({'device': 'EXTERNAL_DESTINATION', 'port': 'unknown_interface'})
+                        # Fallback: create a minimal destination on the same device
+                        destinations.append({
+                            'device': source_device,
+                            'port': 'internal_port'
+                        })
                 
                 return destinations
+
+            def select_optimal_source_device(devices_map: dict, raw_interfaces: list) -> Tuple[str, str]:
+                """
+                Select the optimal source device and interface for a bridge domain.
+                Prioritizes LEAF devices and ensures all LEAF devices are included.
+                """
+                # Strategy 1: Prefer LEAF devices with access interfaces (typical P2P)
+                for iface in raw_interfaces:
+                    if iface.get('role') == 'access':
+                        device_name = iface['device_name']
+                        device_info = devices_map.get(device_name, {})
+                        if device_info.get('device_type') == 'leaf':
+                            return device_name, iface['name']
+                
+                # Strategy 2: Prefer LEAF devices over SPINE devices
+                leaf_devices = []
+                spine_devices = []
+                superspine_devices = []
+                
+                for device_name, device_info in devices_map.items():
+                    device_type = device_info.get('device_type', 'unknown')
+                    if device_type == 'leaf':
+                        leaf_devices.append(device_name)
+                    elif device_type == 'spine':
+                        spine_devices.append(device_name)
+                    elif device_type == 'superspine':
+                        superspine_devices.append(device_name)
+                
+                # If we have LEAF devices, pick the one with most interfaces
+                if leaf_devices:
+                    device_interface_counts = {}
+                    for device_name in leaf_devices:
+                        device_info = devices_map[device_name]
+                        interfaces = device_info.get('interfaces', [])
+                        device_interface_counts[device_name] = len(interfaces)
+                    
+                    if device_interface_counts:
+                        source_device = max(device_interface_counts.keys(), key=lambda k: device_interface_counts[k])
+                        # Pick first interface from that device
+                        device_info = devices_map[source_device]
+                        interfaces = device_info.get('interfaces', [])
+                        if interfaces:
+                            return source_device, interfaces[0]['name']
+                
+                # Strategy 3: Count interfaces per device and pick the one with most
+                if raw_interfaces:
+                    device_interface_counts = {}
+                    for iface in raw_interfaces:
+                        device_name = iface['device_name']
+                        device_interface_counts[device_name] = device_interface_counts.get(device_name, 0) + 1
+                    
+                    if device_interface_counts:
+                        source_device = max(device_interface_counts.keys(), key=lambda k: device_interface_counts[k])
+                        # Pick first interface from that device
+                        for iface in raw_interfaces:
+                            if iface['device_name'] == source_device:
+                                return source_device, iface['name']
+                
+                # Strategy 4: Final fallback - use first available
+                if raw_interfaces:
+                    first = raw_interfaces[0]
+                    return first['device_name'], first['name']
+                
+                # Last resort
+                return 'unknown', 'unknown'
 
             for service_name in service_names:
                 try:
@@ -680,39 +751,7 @@ class EnhancedDatabasePopulationService:
                             })
 
                     # Pick source device/interface first
-                    source_device = None
-                    source_interface = None
-                    
-                    # Strategy 1: Prefer leaf with access interface (typical P2P)
-                    for iface in raw_interfaces:
-                        if iface['role'] == 'access':
-                            source_device = iface['device_name']
-                            source_interface = iface['name']
-                            break
-                    
-                    # Strategy 2: For QinQ scenarios where all interfaces are uplink,
-                    # pick the device with the most interfaces (likely the source)
-                    if source_device is None and raw_interfaces:
-                        # Count interfaces per device
-                        device_interface_counts = {}
-                        for iface in raw_interfaces:
-                            device_name = iface['device_name']
-                            device_interface_counts[device_name] = device_interface_counts.get(device_name, 0) + 1
-                        
-                        # Pick device with most interfaces as source
-                        if device_interface_counts:
-                            source_device = max(device_interface_counts.keys(), key=lambda k: device_interface_counts[k])
-                            # Pick first interface from that device
-                            for iface in raw_interfaces:
-                                if iface['device_name'] == source_device:
-                                    source_interface = iface['name']
-                                    break
-                    
-                    # Strategy 3: Final fallback - use first available
-                    if source_device is None and raw_interfaces:
-                        first = raw_interfaces[0]
-                        source_device = first['device_name']
-                        source_interface = first['name']
+                    source_device, source_interface = select_optimal_source_device(devices_map, raw_interfaces)
 
                     # Bridge domain type selection using original interface data
                     original_interfaces = []

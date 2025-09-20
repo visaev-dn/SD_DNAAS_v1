@@ -52,6 +52,19 @@ class Phase1TopologyData(Base):
     last_updated = Column(DateTime, default=datetime.utcnow)
     change_count = Column(Integer, default=0)
     
+    # Service signature fields for deduplication
+    service_signature = Column(String(500), nullable=True, unique=True, index=True)
+    discovery_session_id = Column(String(100), nullable=True, index=True)
+    discovery_count = Column(Integer, default=1)
+    first_discovered_at = Column(DateTime, nullable=True)
+    signature_confidence = Column(Float, default=0.0)
+    signature_classification = Column(String(100), nullable=True)
+    
+    # Review and quality control fields
+    review_required = Column(Boolean, default=False, index=True)
+    review_reason = Column(String(500), nullable=True)
+    data_sources = Column(JSON, nullable=True)  # Track contributing discovery runs
+    
     # Relationships
     devices = relationship('Phase1DeviceInfo', back_populates='topology', cascade='all, delete-orphan')
     interfaces = relationship('Phase1InterfaceInfo', back_populates='topology', cascade='all, delete-orphan')
@@ -82,7 +95,51 @@ class Phase1TopologyData(Base):
         # Reconstruct devices, interfaces, and paths
         devices = [device.to_phase1_device() for device in self.devices]
         interfaces = [interface.to_phase1_interface() for interface in self.interfaces]
-        paths = [path.to_phase1_path() for path in self.paths]
+        
+        # Reconstruct paths with error handling for validation issues
+        paths = []
+        for path in self.paths:
+            try:
+                reconstructed_path = path.to_phase1_path()
+                paths.append(reconstructed_path)
+            except Exception as e:
+                # Log the path reconstruction error but continue
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"⚠️ Failed to reconstruct path {path.path_name}: {e}")
+                # Skip this path rather than failing the entire topology
+                continue
+        
+        # If no valid paths were reconstructed, create a minimal fallback path
+        if not paths and devices:
+            try:
+                from config_engine.phase1_data_structures.path_info import PathInfo, PathSegment, TopologyType
+                from config_engine.phase1_data_structures.enums import TopologyType as TopologyTypeEnum
+                
+                # Create a minimal path using the first device
+                first_device = devices[0].name if devices else 'unknown_device'
+                minimal_segment = PathSegment(
+                    source_device=first_device,
+                    dest_device=first_device,
+                    source_interface='internal_switching',
+                    dest_interface='internal_switching',
+                    segment_type='minimal_fallback'
+                )
+                
+                minimal_path = PathInfo(
+                    path_name=f"{self.bridge_domain_name}_minimal_fallback",
+                    path_type=TopologyTypeEnum.P2P,
+                    source_device=first_device,
+                    dest_device=first_device,
+                    segments=[minimal_segment]
+                )
+                
+                paths = [minimal_path]
+                logger.warning(f"⚠️ Created minimal fallback path for {self.bridge_domain_name}")
+                
+            except Exception as fallback_error:
+                logger.error(f"❌ Failed to create fallback path: {fallback_error}")
+                # If even fallback fails, we'll let the TopologyData constructor handle it
         
         # Get bridge domain config if available
         bridge_domain_config = None
@@ -116,7 +173,9 @@ class Phase1TopologyData(Base):
             
             # Ensure at least one destination exists (validation requirement)
             if not formatted_destinations:
-                formatted_destinations = [{'device': 'unknown', 'port': 'unknown'}]
+                # Use the first device from the devices list if available
+                first_device = devices[0].name if devices else 'unknown'
+                formatted_destinations = [{'device': first_device, 'port': 'unknown'}]
             
             try:
                 # Handle potential enum conversion issues
@@ -174,12 +233,13 @@ class Phase1TopologyData(Base):
             import config_engine.phase1_data_structures.enums as enums_module
             
             # Create a minimal bridge domain config with default values
+            first_device = devices[0].name if devices else 'unknown'
             bridge_domain_config = bd_config_module.BridgeDomainConfig(
                 service_name=self.bridge_domain_name or 'unknown',
                 bridge_domain_type=enums_module.BridgeDomainType.SINGLE_VLAN,
-                source_device='unknown',
+                source_device=first_device,
                 source_interface='unknown',
-                destinations=[{'device': 'unknown', 'port': 'unknown'}],
+                destinations=[{'device': first_device, 'port': 'unknown'}],
                 vlan_id=self.vlan_id or 1,
                 bridge_domain_scope=enums_module.BridgeDomainScope.detect_from_name(self.bridge_domain_name or '')
             )
@@ -477,6 +537,13 @@ class Phase1BridgeDomainConfig(Base):
     # Metadata
     confidence_score = Column(Float, default=0.0)
     validation_status = Column(String(50), default='pending')
+    
+    # Consolidation metadata
+    bridge_domain_scope = Column(String(20), nullable=True)  # LOCAL, GLOBAL, UNSPECIFIED
+    is_consolidated = Column(Boolean, default=False)
+    consolidation_key = Column(String(255), nullable=True)  # username_vlan key for grouping
+    original_names = Column(JSON, nullable=True)  # List of original BD names before consolidation
+    consolidation_reason = Column(String(500), nullable=True)  # Why this was consolidated
     
     # Relationships
     topology = relationship('Phase1TopologyData', back_populates='bridge_domain_configs')
@@ -850,6 +917,11 @@ class Phase1PathSegment(Base):
     
     # Connection details
     connection_type = Column(String(50), default='direct')
+    
+    # Performance metrics
+    bandwidth = Column(Float, nullable=True)
+    latency = Column(Float, nullable=True)
+    
     # Timestamps
     discovered_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -869,6 +941,8 @@ class Phase1PathSegment(Base):
         self.dest_interface = segment.dest_interface
         self.segment_type = segment.segment_type
         self.connection_type = segment.connection_type
+        self.bandwidth = getattr(segment, 'bandwidth', None)
+        self.latency = getattr(segment, 'latency', None)
         self.discovered_at = segment.discovered_at
         self.confidence_score = segment.confidence_score
     
@@ -897,6 +971,8 @@ class Phase1PathSegment(Base):
             'dest_interface': self.dest_interface,
             'segment_type': self.segment_type,
             'connection_type': self.connection_type,
+            'bandwidth': self.bandwidth,
+            'latency': self.latency,
             'discovered_at': self.discovered_at.isoformat() if self.discovered_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'confidence_score': self.confidence_score

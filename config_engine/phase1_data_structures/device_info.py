@@ -73,7 +73,7 @@ class DeviceInfo:
         if not isinstance(self.device_role, DeviceRole):
             raise ValueError("Device role must be a valid DeviceRole enum")
         
-        if self.confidence_score < 0.0 or self.confidence_score > 1.0:
+        if self.confidence_score is not None and (self.confidence_score < 0.0 or self.confidence_score > 1.0):
             raise ValueError("Confidence score must be between 0.0 and 1.0")
         
         if self.total_interfaces < 0:

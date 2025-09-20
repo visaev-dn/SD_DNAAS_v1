@@ -74,6 +74,11 @@ class VLANConfigurationCollector:
             'vlan_manipulation_ingress': r'interfaces\s+(\S+)\s+vlan-manipulation\s+ingress-mapping\s+action\s+push\s+outer-tag\s+(\d+)',
             'vlan_manipulation_egress': r'interfaces\s+(\S+)\s+vlan-manipulation\s+egress-mapping\s+action\s+pop',
             'qinq_outer_inner': r'interfaces\s+(\S+)\s+vlan-tags\s+outer-tag\s+(\d+)\s+inner-tag\s+(\d+)',
+            # GOLDEN RULE FIX: Add missing QinQ inner-tag-list patterns
+            'qinq_outer_inner_list_range': r'interfaces\s+(\S+)\s+vlan-tags\s+outer-tag\s+(\d+)\s+inner-tag-list\s+(\d+)-(\d+)',
+            'qinq_outer_inner_list_discrete': r'interfaces\s+(\S+)\s+vlan-tags\s+outer-tag\s+(\d+)\s+inner-tag-list\s+([\d\s]+)',
+            # Enhanced VLAN manipulation with TPID
+            'vlan_manipulation_ingress_tpid': r'interfaces\s+(\S+)\s+vlan-manipulation\s+ingress-mapping\s+action\s+push\s+outer-tag\s+(\d+)\s+outer-tpid\s+(0x[0-9a-fA-F]+)',
             'l2_service': r'interfaces\s+(\S+)\s+l2-service\s+enabled',
             'bridge_domain_interface': r'network-services\s+bridge-domain\s+instance\s+(\S+)\s+interface\s+(\S+)',
             'interface_description': r'interfaces\s+(\S+)\s+description\s+(.+)'

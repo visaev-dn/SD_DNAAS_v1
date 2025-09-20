@@ -21,6 +21,9 @@ from .models import (
     Phase1Destination, Phase1Configuration, Phase1PathGroup, Phase1VlanConfig, Phase1ConfidenceMetrics
 )
 from config_engine.phase1_data_structures import TopologyData
+from .root_consolidation_manager import RootConsolidationManager
+from config_engine.path_validation import validate_path_continuity, ValidationResult
+from config_engine.service_signature import ServiceSignatureGenerator, ServiceSignatureResult
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +48,12 @@ class Phase1DatabaseManager:
         self.engine = create_engine(f'sqlite:///{db_path}', echo=False)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         
+        # Initialize ROOT consolidation manager - back to network engineering fundamentals
+        self.consolidation_manager = RootConsolidationManager()
+        
+        # Initialize service signature generator for deduplication
+        self.signature_generator = ServiceSignatureGenerator()
+        
         # Create Phase 1 tables if they don't exist
         self._create_phase1_tables()
         
@@ -59,6 +68,38 @@ class Phase1DatabaseManager:
             self.logger.error(f"❌ Failed to create Phase 1 tables: {e}")
             raise
     
+    def upsert_topology_data(self, topology_data: TopologyData, discovery_session_id: str = None) -> int:
+        """
+        Insert or update topology data based on service signature (deduplication)
+        
+        Args:
+            topology_data: TopologyData to save/update
+            discovery_session_id: ID of the discovery session
+            
+        Returns:
+            Topology ID of saved/updated topology
+        """
+        try:
+            # Generate service signature
+            signature_result = self.signature_generator.generate_signature(topology_data)
+            
+            # Check if service already exists
+            existing_topology = self._get_topology_by_signature(signature_result.signature)
+            
+            if existing_topology:
+                # UPDATE: Merge with existing topology
+                self.logger.info(f"🔄 Updating existing service: {signature_result.signature}")
+                return self._update_existing_topology(existing_topology, topology_data, signature_result, discovery_session_id)
+            else:
+                # INSERT: Create new topology
+                self.logger.info(f"✨ Creating new service: {signature_result.signature}")
+                return self._create_new_topology(topology_data, signature_result, discovery_session_id)
+                
+        except ValueError as e:
+            # Service signature generation failed - queue for review
+            self.logger.warning(f"🔍 Service signature failed for {topology_data.bridge_domain_name}: {e}")
+            return self._save_topology_for_review(topology_data, str(e), discovery_session_id)
+
     def save_topology_data(self, topology_data: TopologyData, 
                           legacy_config_id: Optional[int] = None) -> Optional[int]:
         """
@@ -165,8 +206,9 @@ class Phase1DatabaseManager:
                 session.add(phase1_path)
                 session.flush()
                 
-                # Create path segments
-                for segment in path_info.segments:
+                # Create path segments (with deduplication)
+                deduplicated_segments = self._deduplicate_path_segments(path_info.segments)
+                for segment in deduplicated_segments:
                     phase1_segment = Phase1PathSegment(segment, phase1_path.id)
                     session.add(phase1_segment)
             
@@ -181,6 +223,46 @@ class Phase1DatabaseManager:
             return None
         finally:
             session.close()
+    
+    def _deduplicate_path_segments(self, segments: List) -> List:
+        """
+        Remove duplicate path segments based on source/dest device and interface.
+        
+        Args:
+            segments: List of PathSegment objects
+            
+        Returns:
+            List: Deduplicated segments with highest confidence scores
+        """
+        if not segments:
+            return segments
+        
+        # Create a dictionary to track unique segments
+        unique_segments = {}
+        
+        for segment in segments:
+            # Create a key based on source/dest device and interface
+            segment_key = (
+                segment.source_device,
+                segment.dest_device,
+                segment.source_interface,
+                segment.dest_interface,
+                segment.segment_type
+            )
+            
+            # If this is a new segment or has higher confidence, keep it
+            if (segment_key not in unique_segments or 
+                segment.confidence_score > unique_segments[segment_key].confidence_score):
+                unique_segments[segment_key] = segment
+        
+        # Return deduplicated segments
+        deduplicated = list(unique_segments.values())
+        
+        if len(deduplicated) < len(segments):
+            self.logger.info(f"🔄 Deduplicated path segments: {len(segments)} → {len(deduplicated)} "
+                           f"(removed {len(segments) - len(deduplicated)} duplicates)")
+        
+        return deduplicated
     
     def _create_path_groups(self, session: Session, config_id: int, paths: List) -> None:
         """Create path groups by consolidating paths between same source-destination pairs"""
@@ -350,15 +432,44 @@ class Phase1DatabaseManager:
             # Execute query
             phase1_topologies = query.all()
             
-            # Convert to Phase 1 TopologyData objects
+            # Convert to Phase 1 TopologyData objects with path validation
             topology_data_list = []
+            validation_failures = []
+            
             for phase1_topology in phase1_topologies:
                 try:
                     topology_data = phase1_topology.to_phase1_topology()
+                    
+                    # Validate path continuity for each topology
+                    for path in topology_data.paths:
+                        if path.segments:
+                            validation_result = validate_path_continuity(path.segments)
+                            if not validation_result.is_valid:
+                                self.logger.warning(
+                                    f"⚠️ Path validation failed for topology {phase1_topology.id} "
+                                    f"({phase1_topology.bridge_domain_name}): {validation_result.get_error_summary()}"
+                                )
+                                validation_failures.append({
+                                    'topology_id': phase1_topology.id,
+                                    'bridge_domain_name': phase1_topology.bridge_domain_name,
+                                    'validation_result': validation_result
+                                })
+                    
                     topology_data_list.append(topology_data)
+                    
                 except Exception as e:
                     self.logger.warning(f"⚠️ Failed to convert topology {phase1_topology.id}: {e}")
                     continue
+            
+            # Log validation summary
+            if validation_failures:
+                self.logger.warning(f"⚠️ Path validation failed for {len(validation_failures)} topologies")
+                for failure in validation_failures[:5]:  # Log first 5 failures
+                    self.logger.warning(
+                        f"  - {failure['bridge_domain_name']}: {failure['validation_result'].get_error_summary()}"
+                    )
+            else:
+                self.logger.info("✅ All topology paths passed validation")
             
             self.logger.info(f"✅ Retrieved {len(topology_data_list)} Phase 1 topologies")
             return topology_data_list
@@ -1074,3 +1185,690 @@ class Phase1DatabaseManager:
         except Exception as e:
             self.logger.error(f"❌ Failed to search topologies for '{search_term}': {e}")
             return []
+    
+    def consolidate_bridge_domains(self) -> Dict[str, Any]:
+        """
+        Consolidate duplicate bridge domains in the database
+        
+        Returns:
+            Dict with consolidation results and statistics
+        """
+        self.logger.info("🔄 Starting bridge domain consolidation")
+        
+        try:
+            # Get all topologies from database
+            topologies = self.get_all_topologies()
+            original_count = len(topologies)
+            
+            # Identify consolidation candidates
+            candidates = self.consolidation_manager.get_consolidation_candidates(topologies)
+            
+            if not candidates:
+                self.logger.info("✅ No consolidation needed - no duplicates found")
+                return {
+                    'success': True,
+                    'original_count': original_count,
+                    'consolidated_count': original_count,
+                    'duplicates_removed': 0,
+                    'consolidation_groups': 0,
+                    'candidates': {}
+                }
+            
+            # Perform consolidation
+            consolidated_topologies, consolidation_info = self.consolidation_manager.consolidate_topologies(topologies)
+            
+            # Update database with consolidated topologies
+            with self.SessionLocal() as session:
+                # Delete old topologies
+                session.query(Phase1TopologyData).delete()
+                session.commit()
+                
+                # Save consolidated topologies
+                for topology in consolidated_topologies:
+                    self.save_topology_data(topology)
+                
+                # Update consolidation metadata
+                for consolidated_name, info in consolidation_info.items():
+                    self._update_consolidation_metadata(session, consolidated_name, info)
+                
+                session.commit()
+            
+            consolidation_stats = {
+                'success': True,
+                'original_count': original_count,
+                'consolidated_count': len(consolidated_topologies),
+                'duplicates_removed': original_count - len(consolidated_topologies),
+                'consolidation_groups': len(consolidation_info),
+                'candidates': candidates,
+                'consolidation_details': {name: {
+                    'original_names': info.original_names,
+                    'reason': info.consolidation_reason,
+                    'confidence': info.confidence_score
+                } for name, info in consolidation_info.items()}
+            }
+            
+            self.logger.info(f"✅ Consolidation complete: {original_count} -> {len(consolidated_topologies)} bridge domains")
+            self.logger.info(f"🔗 Consolidated {len(consolidation_info)} duplicate groups")
+            
+            return consolidation_stats
+            
+        except Exception as e:
+            self.logger.error(f"❌ Consolidation failed: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'original_count': 0,
+                'consolidated_count': 0
+            }
+    
+    # UPSERT HELPER METHODS FOR SERVICE SIGNATURE-BASED DEDUPLICATION
+    
+    def _get_topology_by_signature(self, service_signature: str) -> Optional[Phase1TopologyData]:
+        """Get existing topology by service signature"""
+        try:
+            with self.SessionLocal() as session:
+                return session.query(Phase1TopologyData).filter(
+                    Phase1TopologyData.service_signature == service_signature
+                ).first()
+        except Exception as e:
+            self.logger.error(f"Failed to query topology by signature {service_signature}: {e}")
+            return None
+    
+    def _create_new_topology(self, topology_data: TopologyData, signature_result: ServiceSignatureResult, 
+                           discovery_session_id: str = None) -> int:
+        """Create new topology with service signature"""
+        
+        # Generate discovery session ID if not provided
+        if not discovery_session_id:
+            discovery_session_id = f"discovery_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        try:
+            with self.SessionLocal() as session:
+                # Create topology record with service signature using correct constructor
+                topology_record = Phase1TopologyData(topology_data)
+                
+                # Set service signature fields
+                topology_record.service_signature = signature_result.signature
+                topology_record.discovery_session_id = discovery_session_id
+                topology_record.discovery_count = 1
+                topology_record.first_discovered_at = topology_data.discovered_at
+                topology_record.signature_confidence = signature_result.confidence
+                topology_record.signature_classification = signature_result.classification
+                topology_record.data_sources = [{
+                    'discovery_session': discovery_session_id,
+                    'scan_method': topology_data.scan_method,
+                    'discovered_at': topology_data.discovered_at.isoformat(),
+                    'device_count': len(topology_data.devices),
+                    'interface_count': len(topology_data.interfaces)
+                }]
+                
+                session.add(topology_record)
+                session.flush()  # Get the ID
+                topology_id = topology_record.id
+                
+                # Save related data (devices, interfaces, paths, etc.)
+                self._save_topology_components(session, topology_data, topology_id)
+                
+                session.commit()
+                
+                self.logger.info(f"✅ Created new topology with signature: {signature_result.signature} (ID: {topology_id})")
+                return topology_id
+                
+        except Exception as e:
+            self.logger.error(f"Failed to create new topology: {e}")
+            raise
+    
+    def _update_existing_topology(self, existing_topology: Phase1TopologyData, new_topology_data: TopologyData, 
+                                signature_result: ServiceSignatureResult, discovery_session_id: str = None) -> int:
+        """Update existing topology with new discovery data"""
+        
+        # Generate discovery session ID if not provided
+        if not discovery_session_id:
+            discovery_session_id = f"discovery_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        try:
+            with self.SessionLocal() as session:
+                # Merge the existing topology object into this session
+                existing = session.merge(existing_topology)
+                
+                # Update discovery tracking
+                existing.discovery_count += 1
+                existing.last_updated = datetime.now()
+                existing.discovered_at = new_topology_data.discovered_at  # Latest discovery time
+                
+                # Update data sources
+                if not existing.data_sources:
+                    existing.data_sources = []
+                
+                existing.data_sources.append({
+                    'discovery_session': discovery_session_id,
+                    'scan_method': new_topology_data.scan_method,
+                    'discovered_at': new_topology_data.discovered_at.isoformat(),
+                    'device_count': len(new_topology_data.devices),
+                    'interface_count': len(new_topology_data.interfaces)
+                })
+                
+                # Update confidence score (keep highest)
+                if new_topology_data.confidence_score > existing.confidence_score:
+                    existing.confidence_score = new_topology_data.confidence_score
+                
+                # Update device/interface counts
+                existing.device_count = len(new_topology_data.devices)
+                existing.interface_count = len(new_topology_data.interfaces)
+                existing.path_count = len(new_topology_data.paths)
+                
+                # Clear existing components and save new ones (full replace strategy)
+                self._clear_topology_components(session, existing.id)
+                self._save_topology_components(session, new_topology_data, existing.id)
+                
+                session.commit()
+                
+                self.logger.info(f"✅ Updated existing topology: {signature_result.signature} (ID: {existing.id}, discovery #{existing.discovery_count})")
+                return existing.id
+                
+        except Exception as e:
+            self.logger.error(f"Failed to update existing topology: {e}")
+            raise
+    
+    def _save_topology_for_review(self, topology_data: TopologyData, review_reason: str, 
+                                discovery_session_id: str = None) -> int:
+        """Save topology that requires manual review (no service signature)"""
+        
+        if not discovery_session_id:
+            discovery_session_id = f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        try:
+            with self.SessionLocal() as session:
+                # Check if topology already exists
+                existing_topology = session.query(Phase1TopologyData).filter(
+                    Phase1TopologyData.bridge_domain_name == topology_data.bridge_domain_name
+                ).first()
+                
+                if existing_topology:
+                    # Update existing topology for review
+                    existing_topology.review_required = True
+                    existing_topology.review_reason = review_reason
+                    existing_topology.discovery_session_id = discovery_session_id
+                    
+                    # Update data sources
+                    if not existing_topology.data_sources:
+                        existing_topology.data_sources = []
+                    existing_topology.data_sources.append({
+                        'discovery_session': discovery_session_id,
+                        'scan_method': topology_data.scan_method,
+                        'discovered_at': topology_data.discovered_at.isoformat(),
+                        'review_reason': review_reason
+                    })
+                    
+                    session.commit()
+                    self.logger.info(f"✅ Updated existing topology for review: {topology_data.bridge_domain_name} (ID: {existing_topology.id})")
+                    return existing_topology.id
+                
+                # Create new topology record marked for review using correct constructor
+                topology_record = Phase1TopologyData(topology_data)
+                
+                # Set review-related fields
+                topology_record.review_required = True
+                topology_record.review_reason = review_reason
+                topology_record.discovery_session_id = discovery_session_id
+                topology_record.service_signature = None  # No signature for review items
+                topology_record.data_sources = [{
+                    'discovery_session': discovery_session_id,
+                    'scan_method': topology_data.scan_method,
+                    'discovered_at': topology_data.discovered_at.isoformat(),
+                    'review_reason': review_reason
+                }]
+                
+                session.add(topology_record)
+                session.flush()
+                topology_id = topology_record.id
+                
+                # Save related data
+                self._save_topology_components(session, topology_data, topology_id)
+                
+                session.commit()
+                
+                self.logger.warning(f"🔍 Saved topology for review: {topology_data.bridge_domain_name} (ID: {topology_id}) - {review_reason}")
+                return topology_id
+                
+        except Exception as e:
+            self.logger.error(f"Failed to save topology for review: {e}")
+            raise
+    
+    def _save_topology_components(self, session, topology_data: TopologyData, topology_id: int):
+        """Save devices, interfaces, paths for a topology"""
+        from config_engine.phase1_database.models import Phase1DeviceInfo, Phase1InterfaceInfo, Phase1PathInfo, Phase1BridgeDomainConfig
+        
+        try:
+            # Save devices first and create device name to ID mapping
+            device_name_to_id = {}
+            for device in topology_data.devices:
+                device_record = Phase1DeviceInfo(device, topology_id)
+                session.add(device_record)
+                session.flush()  # Get the device ID
+                device_name_to_id[device.name] = device_record.id
+            
+            # Save interfaces with device_id mapping
+            for interface in topology_data.interfaces:
+                device_id = device_name_to_id.get(interface.device_name)
+                if device_id:
+                    interface_record = Phase1InterfaceInfo(interface, topology_id, device_id)
+                    session.add(interface_record)
+                else:
+                    self.logger.warning(f"Interface {interface.name} references unknown device {interface.device_name}")
+            
+            # Save paths
+            for path in topology_data.paths:
+                path_record = Phase1PathInfo(path, topology_id)
+                session.add(path_record)
+            
+            # Save bridge domain config
+            if topology_data.bridge_domain_config:
+                bd_config_record = Phase1BridgeDomainConfig(topology_data.bridge_domain_config, topology_id)
+                session.add(bd_config_record)
+                
+            self.logger.debug(f"✅ Saved {len(topology_data.devices)} devices, {len(topology_data.interfaces)} interfaces, {len(topology_data.paths)} paths for topology {topology_id}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to save topology components: {e}")
+            raise
+    
+    def _clear_topology_components(self, session, topology_id: int):
+        """Clear existing components for a topology before updating"""
+        from config_engine.phase1_database.models import Phase1DeviceInfo, Phase1InterfaceInfo, Phase1PathInfo, Phase1BridgeDomainConfig
+        
+        try:
+            # Clear existing components
+            session.query(Phase1DeviceInfo).filter(Phase1DeviceInfo.topology_id == topology_id).delete()
+            session.query(Phase1InterfaceInfo).filter(Phase1InterfaceInfo.topology_id == topology_id).delete()
+            session.query(Phase1PathInfo).filter(Phase1PathInfo.topology_id == topology_id).delete()
+            session.query(Phase1BridgeDomainConfig).filter(Phase1BridgeDomainConfig.topology_id == topology_id).delete()
+            
+            self.logger.debug(f"✅ Cleared existing components for topology {topology_id}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to clear topology components: {e}")
+            raise
+    
+    def generate_discovery_session_id(self, scan_method: str = "unknown") -> str:
+        """Generate a unique discovery session ID"""
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')[:-3]  # Include milliseconds
+        return f"{scan_method}_{timestamp}"
+    
+    def get_consolidation_candidates(self) -> Dict[str, List[str]]:
+        """
+        Identify consolidation candidates without performing consolidation
+        
+        Returns:
+            Dict mapping consolidation keys to lists of bridge domain names
+        """
+        try:
+            topologies = self.get_all_topologies()
+            return self.consolidation_manager.get_consolidation_candidates(topologies)
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get consolidation candidates: {e}")
+            return {}
+    
+    def _update_consolidation_metadata(self, session: Session, consolidated_name: str, info) -> None:
+        """Update consolidation metadata in database"""
+        try:
+            # Find the topology by name
+            topology_record = session.query(Phase1TopologyData).filter(
+                Phase1TopologyData.bridge_domain_name == consolidated_name
+            ).first()
+            
+            if topology_record and topology_record.bridge_domain_configs:
+                bd_config = topology_record.bridge_domain_configs[0]
+                
+                # Update consolidation fields
+                bd_config.is_consolidated = True
+                bd_config.consolidation_key = info.consolidation_key
+                bd_config.original_names = info.original_names
+                bd_config.consolidation_reason = info.consolidation_reason
+                bd_config.confidence_score = max(bd_config.confidence_score, info.confidence_score)
+                
+                self.logger.debug(f"Updated consolidation metadata for {consolidated_name}")
+                
+        except Exception as e:
+            self.logger.error(f"Failed to update consolidation metadata for {consolidated_name}: {e}")
+    
+    def get_consolidation_info(self, bridge_domain_name: str) -> Optional[Dict[str, Any]]:
+        """Get consolidation information for a specific bridge domain"""
+        try:
+            with self.SessionLocal() as session:
+                topology_record = session.query(Phase1TopologyData).filter(
+                    Phase1TopologyData.bridge_domain_name == bridge_domain_name
+                ).first()
+                
+                if topology_record and topology_record.bridge_domain_configs:
+                    bd_config = topology_record.bridge_domain_configs[0]
+                    
+                    if bd_config.is_consolidated:
+                        return {
+                            'is_consolidated': True,
+                            'consolidation_key': bd_config.consolidation_key,
+                            'original_names': bd_config.original_names,
+                            'consolidation_reason': bd_config.consolidation_reason,
+                            'confidence_score': bd_config.confidence_score
+                        }
+                
+                return {'is_consolidated': False}
+                
+        except Exception as e:
+            self.logger.error(f"Failed to get consolidation info for {bridge_domain_name}: {e}")
+            return None
+    
+    def apply_bulletproof_consolidations(self, consolidation_decisions: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Apply approved simplified consolidations to the database with transaction safety
+        
+        Args:
+            consolidation_decisions: Dictionary of consolidation decisions from bulletproof analysis
+            
+        Returns:
+            Dictionary with consolidation results and statistics
+        """
+        from config_engine.phase1_data_structures.enums import ConsolidationDecision
+        from sqlalchemy.orm import sessionmaker
+        from datetime import datetime
+        import json
+        
+        # Filter approved decisions
+        approved_decisions = [
+            decision for decision in consolidation_decisions.values() 
+            if decision.decision in [
+                ConsolidationDecision.APPROVE, 
+                ConsolidationDecision.APPROVE_EXACT, 
+                ConsolidationDecision.APPROVE_HIGH_CONFIDENCE
+            ]
+        ]
+        
+        if not approved_decisions:
+            return {"status": "no_consolidations", "message": "No approved consolidations to apply"}
+        
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+        
+        consolidation_results = {
+            "status": "success",
+            "groups_processed": 0,
+            "bridge_domains_consolidated": 0,
+            "bridge_domains_removed": 0,
+            "consolidation_details": [],
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        try:
+            # Begin transaction
+            session.begin()
+            
+            for decision in approved_decisions:
+                consolidation_result = self._consolidate_bridge_domain_group(
+                    session, decision, consolidation_results
+                )
+                consolidation_results["consolidation_details"].append(consolidation_result)
+                consolidation_results["groups_processed"] += 1
+            
+            # Commit all changes
+            session.commit()
+            
+            self.logger.info(f"Successfully consolidated {consolidation_results['groups_processed']} bridge domain groups")
+            
+        except Exception as e:
+            # Rollback on any error
+            session.rollback()
+            self.logger.error(f"Error during consolidation: {e}")
+            consolidation_results["status"] = "error"
+            consolidation_results["error"] = str(e)
+            raise
+        finally:
+            session.close()
+        
+        return consolidation_results
+    
+    def _consolidate_bridge_domain_group(self, session, decision, consolidation_results):
+        """
+        Consolidate a specific group of bridge domains
+        
+        Args:
+            session: Database session
+            decision: ConsolidationDecisionResult
+            consolidation_results: Results dictionary to update
+            
+        Returns:
+            Dictionary with consolidation details for this group
+        """
+        from config_engine.phase1_database.models import Phase1TopologyData, Phase1BridgeDomainConfig
+        from datetime import datetime
+        import json
+        
+        bridge_domain_names = decision.bridge_domain_names
+        consolidation_key = decision.consolidation_key
+        
+        # Get all topology records for this group
+        topology_records = session.query(Phase1TopologyData).filter(
+            Phase1TopologyData.bridge_domain_name.in_(bridge_domain_names)
+        ).all()
+        
+        if len(topology_records) != len(bridge_domain_names):
+            raise ValueError(f"Could not find all bridge domains for group {consolidation_key}")
+        
+        # Select the best topology as the consolidation target
+        best_topology = self._select_best_topology_record(topology_records)
+        topologies_to_remove = [t for t in topology_records if t.id != best_topology.id]
+        
+        # Merge topology data into the best topology
+        merged_topology_data = self._merge_topology_records(best_topology, topology_records)
+        
+        # Update the best topology with merged data
+        self._update_topology_with_merged_data(session, best_topology, merged_topology_data)
+        
+        # Mark as consolidated and add metadata
+        self._add_consolidation_metadata(session, best_topology, decision)
+        
+        # Remove the other topologies
+        for topology_to_remove in topologies_to_remove:
+            session.delete(topology_to_remove)
+            consolidation_results["bridge_domains_removed"] += 1
+        
+        consolidation_results["bridge_domains_consolidated"] += len(bridge_domain_names)
+        
+        return {
+            "consolidation_key": consolidation_key,
+            "bridge_domain_names": bridge_domain_names,
+            "consolidated_into": best_topology.bridge_domain_name,
+            "removed_topologies": [t.bridge_domain_name for t in topologies_to_remove],
+            "safety_score": decision.safety_score,
+            "confidence": decision.confidence,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    
+    def _select_best_topology_record(self, topology_records):
+        """Select the best topology record as consolidation target"""
+        
+        best_topology = topology_records[0]
+        best_score = 0
+        
+        for topology in topology_records:
+            score = 0
+            
+            # Prefer more devices and interfaces
+            score += topology.device_count * 10
+            score += topology.interface_count
+            
+            # Prefer shorter names (less verbose)
+            score -= len(topology.bridge_domain_name)
+            
+            # Prefer global scope
+            if topology.bridge_domain_name.startswith('g_'):
+                score += 100
+            
+            if score > best_score:
+                best_score = score
+                best_topology = topology
+        
+        return best_topology
+    
+    def _merge_topology_records(self, best_topology, all_topology_records):
+        """Merge data from multiple topology records"""
+        
+        # Collect unique devices, interfaces, and paths by ID
+        all_devices = {}
+        all_interfaces = {}
+        all_paths = {}
+        
+        for topology in all_topology_records:
+            # Merge devices
+            for device in topology.devices:
+                all_devices[device.id] = device
+            
+            # Merge interfaces  
+            for interface in topology.interfaces:
+                all_interfaces[interface.id] = interface
+            
+            # Merge paths
+            for path in topology.paths:
+                all_paths[path.id] = path
+        
+        return {
+            "devices": list(all_devices.values()),
+            "interfaces": list(all_interfaces.values()),
+            "paths": list(all_paths.values())
+        }
+    
+    def _update_topology_with_merged_data(self, session, best_topology, merged_data):
+        """Update topology record with merged data"""
+        from datetime import datetime
+        
+        # Update counts
+        best_topology.device_count = len(merged_data["devices"])
+        best_topology.interface_count = len(merged_data["interfaces"])
+        
+        # Note: The actual device/interface/path relationships are handled by SQLAlchemy
+        # The merged data represents the combined topology
+        
+        # Update timestamp
+        best_topology.last_updated = datetime.utcnow()
+    
+    def _add_consolidation_metadata(self, session, topology, decision):
+        """Add consolidation metadata to the topology"""
+        from config_engine.phase1_database.models import Phase1BridgeDomainConfig
+        from datetime import datetime
+        import json
+        
+        # Get the bridge domain config
+        bd_config = session.query(Phase1BridgeDomainConfig).filter(
+            Phase1BridgeDomainConfig.topology_id == topology.id
+        ).first()
+        
+        if bd_config:
+            # Mark as consolidated
+            bd_config.is_consolidated = True
+            bd_config.consolidation_key = decision.consolidation_key
+            bd_config.original_names = json.dumps(decision.bridge_domain_names)
+            
+            # Create comprehensive audit trail
+            audit_data = {
+                "consolidation_timestamp": datetime.utcnow().isoformat(),
+                "decision_type": decision.decision.value,
+                "safety_score": decision.safety_score,
+                "confidence": decision.confidence,
+                "validation_results": len(decision.validation_results),
+                "approval_reasons": decision.approval_reasons,
+                "warnings": decision.warnings,
+                "original_bridge_domains": decision.bridge_domain_names,
+                "consolidation_method": "bulletproof_signature_matching"
+            }
+            
+            bd_config.consolidation_reason = json.dumps(audit_data)
+    
+    def flush_database(self) -> Dict[str, Any]:
+        """
+        Flush all data from the database and reset ID sequences
+        
+        WARNING: This permanently deletes all topology data!
+        
+        Returns:
+            Dictionary with flush results and statistics
+        """
+        from sqlalchemy.orm import sessionmaker
+        from config_engine.phase1_database.models import (
+            Phase1TopologyData, Phase1DeviceInfo, Phase1InterfaceInfo,
+            Phase1BridgeDomainConfig, Phase1VlanConfig, Phase1PathInfo
+        )
+        
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+        
+        flush_results = {
+            "status": "success",
+            "tables_cleared": 0,
+            "records_deleted": 0,
+            "sequences_reset": 0,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        try:
+            # Begin transaction
+            session.begin()
+            
+            # Count records before deletion
+            tables_to_clear = [
+                ("phase1_topology_data", Phase1TopologyData),
+                ("phase1_device_info", Phase1DeviceInfo),
+                ("phase1_interface_info", Phase1InterfaceInfo),
+                ("phase1_bridge_domain_config", Phase1BridgeDomainConfig),
+                ("phase1_vlan_configs", Phase1VlanConfig),
+                ("phase1_path_info", Phase1PathInfo)
+            ]
+            
+            total_records = 0
+            for table_name, model_class in tables_to_clear:
+                count = session.query(model_class).count()
+                total_records += count
+                self.logger.info(f"Table {table_name}: {count} records to delete")
+            
+            # Delete all records (cascading will handle relationships)
+            for table_name, model_class in tables_to_clear:
+                deleted_count = session.query(model_class).delete()
+                if deleted_count > 0:
+                    flush_results["tables_cleared"] += 1
+                    self.logger.info(f"Cleared table {table_name}: {deleted_count} records deleted")
+            
+            flush_results["records_deleted"] = total_records
+            
+            # Reset ID sequences (SQLite specific)
+            if self.engine.dialect.name == 'sqlite':
+                # Reset SQLite sequences
+                sequence_tables = [
+                    "phase1_topology_data",
+                    "phase1_device_info", 
+                    "phase1_interface_info",
+                    "phase1_bridge_domain_config",
+                    "phase1_vlan_configs",
+                    "phase1_path_info"
+                ]
+                
+                for table in sequence_tables:
+                    try:
+                        session.execute(f"DELETE FROM sqlite_sequence WHERE name='{table}'")
+                        flush_results["sequences_reset"] += 1
+                    except Exception as e:
+                        self.logger.warning(f"Could not reset sequence for {table}: {e}")
+            
+            # Commit all changes
+            session.commit()
+            
+            self.logger.info(f"Database flush completed: {total_records} records deleted, {flush_results['sequences_reset']} sequences reset")
+            
+        except Exception as e:
+            # Rollback on any error
+            session.rollback()
+            self.logger.error(f"Database flush failed: {e}")
+            flush_results["status"] = "error"
+            flush_results["error"] = str(e)
+            raise
+        finally:
+            session.close()
+        
+        return flush_results

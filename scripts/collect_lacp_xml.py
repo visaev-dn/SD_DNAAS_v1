@@ -637,6 +637,8 @@ def parse_lacp_xml(xml_content):
         print(f"Error parsing LACP XML: {e}")
         return []
 
+
+
 def parse_bridge_domain_instance(cli_output):
     """Parse Bridge Domain Instance CLI output."""
     bridge_domains = []
@@ -765,7 +767,7 @@ def parse_vlan_configuration(cli_output):
             
             # Check for interface line
             interface_match = re.search(r'interfaces ([^\s]+)', clean_line)
-                if interface_match:
+            if interface_match:
                 # Save previous interface config if exists
                 if current_interface and current_config:
                     vlan_configs.append(current_config.copy())
@@ -1018,7 +1020,7 @@ def parse_raw_data():
             logger.error(f"Error parsing LLDP file {lldp_file}: {e}")
             summary.add_parse_result(device_name, 'lldp', False, error=f"Error parsing LLDP CLI: {e}")
     
-    # Parse Bridge Domain Instance files
+    # Parse Bridge Domain Instance files with VLAN correlation
     for bridge_domain_instance_file in bridge_domain_instance_files:
         try:
             device_name = bridge_domain_instance_file.name.split('_bridge_domain_instance_raw_')[0]
@@ -1029,6 +1031,7 @@ def parse_raw_data():
             bridge_domains = parse_bridge_domain_instance(cli_output)
             
             if bridge_domains:
+                
                 # Save parsed Bridge Domain Instance data
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                 filename = f"{device_name}_bridge_domain_instance_parsed_{timestamp}.yaml"

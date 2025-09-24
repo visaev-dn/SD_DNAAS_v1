@@ -13,7 +13,7 @@ sys.path.append(str(Path(__file__).parent))
 
 # Import enhanced simplified discovery display
 try:
-    from config_engine.simplified_discovery.enhanced_cli_display import run_enhanced_simplified_discovery_display
+    from config_engine.discovery.simplified.enhanced_cli_display import run_enhanced_simplified_discovery_display
 except ImportError:
     def run_enhanced_simplified_discovery_display():
         print("❌ Enhanced Simplified Discovery Display not available")
@@ -25,14 +25,11 @@ def show_main_menu():
     print("🚀 LAB AUTOMATION FRAMEWORK")
     print("🚀" + "=" * 68)
     print("📋 Main Options:")
-    print("1. 🔍 Discovery & Topology")
-    print("2. 👤 User Workflow")
-    print("3. 🛠️  Advanced Tools")
-    print("4. 📊 Reports & Analytics")
-    print("5. ⚙️  Configuration")
-    print("6. 🗄️  Enhanced Database Operations")
-    print("7. 🎯 Enhanced Simplified Discovery Database")
-    print("8. ❌ Exit")
+    print("1. 🔨 Bridge Domain Builder")
+    print("2. 🔍 Discovery & Analysis")
+    print("3. 🗄️  Database & Management")
+    print("4. 🛠️  Advanced Tools")
+    print("5. ❌ Exit")
     print()
 
 def show_discovery_menu():
@@ -49,6 +46,151 @@ def show_discovery_menu():
     print("6. ✨ Enhanced Topology Analysis")
     print("7. 🔙 Back to Main Menu")
     print()
+
+def show_builder_menu():
+    """Bridge Domain Builder menu - Primary user workflow"""
+    while True:
+        print("\n" + "🔨" + "=" * 68)
+        print("🔨 BRIDGE DOMAIN BUILDER")
+        print("🔨" + "=" * 68)
+        print("📋 Builder Options:")
+        print("1. 🔨 P2P Bridge Domain Builder")
+        print("2. 🔨 P2MP Bridge Domain Builder (with Superspine)")
+        print("3. ✨ Enhanced Builder (Advanced Validation)")
+        print("4. 🚀 Push Config via SSH")
+        print("5. 🔙 Back to Main Menu")
+        print()
+        
+        choice = input("Select an option [1-5]: ").strip()
+        
+        if choice == '1':
+            run_bridge_domain_builder()
+        elif choice == '2':
+            run_unified_bridge_domain_builder()
+        elif choice == '3':
+            run_enhanced_bridge_domain_builder()
+        elif choice == '4':
+            run_ssh_push_menu()
+        elif choice == '5':
+            break
+        else:
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, or 5.")
+
+def show_discovery_analysis_menu():
+    """Discovery & Analysis menu - Combined discovery functions"""
+    while True:
+        print("\n" + "🔍" + "=" * 68)
+        print("🔍 DISCOVERY & ANALYSIS")
+        print("🔍" + "=" * 68)
+        print("📋 Discovery Options:")
+        print("1. 🎯 Run Bridge Domain Discovery (Recommended)")
+        print("2. 🔍 Advanced Bridge Domain Analysis (QinQ + DNAAS)")
+        print("3. 🌳 View Network Topology")
+        print("4. 📊 Device Status & Information")
+        print("5. 🔍 Probe & Parse (LACP + LLDP)")
+        print("6. 🔙 Back to Main Menu")
+        print()
+        
+        choice = input("Select an option [1-6]: ").strip()
+        
+        if choice == '1':
+            run_enhanced_database_menu()  # Simplified discovery
+        elif choice == '2':
+            run_bridge_domain_discovery()  # Enhanced discovery
+        elif choice == '3':
+            show_topology_menu()
+        elif choice == '4':
+            run_device_status_viewer()
+        elif choice == '5':
+            run_probe_and_parse()
+        elif choice == '6':
+            break
+        else:
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, or 6.")
+
+def show_database_management_menu():
+    """Database & Management menu - Unified database operations"""
+    while True:
+        print("\n" + "🗄️" + "=" * 68)
+        print("🗄️ DATABASE & MANAGEMENT")
+        print("🗄️" + "=" * 68)
+        print("📋 Database Options:")
+        print("1. 📊 View Discovery Results (Simplified Discovery)")
+        print("2. 🔍 Search & Filter Bridge Domains")
+        print("3. ✏️  Bridge Domain Editor")  # NEW - User's vision!
+        print("4. 📋 Manage Bridge Domain Details")
+        print("5. 📤 Export & Import Data")
+        print("6. 🗄️  Legacy Database Operations (Phase 1)")
+        print("7. 🔙 Back to Main Menu")
+        print()
+        
+        choice = input("Select an option [1-7]: ").strip()
+        
+        if choice == '1':
+            run_enhanced_simplified_discovery_display()
+        elif choice == '2':
+            run_enhanced_simplified_discovery_display()  # Has search functionality
+        elif choice == '3':
+            run_bridge_domain_editor()  # NEW - User's vision: BD Editor!
+        elif choice == '4':
+            run_enhanced_simplified_discovery_display()  # Has detail management
+        elif choice == '5':
+            run_enhanced_simplified_discovery_display()  # Has export functionality
+        elif choice == '6':
+            show_enhanced_database_menu()  # Legacy Phase 1 operations
+        elif choice == '7':
+            break
+        else:
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, or 7.")
+
+def show_working_advanced_tools_menu():
+    """Advanced Tools menu - Only working features"""
+    while True:
+        print("\n" + "🛠️" + "=" * 68)
+        print("🛠️ ADVANCED TOOLS")
+        print("🛠️" + "=" * 68)
+        print("📋 Advanced Options:")
+        print("1. 📊 Populate Devices from Inventory")
+        print("2. 🌐 Bridge Domain Visualization")
+        print("3. ✨ Enhanced Topology Analysis")
+        print("4. 🔙 Back to Main Menu")
+        print()
+        
+        choice = input("Select an option [1-4]: ").strip()
+        
+        if choice == '1':
+            run_populate_devices_from_inventory()
+        elif choice == '2':
+            run_bridge_domain_visualization()
+        elif choice == '3':
+            run_enhanced_topology_analysis()
+        elif choice == '4':
+            break
+        else:
+            print("❌ Invalid choice. Please select 1, 2, 3, or 4.")
+
+def show_topology_menu():
+    """Topology viewing submenu"""
+    while True:
+        print("\n" + "🌳" + "=" * 68)
+        print("🌳 NETWORK TOPOLOGY")
+        print("🌳" + "=" * 68)
+        print("📋 Topology Options:")
+        print("1. 🌳 ASCII Topology Tree")
+        print("2. 🌳 Minimized Topology Tree")
+        print("3. 🔙 Back to Discovery Menu")
+        print()
+        
+        choice = input("Select an option [1-3]: ").strip()
+        
+        if choice == '1':
+            run_ascii_tree_viewer()
+        elif choice == '2':
+            run_minimized_tree_viewer()
+        elif choice == '3':
+            break
+        else:
+            print("❌ Invalid choice. Please select 1, 2, or 3.")
 
 def show_user_menu():
     """User options menu"""
@@ -94,40 +236,7 @@ def show_user_menu():
         else:
             print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, 7, 8, 9, or 10.")
 
-def show_advanced_menu():
-    """Advanced tools menu"""
-    print("\n" + "🛠️" + "=" * 68)
-    print("🛠️ ADVANCED TOOLS")
-    print("🛠️" + "=" * 68)
-    print("📋 Advanced Options:")
-    print("1. 🔧 Device Management")
-    print("2. 📊 Performance Monitoring")
-    print("3. 🔒 Security Analysis")
-    print("4. 🔙 Back to Main Menu")
-    print()
-
-def show_reports_menu():
-    """Reports and analytics menu"""
-    print("\n" + "📊" + "=" * 68)
-    print("📊 REPORTS & ANALYTICS")
-    print("📊" + "=" * 68)
-    print("📋 Report Options:")
-    print("1. 📈 Topology Reports")
-    print("2. 📊 Configuration Reports")
-    print("3. 📋 Device Status Reports")
-    print("4. 🔙 Back to Main Menu")
-    print()
-
-def show_config_menu():
-    """Configuration menu"""
-    print("\n" + "⚙️" + "=" * 68)
-    print("⚙️ CONFIGURATION")
-    print("⚙️" + "=" * 68)
-    print("📋 Configuration Options:")
-    print("1. 🔧 System Settings")
-    print("2. 📁 File Management")
-    print("3. 🔙 Back to Main Menu")
-    print()
+# Placeholder menu definitions removed - were only showing "Coming Soon!" messages
 
 def run_discovery_menu():
     """Run discovery and topology menu"""
@@ -152,54 +261,7 @@ def run_discovery_menu():
         else:
             print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, or 7.")
 
-def run_advanced_menu():
-    """Run advanced tools menu"""
-    while True:
-        show_advanced_menu()
-        choice = input("Select an option [1-4]: ").strip()
-        
-        if choice == '1':
-            print("🔧 Device Management - Coming Soon!")
-        elif choice == '2':
-            print("📊 Performance Monitoring - Coming Soon!")
-        elif choice == '3':
-            print("🔒 Security Analysis - Coming Soon!")
-        elif choice == '4':
-            break
-        else:
-            print("❌ Invalid choice. Please select 1, 2, 3, or 4.")
-
-def run_reports_menu():
-    """Run reports and analytics menu"""
-    while True:
-        show_reports_menu()
-        choice = input("Select an option [1-4]: ").strip()
-        
-        if choice == '1':
-            print("📈 Topology Reports - Coming Soon!")
-        elif choice == '2':
-            print("📊 Configuration Reports - Coming Soon!")
-        elif choice == '3':
-            print("📋 Device Status Reports - Coming Soon!")
-        elif choice == '4':
-            break
-        else:
-            print("❌ Invalid choice. Please select 1, 2, 3, or 4.")
-
-def run_config_menu():
-    """Run configuration menu"""
-    while True:
-        show_config_menu()
-        choice = input("Select an option [1-3]: ").strip()
-        
-        if choice == '1':
-            print("🔧 System Settings - Coming Soon!")
-        elif choice == '2':
-            print("📁 File Management - Coming Soon!")
-        elif choice == '3':
-            break
-        else:
-            print("❌ Invalid choice. Please select 1, 2, or 3.")
+# Placeholder menus removed - were showing "Coming Soon!" messages
 
 def run_probe_and_parse():
     """Run probe and parse functionality"""
@@ -592,7 +654,7 @@ def run_enhanced_database_menu():
     
     try:
         # Import the simplified discovery CLI
-        from config_engine.simplified_discovery import run_enhanced_database_menu
+        from config_engine.discovery.simplified import run_enhanced_database_menu
         
         # Run the CLI interface
         run_enhanced_database_menu()
@@ -1590,28 +1652,22 @@ def main():
     
     while True:
         show_main_menu()
-        choice = input("Select an option [1-8]: ").strip()
+        choice = input("Select an option [1-5]: ").strip()
         
         if choice == '1':
-            run_discovery_menu()
+            show_builder_menu()
         elif choice == '2':
-            show_user_menu()
+            show_discovery_analysis_menu()
         elif choice == '3':
-            run_advanced_menu()
+            show_database_management_menu()
         elif choice == '4':
-            run_reports_menu()
+            show_working_advanced_tools_menu()
         elif choice == '5':
-            run_config_menu()
-        elif choice == '6':
-            show_enhanced_database_menu()
-        elif choice == '7':
-            run_enhanced_simplified_discovery_display()
-        elif choice == '8':
             print("\n👋 Thank you for using Lab Automation Framework!")
             print("🚀 Goodbye!")
             break
         else:
-            print("❌ Invalid choice. Please select 1, 2, 3, 4, 5, 6, 7, or 8.")
+            print("❌ Invalid choice. Please select 1, 2, 3, 4, or 5.")
 
 def _calculate_scope_statistics(topologies):
     """Calculate scope compliance statistics"""
@@ -3599,6 +3655,428 @@ def _display_basic_topology_info(topology):
     print("💡 This topology may need data repair or re-discovery")
     print("🔧 Root cause: Path validation error - device name mismatch in stored data")
     print("🎯 INSPECTION COMPLETE - Press Enter to return to topology list")
+
+
+def run_bridge_domain_editor():
+    """Bridge Domain Editor - User's vision implementation"""
+    try:
+        # Import BD Editor components
+        from database_manager import DatabaseManager
+        
+        print("\n" + "✏️" + "=" * 68)
+        print("✏️ BRIDGE DOMAIN EDITOR")
+        print("✏️" + "=" * 68)
+        print("🎯 Edit discovered and user-created bridge domains")
+        print()
+        
+        # Initialize database manager
+        db_manager = DatabaseManager()
+        
+        # Run BD browser (Task 1.2)
+        run_bridge_domain_browser(db_manager)
+        
+    except Exception as e:
+        print(f"❌ Error in Bridge Domain Editor: {e}")
+        print("💡 Please ensure the database is properly initialized")
+        input("Press Enter to continue...")
+
+
+def run_bridge_domain_browser(db_manager):
+    """Browse all discovered + user-created BDs - Task 1.2 Implementation"""
+    # User Vision: "browse those BD via the main.py CLI DB browser"
+    
+    print("📋 BRIDGE DOMAIN BROWSER")
+    print("=" * 50)
+    print("🎯 Loading all bridge domains...")
+    print()
+    
+    try:
+        # Get all bridge domains from unified database
+        # User Vision: "discover all the available BD + all the BD our users configured/created"
+        
+        # Method 1: Get discovered BDs (from PersonalBridgeDomain table)
+        discovered_bds = get_discovered_bridge_domains(db_manager)
+        
+        # Method 2: Get user-created BDs (from Configuration table)  
+        user_bds = get_user_created_bridge_domains(db_manager)
+        
+        print(f"📊 Found {len(discovered_bds)} discovered bridge domains")
+        print(f"🔨 Found {len(user_bds)} user-created bridge domains")
+        print(f"📋 Total: {len(discovered_bds) + len(user_bds)} bridge domains available")
+        print()
+        
+        if not discovered_bds and not user_bds:
+            print("❌ No bridge domains found in database")
+            print("💡 Run discovery first or create some bridge domains")
+            input("Press Enter to continue...")
+            return
+        
+        # Display all BDs with edit option
+        # User Vision: "there will be a new option to 'edit' a certain entry"
+        display_bridge_domains_for_editing(discovered_bds, user_bds, db_manager)
+        
+    except Exception as e:
+        print(f"❌ Error loading bridge domains: {e}")
+        input("Press Enter to continue...")
+
+
+def get_discovered_bridge_domains(db_manager):
+    """Get all discovered bridge domains from unified bridge_domains table"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect(db_manager.db_path)
+        cursor = conn.cursor()
+        
+        # Query ALL bridge domains from unified table (no dual storage!)
+        cursor.execute("""
+            SELECT name, vlan_id, username, discovery_data, interface_data, 
+                   dnaas_type, topology_type, source, created_at, id
+            FROM bridge_domains 
+            WHERE source = 'discovered'
+            ORDER BY name
+        """)
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        discovered_bds = []
+        for row in rows:
+            discovered_bds.append({
+                'id': row[9],
+                'name': row[0],
+                'vlan_id': row[1],
+                'username': row[2],
+                'discovery_data': row[3],
+                'interface_data': row[4],
+                'dnaas_type': row[5],
+                'topology_type': row[6],
+                'source_type': row[7],
+                'created_at': row[8],
+                'source': 'discovered',
+                'source_icon': '🔍'
+            })
+        
+        return discovered_bds
+        
+    except Exception as e:
+        print(f"❌ Error getting discovered BDs: {e}")
+        return []
+
+
+def get_user_created_bridge_domains(db_manager):
+    """Get all user-created bridge domains from unified bridge_domains table"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect(db_manager.db_path)
+        cursor = conn.cursor()
+        
+        # Query user-created bridge domains from unified table
+        cursor.execute("""
+            SELECT name, vlan_id, username, discovery_data, interface_data, 
+                   dnaas_type, topology_type, source, created_at, id, deployment_status
+            FROM bridge_domains 
+            WHERE source IN ('user_created', 'builder', 'manual')
+            ORDER BY name
+        """)
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        user_bds = []
+        for row in rows:
+            user_bds.append({
+                'id': row[9],
+                'name': row[0],
+                'vlan_id': row[1],
+                'username': row[2],
+                'discovery_data': row[3],
+                'interface_data': row[4],
+                'dnaas_type': row[5],
+                'topology_type': row[6],
+                'source_type': row[7],
+                'created_at': row[8],
+                'deployment_status': row[10],
+                'source': 'user_created',
+                'source_icon': '🔨'
+            })
+        
+        return user_bds
+        
+    except Exception as e:
+        print(f"❌ Error getting user-created BDs: {e}")
+        return []
+
+
+def display_bridge_domains_for_editing(discovered_bds, user_bds, db_manager):
+    """Display all BDs with edit option - User Vision Implementation"""
+    
+    # Combine all BDs for display
+    all_bds = []
+    
+    # Add discovered BDs
+    for bd in discovered_bds:
+        all_bds.append(bd)
+    
+    # Add user-created BDs  
+    for bd in user_bds:
+        all_bds.append(bd)
+    
+    if not all_bds:
+        print("❌ No bridge domains available for editing")
+        return
+    
+    while True:
+        print("📋 BRIDGE DOMAINS AVAILABLE FOR EDITING")
+        print("=" * 70)
+        print(f"{'#':>2} {'Name':20} {'VLAN':6} {'Username':12} {'DNAAS Type':12} {'Source':12} {'Edit':6}")
+        print("-" * 70)
+        
+        for i, bd in enumerate(all_bds, 1):
+            name = bd['name'][:19] if bd['name'] else 'Unknown'
+            vlan = str(bd['vlan_id']) if bd['vlan_id'] else 'N/A'
+            username = (bd.get('username', 'N/A') or 'N/A')[:11]
+            # Use DNAAS type instead of topology type and simplify it
+            dnaas_type = bd.get('dnaas_type', 'N/A')
+            if dnaas_type and dnaas_type != 'N/A':
+                # Simplify DNAAS type for display (e.g., "DNAAS_TYPE_2A_QINQ_SINGLE_BD" -> "2A_QINQ")
+                if 'TYPE_2A_QINQ' in dnaas_type:
+                    dnaas_display = '2A_QINQ'
+                elif 'TYPE_4A_SINGLE' in dnaas_type:
+                    dnaas_display = '4A_SINGLE'
+                elif 'TYPE_1_DOUBLE' in dnaas_type:
+                    dnaas_display = '1_DOUBLE'
+                else:
+                    dnaas_display = dnaas_type[:11]
+            else:
+                dnaas_display = 'N/A'
+            source_type = f"{bd['source_icon']} {bd['source'][:8]}"
+            
+            print(f"{i:2}. {name:20} {vlan:6} {username:12} {dnaas_display:12} {source_type:12} [EDIT]")
+        
+        print("-" * 70)
+        print()
+        print("📋 Options:")
+        print("• Enter number to EDIT bridge domain")
+        print("• 'q' to quit to previous menu")
+        print()
+        
+        choice = input("Select bridge domain to edit (number or 'q'): ").strip().lower()
+        
+        if choice == 'q':
+            break
+        
+        if choice.isdigit():
+            bd_index = int(choice) - 1
+            if 0 <= bd_index < len(all_bds):
+                selected_bd = all_bds[bd_index]
+                print(f"\n✏️ Selected for editing: {selected_bd['name']}")
+                
+                # User Vision: "Once we enter an 'edit mode'"
+                enter_edit_mode(selected_bd, db_manager)
+            else:
+                print("❌ Invalid selection")
+        else:
+            print("❌ Invalid input. Please enter a number or 'q'")
+        
+        print()
+
+
+def enter_edit_mode(bd, db_manager):
+    """Enter edit mode for selected BD - Task 1.3 Implementation"""
+    # User Vision: "Once we enter an 'edit mode'"
+    
+    print(f"\n🔧 ENTERING EDIT MODE")
+    print("=" * 50)
+    print(f"Selected BD: {bd['name']}")
+    print(f"VLAN ID: {bd['vlan_id']}")
+    print(f"Username: {bd.get('username', 'N/A')}")
+    print(f"Source: {bd['source_icon']} {bd['source'].replace('_', ' ').title()}")
+    print(f"Type: {bd.get('topology_type', 'N/A')}")
+    print()
+    
+    print("🚧 EDIT MODE PREPARATION")
+    print("=" * 30)
+    
+    # User Vision: "copy the data to a new 'editing' space"
+    print("📋 Creating safe editing workspace...")
+    print("🔄 Copying bridge domain data to editing space...")
+    
+    # Show what will be available for editing
+    if bd['source'] == 'discovered':
+        print("📊 Available for editing:")
+        print("   • Interface endpoints (add/remove/modify)")
+        print("   • Device assignments")
+        print("   • VLAN configuration")
+        print("   • Topology parameters")
+        
+        if bd.get('discovery_data'):
+            import json
+            try:
+                discovery_data = json.loads(bd['discovery_data'])
+                interfaces_count = len(discovery_data.get('interfaces', []))
+                devices_count = len(discovery_data.get('devices', {}))
+                print(f"   • Current interfaces: {interfaces_count}")
+                print(f"   • Current devices: {devices_count}")
+            except:
+                print("   • Discovery data available for context")
+    else:
+        print("📊 Available for editing:")
+        print("   • Configuration parameters")
+        print("   • Deployment settings")
+        print("   • Service definitions")
+    
+    print()
+    # User Vision: "copy the data to a new 'editing' space"
+    print("📋 CREATING SAFE EDITING WORKSPACE...")
+    print("=" * 40)
+    
+    try:
+        # Create editing session with safe workspace
+        editing_session = create_editing_workspace(bd, db_manager)
+        
+        print("✅ Editing workspace created successfully!")
+        print("✅ Bridge domain data copied to safe editing space")
+        print("✅ Original data preserved and protected")
+        print()
+        
+        # Show editing workspace summary
+        show_editing_workspace_summary(editing_session)
+        
+        # Enter the editing interface (Week 2 implementation)
+        from bd_editor_week2 import show_editing_interface
+        show_editing_interface(editing_session, db_manager)
+        
+    except Exception as e:
+        print(f"❌ Failed to create editing workspace: {e}")
+        input("Press Enter to continue...")
+
+
+def create_editing_workspace(bd, db_manager):
+    """Create safe editing workspace - Task 2.1 Implementation"""
+    # User Vision: "copy the data to a new 'editing' space"
+    
+    import json
+    import uuid
+    from datetime import datetime
+    
+    print("🔄 Copying bridge domain data to editing space...")
+    
+    # Extract interface and device data from discovery_data (correct location)
+    interfaces = []
+    devices = {}
+    
+    # Extract device and interface information from discovery_data
+    if bd.get('discovery_data'):
+        try:
+            discovery_json = json.loads(bd['discovery_data'])
+            devices = discovery_json.get('devices', {})
+            
+            # Extract interfaces from each device (ONLY user-editable endpoints)
+            for device_name, device_info in devices.items():
+                if isinstance(device_info, dict) and 'interfaces' in device_info:
+                    device_interfaces = device_info['interfaces']
+                    if isinstance(device_interfaces, list):
+                        for iface in device_interfaces:
+                            interface_role = iface.get('role', 'unknown')
+                            
+                            # FILTER: Only show user-editable endpoint interfaces
+                            # Hide uplink/downlink interfaces (automatically calculated overlay)
+                            if interface_role in ['access', 'endpoint', 'customer']:
+                                interfaces.append({
+                                    'device': device_name,
+                                    'interface': iface.get('name', 'unknown'),
+                                    'vlan_id': iface.get('vlan_id', bd['vlan_id']),
+                                    'outer_vlan': iface.get('outer_vlan'),
+                                    'inner_vlan': iface.get('inner_vlan'),
+                                    'l2_service': True,  # Default for discovered interfaces
+                                    'interface_type': iface.get('type', 'physical'),
+                                    'role': interface_role,
+                                    'raw_cli_config': iface.get('raw_cli_config', []),
+                                    'is_user_endpoint': True  # Mark as user-editable
+                                })
+                            # Skip uplink/downlink interfaces - they're overlay infrastructure
+            
+            print(f"✅ Extracted {len(interfaces)} interfaces from {len(devices)} devices")
+            
+        except Exception as e:
+            print(f"⚠️ Discovery data parsing error: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    # Fallback: try interface_data if discovery_data extraction failed
+    if not interfaces and bd.get('interface_data'):
+        try:
+            interface_json = json.loads(bd['interface_data'])
+            print("🔄 Falling back to interface_data field...")
+            # Handle interface_data structure if needed
+        except Exception as e:
+            print(f"⚠️ Interface data fallback failed: {e}")
+    
+    # Create safe working copy
+    working_copy = {
+        'id': bd.get('id'),
+        'name': bd['name'],
+        'vlan_id': bd['vlan_id'],
+        'username': bd['username'],
+        'dnaas_type': bd.get('dnaas_type'),
+        'topology_type': bd.get('topology_type'),
+        'devices': devices,
+        'interfaces': interfaces,
+        'deployment_status': bd.get('deployment_status', 'pending'),
+        'source': bd['source']
+    }
+    
+    # Create editing session
+    editing_session = {
+        'session_id': str(uuid.uuid4()),
+        'original_bd': bd.copy(),  # Immutable original
+        'working_copy': working_copy,  # Editable copy
+        'changes_made': [],
+        'created_at': datetime.now(),
+        'status': 'active'
+    }
+    
+    print("✅ Safe editing workspace created")
+    print(f"📋 Session ID: {editing_session['session_id'][:8]}...")
+    
+    return editing_session
+
+
+def show_editing_workspace_summary(session):
+    """Show summary of editing workspace - Task 2.1 Implementation"""
+    
+    working_copy = session['working_copy']
+    
+    print("📊 EDITING WORKSPACE SUMMARY")
+    print("=" * 40)
+    print(f"Bridge Domain: {working_copy['name']}")
+    print(f"VLAN ID: {working_copy['vlan_id']}")
+    print(f"Username: {working_copy['username']}")
+    print(f"DNAAS Type: {working_copy.get('dnaas_type', 'N/A')}")
+    print(f"User Endpoints: {len(working_copy['interfaces'])}")  # Clarify these are endpoints
+    print(f"Devices: {len(working_copy['devices'])}")
+    print(f"Status: {working_copy.get('deployment_status', 'Unknown')}")
+    print()
+    
+    # Show current user-editable endpoint interfaces only
+    if working_copy['interfaces']:
+        print("🔌 User-Editable Endpoints:")
+        for i, iface in enumerate(working_copy['interfaces'][:5], 1):  # Show first 5
+            device = iface.get('device', 'Unknown')
+            interface_name = iface.get('interface', 'Unknown')
+            vlan = iface.get('vlan_id', 'N/A')
+            role = iface.get('role', 'unknown')
+            print(f"   {i}. {device}:{interface_name} (VLAN {vlan}) - {role}")
+        
+        if len(working_copy['interfaces']) > 5:
+            print(f"   ... and {len(working_copy['interfaces']) - 5} more endpoints")
+        
+        print(f"💡 Uplink interfaces hidden (automatically managed by overlay)")
+    else:
+        print("🔌 User-Editable Endpoints: None")
+        print("💡 Uplink interfaces hidden (automatically managed by overlay)")
+    
+    print()
 
 
 if __name__ == "__main__":

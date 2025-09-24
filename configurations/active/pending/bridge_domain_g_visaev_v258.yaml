@@ -1,0 +1,47 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_visaev_v258 interface ge100-0/0/20.258
+- interfaces ge100-0/0/20.258 l2-service enabled
+- interfaces ge100-0/0/20.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60000.258
+- interfaces bundle-60000.258 l2-service enabled
+- interfaces bundle-60000.258 vlan-id 258
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60000.258
+- interfaces bundle-60000.258 l2-service enabled
+- interfaces bundle-60000.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface ge100-0/0/30.258
+- interfaces ge100-0/0/30.258 l2-service enabled
+- interfaces ge100-0/0/30.258 vlan-id 258
+DNAAS-SPINE-B09:
+- interfaces bundle-60000.258 l2-service enabled
+- interfaces bundle-60000.258 vlan-id 258
+- interfaces bundle-60002.258 l2-service enabled
+- interfaces bundle-60002.258 vlan-id 258
+- interfaces bundle-60003.258 l2-service enabled
+- interfaces bundle-60003.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60000.258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60002.258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60003.258
+DNAAS-SPINE-D14:
+- interfaces bundle-60000.258 l2-service enabled
+- interfaces bundle-60000.258 vlan-id 258
+- interfaces bundle-60002.258 l2-service enabled
+- interfaces bundle-60002.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60000.258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60002.258
+DNAAS-SUPERSPINE-D04-NCC0:
+- interfaces bundle-60004.258 l2-service enabled
+- interfaces bundle-60004.258 vlan-id 258
+- interfaces bundle-60007.258 l2-service enabled
+- interfaces bundle-60007.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60004.258
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60007.258
+DNAAS_LEAF_D13:
+- network-services bridge-domain instance g_visaev_v258 interface bundle-60000.258
+- interfaces bundle-60000.258 l2-service enabled
+- interfaces bundle-60000.258 vlan-id 258
+- network-services bridge-domain instance g_visaev_v258 interface ge100-0/0/13.258
+- interfaces ge100-0/0/13.258 l2-service enabled
+- interfaces ge100-0/0/13.258 vlan-id 258
+_metadata:
+- '[object Object]'

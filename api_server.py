@@ -31,12 +31,12 @@ from deployment_manager import DeploymentManager
 # Import existing modules
 from config_engine.unified_bridge_domain_builder import UnifiedBridgeDomainBuilder
 from config_engine.device_scanner import DeviceScanner
-from scripts.ssh_push_menu import SSHPushMenu
-from scripts.inventory_manager import InventoryManager
-from scripts.device_status_viewer import DeviceStatusViewer
+# from scripts.ssh_push_menu import SSHPushMenu  # Temporarily disabled - missing ssh_push_manager
+# from scripts.inventory_manager import InventoryManager  # Temporarily disabled
+# from scripts.device_status_viewer import DeviceStatusViewer  # Temporarily disabled
 
 # Import the enhanced topology scanner
-from config_engine.enhanced_topology_scanner import EnhancedTopologyScanner
+# from config_engine.enhanced_topology_scanner import EnhancedTopologyScanner  # Temporarily disabled - missing dependencies
 
 # Import smart deployment components
 from config_engine.smart_deployment_manager import SmartDeploymentManager
@@ -1094,6 +1094,202 @@ def search_bridge_domains():
             "success": False,
             "error": f"Failed to search bridge domains: {str(e)}"
         }), 500
+
+# =============================================================================
+# ENHANCED BD EDITOR API ENDPOINTS (Frontend Integration)
+# =============================================================================
+
+@app.route('/api/bridge-domains/unified-list', methods=['GET'])
+@token_required
+def get_unified_bridge_domains(current_user):
+    """Get all discovered + user-created BDs from unified table for BD Editor"""
+    try:
+        # Import our CLI BD Editor logic
+        from main import get_discovered_bridge_domains, get_user_created_bridge_domains
+        from database_manager import DatabaseManager
+        
+        db_manager = DatabaseManager()
+        
+        # Get discovered BDs (using our CLI logic)
+        discovered_bds = get_discovered_bridge_domains(db_manager)
+        
+        # Get user-created BDs (using our CLI logic)
+        user_bds = get_user_created_bridge_domains(db_manager)
+        
+        # Combine and enhance for frontend
+        all_bds = []
+        
+        # Add discovered BDs
+        for bd in discovered_bds:
+            all_bds.append({
+                'id': bd['id'],
+                'name': bd['name'],
+                'vlan_id': bd['vlan_id'],
+                'username': bd['username'],
+                'dnaas_type': bd['dnaas_type'],
+                'topology_type': bd['topology_type'],
+                'source': 'discovered',
+                'source_icon': '🔍',
+                'deployment_status': bd.get('deployment_status', 'pending'),
+                'created_at': bd['created_at'],
+                'can_edit': True,  # All discovered BDs are editable
+                'interface_count': len(json.loads(bd['interface_data']) if bd['interface_data'] else []),
+                'has_raw_config': bool(bd.get('discovery_data'))
+            })
+        
+        # Add user-created BDs
+        for bd in user_bds:
+            all_bds.append({
+                'id': bd['id'],
+                'name': bd['name'],
+                'vlan_id': bd['vlan_id'],
+                'username': bd.get('username', current_user.username),
+                'dnaas_type': bd['dnaas_type'],
+                'topology_type': bd['topology_type'],
+                'source': 'user_created',
+                'source_icon': '🔨',
+                'deployment_status': bd.get('deployment_status', 'pending'),
+                'created_at': bd['created_at'],
+                'can_edit': True,
+                'interface_count': len(json.loads(bd['interface_data']) if bd['interface_data'] else []),
+                'has_raw_config': bool(bd.get('discovery_data'))
+            })
+        
+        return jsonify({
+            "success": True,
+            "bridge_domains": all_bds,
+            "total_count": len(all_bds),
+            "discovered_count": len(discovered_bds),
+            "user_created_count": len(user_bds),
+            "message": f"Found {len(all_bds)} bridge domains available for editing"
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get unified bridge domains: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to load bridge domains: {str(e)}"
+        }), 500
+
+
+@app.route('/api/bridge-domains/<bd_name>/edit-session', methods=['POST'])
+@token_required
+def create_bd_editing_session(current_user, bd_name):
+    """Create safe editing workspace for bridge domain"""
+    try:
+        # Import our CLI editing workspace logic
+        from main import get_discovered_bridge_domains, get_user_created_bridge_domains, create_editing_workspace
+        from database_manager import DatabaseManager
+        
+        db_manager = DatabaseManager()
+        
+        # Find the bridge domain
+        discovered_bds = get_discovered_bridge_domains(db_manager)
+        user_bds = get_user_created_bridge_domains(db_manager)
+        all_bds = discovered_bds + user_bds
+        
+        bd = next((bd for bd in all_bds if bd['name'] == bd_name), None)
+        
+        if not bd:
+            return jsonify({
+                "success": False,
+                "error": f"Bridge domain '{bd_name}' not found"
+            }), 404
+        
+        # Create editing session using our CLI logic
+        editing_session = create_editing_workspace(bd, db_manager)
+        
+        # Store session in memory (in production, use Redis or database)
+        session_id = editing_session['session_id']
+        
+        return jsonify({
+            "success": True,
+            "session_id": session_id,
+            "editing_session": {
+                'session_id': session_id,
+                'bridge_domain': editing_session['working_copy'],
+                'original_bd': editing_session['original_bd'],
+                'changes_made': editing_session['changes_made'],
+                'status': editing_session['status'],
+                'created_at': editing_session['created_at'].isoformat()
+            },
+            "message": f"Editing session created for {bd_name}"
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to create editing session for {bd_name}: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to create editing session: {str(e)}"
+        }), 500
+
+
+@app.route('/api/bridge-domains/<bd_name>/interfaces/raw-config', methods=['GET'])
+@token_required
+def get_bd_raw_config(current_user, bd_name):
+    """Get raw CLI configuration for bridge domain interfaces"""
+    try:
+        import sqlite3
+        
+        # Get BD from unified bridge_domains table
+        conn = sqlite3.connect('instance/lab_automation.db')
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT discovery_data, interface_data, dnaas_type
+            FROM bridge_domains 
+            WHERE name = ? AND source = 'discovered'
+        """, (bd_name,))
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if not result:
+            return jsonify({
+                "success": False,
+                "error": f"Bridge domain '{bd_name}' not found"
+            }), 404
+        
+        discovery_data, interface_data, dnaas_type = result
+        
+        # Extract raw config from discovery data
+        raw_configs = []
+        if discovery_data:
+            discovery_json = json.loads(discovery_data)
+            devices = discovery_json.get('devices', {})
+            
+            for device_name, device_info in devices.items():
+                if 'interfaces' in device_info:
+                    for iface in device_info['interfaces']:
+                        # Only include access interfaces (user endpoints)
+                        if iface.get('role') == 'access':
+                            raw_configs.append({
+                                'device': device_name,
+                                'interface': iface.get('name'),
+                                'vlan_id': iface.get('vlan_id'),
+                                'role': iface.get('role'),
+                                'raw_cli_config': iface.get('raw_cli_config', []),
+                                'outer_vlan': iface.get('outer_vlan'),
+                                'inner_vlan': iface.get('inner_vlan'),
+                                'vlan_manipulation': iface.get('vlan_manipulation')
+                            })
+        
+        return jsonify({
+            "success": True,
+            "bridge_domain_name": bd_name,
+            "dnaas_type": dnaas_type,
+            "user_editable_endpoints": raw_configs,
+            "total_endpoints": len(raw_configs),
+            "message": f"Raw configuration for {len(raw_configs)} user-editable endpoints"
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get raw config for {bd_name}: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get raw configuration: {str(e)}"
+        }), 500
+
 
 # Phase 1 Enhanced Bridge Domain Builder Endpoint
 @app.route('/api/bridge-domains/enhanced-builder', methods=['POST'])

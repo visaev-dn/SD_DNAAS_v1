@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_unique_test_123_v444 interface bundle-60000.444
+- interfaces bundle-60000.444 l2-service enabled
+- interfaces bundle-60000.444 vlan-id 444
+- network-services bridge-domain instance g_unique_test_123_v444 interface ge100-0/0/1.444
+- interfaces ge100-0/0/1.444 l2-service enabled
+- interfaces ge100-0/0/1.444 vlan-id 444
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_unique_test_123_v444 interface bundle-60000.444
+- interfaces bundle-60000.444 l2-service enabled
+- interfaces bundle-60000.444 vlan-id 444
+- network-services bridge-domain instance g_unique_test_123_v444 interface ge100-0/0/2.444
+- interfaces ge100-0/0/2.444 l2-service enabled
+- interfaces ge100-0/0/2.444 vlan-id 444
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_unique_test_123_v444 interface bundle-60002.444
+- interfaces bundle-60002.444 l2-service enabled
+- interfaces bundle-60002.444 vlan-id 444
+- network-services bridge-domain instance g_unique_test_123_v444 interface bundle-60003.444
+- interfaces bundle-60003.444 l2-service enabled
+- interfaces bundle-60003.444 vlan-id 444

@@ -1,0 +1,21 @@
+DNAAS-LEAF-B02:
+- network-services bridge-domain instance g_test_v100 interface bundle-60000.100
+- interfaces bundle-60000.100 l2-service enabled
+- interfaces bundle-60000.100 vlan-id 100
+- network-services bridge-domain instance g_test_v100 interface ge100-0/0/1.100
+- interfaces ge100-0/0/1.100 l2-service enabled
+- interfaces ge100-0/0/1.100 vlan-id 100
+DNAAS-LEAF-B05:
+- network-services bridge-domain instance g_test_v100 interface bundle-60000.100
+- interfaces bundle-60000.100 l2-service enabled
+- interfaces bundle-60000.100 vlan-id 100
+- network-services bridge-domain instance g_test_v100 interface ge100-0/0/1.100
+- interfaces ge100-0/0/1.100 l2-service enabled
+- interfaces ge100-0/0/1.100 vlan-id 100
+DNAAS-SPINE-B08:
+- network-services bridge-domain instance g_test_v100 interface bundle-60005.100
+- interfaces bundle-60005.100 l2-service enabled
+- interfaces bundle-60005.100 vlan-id 100
+- network-services bridge-domain instance g_test_v100 interface bundle-60002.100
+- interfaces bundle-60002.100 l2-service enabled
+- interfaces bundle-60002.100 vlan-id 100

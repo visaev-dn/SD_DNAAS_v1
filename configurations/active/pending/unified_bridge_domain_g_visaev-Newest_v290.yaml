@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_visaev-Newest_v290 interface bundle-60000.290
+- interfaces bundle-60000.290 l2-service enabled
+- interfaces bundle-60000.290 vlan-id 290
+- network-services bridge-domain instance g_visaev-Newest_v290 interface ge100-0/0/30.290
+- interfaces ge100-0/0/30.290 l2-service enabled
+- interfaces ge100-0/0/30.290 vlan-id 290
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev-Newest_v290 interface bundle-60000.290
+- interfaces bundle-60000.290 l2-service enabled
+- interfaces bundle-60000.290 vlan-id 290
+- network-services bridge-domain instance g_visaev-Newest_v290 interface ge100-0/0/30.290
+- interfaces ge100-0/0/30.290 l2-service enabled
+- interfaces ge100-0/0/30.290 vlan-id 290
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_visaev-Newest_v290 interface bundle-60002.290
+- interfaces bundle-60002.290 l2-service enabled
+- interfaces bundle-60002.290 vlan-id 290
+- network-services bridge-domain instance g_visaev-Newest_v290 interface bundle-60003.290
+- interfaces bundle-60003.290 l2-service enabled
+- interfaces bundle-60003.290 vlan-id 290

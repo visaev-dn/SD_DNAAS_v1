@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_test_user5_v264 interface bundle-60000.264
+- interfaces bundle-60000.264 l2-service enabled
+- interfaces bundle-60000.264 vlan-id 264
+- network-services bridge-domain instance g_test_user5_v264 interface ge100-0/0/9.264
+- interfaces ge100-0/0/9.264 l2-service enabled
+- interfaces ge100-0/0/9.264 vlan-id 264
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_test_user5_v264 interface bundle-60000.264
+- interfaces bundle-60000.264 l2-service enabled
+- interfaces bundle-60000.264 vlan-id 264
+- network-services bridge-domain instance g_test_user5_v264 interface ge100-0/0/10.264
+- interfaces ge100-0/0/10.264 l2-service enabled
+- interfaces ge100-0/0/10.264 vlan-id 264
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_test_user5_v264 interface bundle-60002.264
+- interfaces bundle-60002.264 l2-service enabled
+- interfaces bundle-60002.264 vlan-id 264
+- network-services bridge-domain instance g_test_user5_v264 interface bundle-60003.264
+- interfaces bundle-60003.264 l2-service enabled
+- interfaces bundle-60003.264 vlan-id 264

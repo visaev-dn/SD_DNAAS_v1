@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_visaev_v259 interface bundle-60000.259
+- interfaces bundle-60000.259 l2-service enabled
+- interfaces bundle-60000.259 vlan-id 259
+- network-services bridge-domain instance g_visaev_v259 interface ge100-0/0/30.259
+- interfaces ge100-0/0/30.259 l2-service enabled
+- interfaces ge100-0/0/30.259 vlan-id 259
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev_v259 interface bundle-60000.259
+- interfaces bundle-60000.259 l2-service enabled
+- interfaces bundle-60000.259 vlan-id 259
+- network-services bridge-domain instance g_visaev_v259 interface ge100-0/0/30.259
+- interfaces ge100-0/0/30.259 l2-service enabled
+- interfaces ge100-0/0/30.259 vlan-id 259
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_visaev_v259 interface bundle-60002.259
+- interfaces bundle-60002.259 l2-service enabled
+- interfaces bundle-60002.259 vlan-id 259
+- network-services bridge-domain instance g_visaev_v259 interface bundle-60003.259
+- interfaces bundle-60003.259 l2-service enabled
+- interfaces bundle-60003.259 vlan-id 259

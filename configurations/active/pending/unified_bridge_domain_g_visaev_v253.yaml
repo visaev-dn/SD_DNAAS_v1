@@ -1,0 +1,13 @@
+_metadata:
+  leaf_destinations:
+  - DNAAS-LEAF-C02
+  service_name: g_visaev_v253
+  source_device: DNAAS-LEAF-B13
+  source_device_type: leaf
+  successful_leaf_configs: 1
+  successful_superspine_configs: 0
+  superspine_destinations:
+  - DNAAS-SuperSpine-D04-NCC0
+  topology_type: P2MP_MIXED
+  total_destinations: 2
+  vlan_id: 253

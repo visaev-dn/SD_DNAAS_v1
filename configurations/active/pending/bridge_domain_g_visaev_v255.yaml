@@ -1,0 +1,51 @@
+=== DNAAS-LEAF-A15 ===
+network-services bridge-domain instance g_visaev_v255 interface bundle-60000.255
+interfaces bundle-60000.255 l2-service enabled
+interfaces bundle-60000.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface ge100-0/0/30.255
+interfaces ge100-0/0/30.255 l2-service enabled
+interfaces ge100-0/0/30.255 vlan-id 255
+
+=== DNAAS-LEAF-B13 ===
+network-services bridge-domain instance g_visaev_v255 interface ge100-0/0/25.255
+interfaces ge100-0/0/25.255 l2-service enabled
+interfaces ge100-0/0/25.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60000.255
+interfaces bundle-60000.255 l2-service enabled
+interfaces bundle-60000.255 vlan-id 255
+
+=== DNAAS-LEAF-B14 ===
+network-services bridge-domain instance g_visaev_v255 interface bundle-60000.255
+interfaces bundle-60000.255 l2-service enabled
+interfaces bundle-60000.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface ge100-0/0/30.255
+interfaces ge100-0/0/30.255 l2-service enabled
+interfaces ge100-0/0/30.255 vlan-id 255
+
+=== DNAAS-SPINE-A09 ===
+interfaces bundle-60000.255 l2-service enabled
+interfaces bundle-60000.255 vlan-id 255
+interfaces bundle-60007.255 l2-service enabled
+interfaces bundle-60007.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60000.255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60007.255
+
+=== DNAAS-SPINE-B09 ===
+interfaces bundle-60000.255 l2-service enabled
+interfaces bundle-60000.255 vlan-id 255
+interfaces bundle-60002.255 l2-service enabled
+interfaces bundle-60002.255 vlan-id 255
+interfaces bundle-60003.255 l2-service enabled
+interfaces bundle-60003.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60000.255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60002.255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60003.255
+
+=== DNAAS-SUPERSPINE-D04-NCC0 ===
+interfaces bundle-60002.255 l2-service enabled
+interfaces bundle-60002.255 vlan-id 255
+interfaces bundle-60004.255 l2-service enabled
+interfaces bundle-60004.255 vlan-id 255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60002.255
+network-services bridge-domain instance g_visaev_v255 interface bundle-60004.255
+

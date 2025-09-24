@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_final_debug_test_v111 interface bundle-60000.111
+- interfaces bundle-60000.111 l2-service enabled
+- interfaces bundle-60000.111 vlan-id 111
+- network-services bridge-domain instance g_final_debug_test_v111 interface ge100-0/0/1.111
+- interfaces ge100-0/0/1.111 l2-service enabled
+- interfaces ge100-0/0/1.111 vlan-id 111
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_final_debug_test_v111 interface bundle-60000.111
+- interfaces bundle-60000.111 l2-service enabled
+- interfaces bundle-60000.111 vlan-id 111
+- network-services bridge-domain instance g_final_debug_test_v111 interface ge100-0/0/2.111
+- interfaces ge100-0/0/2.111 l2-service enabled
+- interfaces ge100-0/0/2.111 vlan-id 111
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_final_debug_test_v111 interface bundle-60002.111
+- interfaces bundle-60002.111 l2-service enabled
+- interfaces bundle-60002.111 vlan-id 111
+- network-services bridge-domain instance g_final_debug_test_v111 interface bundle-60003.111
+- interfaces bundle-60003.111 l2-service enabled
+- interfaces bundle-60003.111 vlan-id 111

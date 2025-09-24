@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_visaev-test99_v99 interface bundle-60000.99
+- interfaces bundle-60000.99 l2-service enabled
+- interfaces bundle-60000.99 vlan-id 99
+- network-services bridge-domain instance g_visaev-test99_v99 interface ge100-0/0/30.99
+- interfaces ge100-0/0/30.99 l2-service enabled
+- interfaces ge100-0/0/30.99 vlan-id 99
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev-test99_v99 interface bundle-60000.99
+- interfaces bundle-60000.99 l2-service enabled
+- interfaces bundle-60000.99 vlan-id 99
+- network-services bridge-domain instance g_visaev-test99_v99 interface ge100-0/0/30.99
+- interfaces ge100-0/0/30.99 l2-service enabled
+- interfaces ge100-0/0/30.99 vlan-id 99
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_visaev-test99_v99 interface bundle-60002.99
+- interfaces bundle-60002.99 l2-service enabled
+- interfaces bundle-60002.99 vlan-id 99
+- network-services bridge-domain instance g_visaev-test99_v99 interface bundle-60003.99
+- interfaces bundle-60003.99 l2-service enabled
+- interfaces bundle-60003.99 vlan-id 99

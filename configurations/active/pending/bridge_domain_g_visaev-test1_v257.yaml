@@ -1,0 +1,21 @@
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev-test1_v257 interface bundle-60000.257
+- interfaces bundle-60000.257 l2-service enabled
+- interfaces bundle-60000.257 vlan-id 257
+- network-services bridge-domain instance g_visaev-test1_v257 interface ge100-0/0/20.257
+- interfaces ge100-0/0/20.257 l2-service enabled
+- interfaces ge100-0/0/20.257 vlan-id 257
+DNAAS-LEAF-B15:
+- network-services bridge-domain instance g_visaev-test1_v257 interface bundle-60000.257
+- interfaces bundle-60000.257 l2-service enabled
+- interfaces bundle-60000.257 vlan-id 257
+- network-services bridge-domain instance g_visaev-test1_v257 interface ge100-0/0/20.257
+- interfaces ge100-0/0/20.257 l2-service enabled
+- interfaces ge100-0/0/20.257 vlan-id 257
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_visaev-test1_v257 interface bundle-60003.257
+- interfaces bundle-60003.257 l2-service enabled
+- interfaces bundle-60003.257 vlan-id 257
+- network-services bridge-domain instance g_visaev-test1_v257 interface bundle-60004.257
+- interfaces bundle-60004.257 l2-service enabled
+- interfaces bundle-60004.257 vlan-id 257

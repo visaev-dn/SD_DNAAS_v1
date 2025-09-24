@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_log_test_456_v333 interface bundle-60000.333
+- interfaces bundle-60000.333 l2-service enabled
+- interfaces bundle-60000.333 vlan-id 333
+- network-services bridge-domain instance g_log_test_456_v333 interface ge100-0/0/1.333
+- interfaces ge100-0/0/1.333 l2-service enabled
+- interfaces ge100-0/0/1.333 vlan-id 333
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_log_test_456_v333 interface bundle-60000.333
+- interfaces bundle-60000.333 l2-service enabled
+- interfaces bundle-60000.333 vlan-id 333
+- network-services bridge-domain instance g_log_test_456_v333 interface ge100-0/0/2.333
+- interfaces ge100-0/0/2.333 l2-service enabled
+- interfaces ge100-0/0/2.333 vlan-id 333
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_log_test_456_v333 interface bundle-60002.333
+- interfaces bundle-60002.333 l2-service enabled
+- interfaces bundle-60002.333 vlan-id 333
+- network-services bridge-domain instance g_log_test_456_v333 interface bundle-60003.333
+- interfaces bundle-60003.333 l2-service enabled
+- interfaces bundle-60003.333 vlan-id 333

@@ -1,0 +1,24 @@
+=== DNAAS-LEAF-B15 ===
+network-services bridge-domain instance g_oalfasi_v105 interface bundle-60000.105
+interfaces bundle-60000.105 l2-service enabled
+interfaces bundle-60000.105 vlan-id 105
+network-services bridge-domain instance g_oalfasi_v105 interface ge100-0/0/4.105
+interfaces ge100-0/0/4.105 l2-service enabled
+interfaces ge100-0/0/4.105 vlan-id 105
+
+=== DNAAS-LEAF-B16 ===
+network-services bridge-domain instance g_oalfasi_v105 interface bundle-60000.105
+interfaces bundle-60000.105 l2-service enabled
+interfaces bundle-60000.105 vlan-id 105
+network-services bridge-domain instance g_oalfasi_v105 interface ge100-0/0/7.105
+interfaces ge100-0/0/7.105 l2-service enabled
+interfaces ge100-0/0/7.105 vlan-id 105
+
+=== DNAAS-SPINE-B09 ===
+network-services bridge-domain instance g_oalfasi_v105 interface bundle-60004.105
+interfaces bundle-60004.105 l2-service enabled
+interfaces bundle-60004.105 vlan-id 105
+network-services bridge-domain instance g_oalfasi_v105 interface bundle-60005.105
+interfaces bundle-60005.105 l2-service enabled
+interfaces bundle-60005.105 vlan-id 105
+

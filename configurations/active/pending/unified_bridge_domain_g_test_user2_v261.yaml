@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_test_user2_v261 interface bundle-60000.261
+- interfaces bundle-60000.261 l2-service enabled
+- interfaces bundle-60000.261 vlan-id 261
+- network-services bridge-domain instance g_test_user2_v261 interface ge100-0/0/3.261
+- interfaces ge100-0/0/3.261 l2-service enabled
+- interfaces ge100-0/0/3.261 vlan-id 261
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_test_user2_v261 interface bundle-60000.261
+- interfaces bundle-60000.261 l2-service enabled
+- interfaces bundle-60000.261 vlan-id 261
+- network-services bridge-domain instance g_test_user2_v261 interface ge100-0/0/4.261
+- interfaces ge100-0/0/4.261 l2-service enabled
+- interfaces ge100-0/0/4.261 vlan-id 261
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_test_user2_v261 interface bundle-60002.261
+- interfaces bundle-60002.261 l2-service enabled
+- interfaces bundle-60002.261 vlan-id 261
+- network-services bridge-domain instance g_test_user2_v261 interface bundle-60003.261
+- interfaces bundle-60003.261 l2-service enabled
+- interfaces bundle-60003.261 vlan-id 261

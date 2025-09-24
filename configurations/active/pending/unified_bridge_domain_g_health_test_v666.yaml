@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_health_test_v666 interface bundle-60000.666
+- interfaces bundle-60000.666 l2-service enabled
+- interfaces bundle-60000.666 vlan-id 666
+- network-services bridge-domain instance g_health_test_v666 interface ge100-0/0/1.666
+- interfaces ge100-0/0/1.666 l2-service enabled
+- interfaces ge100-0/0/1.666 vlan-id 666
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_health_test_v666 interface bundle-60000.666
+- interfaces bundle-60000.666 l2-service enabled
+- interfaces bundle-60000.666 vlan-id 666
+- network-services bridge-domain instance g_health_test_v666 interface ge100-0/0/2.666
+- interfaces ge100-0/0/2.666 l2-service enabled
+- interfaces ge100-0/0/2.666 vlan-id 666
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_health_test_v666 interface bundle-60002.666
+- interfaces bundle-60002.666 l2-service enabled
+- interfaces bundle-60002.666 vlan-id 666
+- network-services bridge-domain instance g_health_test_v666 interface bundle-60003.666
+- interfaces bundle-60003.666 l2-service enabled
+- interfaces bundle-60003.666 vlan-id 666

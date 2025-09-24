@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_mkazakov_v1369 interface bundle-60000.1369
+- interfaces bundle-60000.1369 l2-service enabled
+- interfaces bundle-60000.1369 vlan-id 1369
+- network-services bridge-domain instance g_mkazakov_v1369 interface ge100-0/0/26.1369
+- interfaces ge100-0/0/26.1369 l2-service enabled
+- interfaces ge100-0/0/26.1369 vlan-id 1369
+DNAAS-LEAF-B16:
+- network-services bridge-domain instance g_mkazakov_v1369 interface bundle-60000.1369
+- interfaces bundle-60000.1369 l2-service enabled
+- interfaces bundle-60000.1369 vlan-id 1369
+- network-services bridge-domain instance g_mkazakov_v1369 interface ge100-0/0/26.1369
+- interfaces ge100-0/0/26.1369 l2-service enabled
+- interfaces ge100-0/0/26.1369 vlan-id 1369
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_mkazakov_v1369 interface bundle-60005.1369
+- interfaces bundle-60005.1369 l2-service enabled
+- interfaces bundle-60005.1369 vlan-id 1369
+- network-services bridge-domain instance g_mkazakov_v1369 interface bundle-60002.1369
+- interfaces bundle-60002.1369 l2-service enabled
+- interfaces bundle-60002.1369 vlan-id 1369

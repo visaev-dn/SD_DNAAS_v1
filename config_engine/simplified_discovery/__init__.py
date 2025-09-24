@@ -1,121 +1,69 @@
 #!/usr/bin/env python3
 """
-Simplified Bridge Domain Discovery Package
+COMPATIBILITY LAYER - Simplified Discovery
 ==========================================
 
-This package implements the 3-Step Simplified Workflow for bridge domain discovery,
-addressing all the logic flaws identified in the architectural analysis.
+This file provides backward compatibility for existing imports while the system
+transitions to the new unified discovery namespace.
 
-Architecture: 3-Step Simplified Workflow (ADR-001)
+ALL IMPORTS ARE REDIRECTED TO: config_engine.discovery.simplified.*
 
-Components:
-- data_structures: Standardized data structures with guided rails
-- simplified_bridge_domain_discovery: Main 3-step workflow implementation
-- cli_integration: CLI interface following user preferences
-
-Usage:
-    from config_engine.simplified_discovery import run_simplified_discovery
-    results = run_simplified_discovery()
+This compatibility layer will be removed after all imports are updated.
 """
 
-# Import main functions for easy access
-from .simplified_bridge_domain_discovery import (
-    SimplifiedBridgeDomainDiscovery,
+import warnings
+
+# Issue deprecation warning
+warnings.warn(
+    "config_engine.simplified_discovery is deprecated. "
+    "Use config_engine.discovery.simplified instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+# Redirect all imports to new location
+from ..discovery.simplified.simplified_bridge_domain_discovery import (
     run_simplified_discovery,
-    validate_simplified_workflow
+    SimplifiedBridgeDomainDiscovery,
+    DiscoveryResults
 )
-
-from .data_structures import (
-    # Step 1 structures
+from ..discovery.simplified.enhanced_cli_display import run_enhanced_simplified_discovery_display
+from ..discovery.simplified.cli_integration import SimplifiedDiscoveryCLI
+from ..discovery.simplified.data_sync_manager import DataSyncManager
+from ..discovery.simplified.data_structures import (
     RawBridgeDomain,
-    ValidationResult, 
-    LoadedData,
-    
-    # Step 2 structures
-    VLANConfiguration,
-    InterfaceInfo,
     ProcessedBridgeDomain,
-    
-    # Step 3 structures
-    ConsolidationGroup,
     ConsolidatedBridgeDomain,
-    DiscoveryResults,
-    
-    # Error handling
-    DiscoveryError,
-    DataQualityError,
-    ClassificationError,
-    ConsolidationError,
-    WorkflowError,
-    
-    # Validation functions
-    validate_data_flow_step1_to_step2,
-    validate_data_flow_step2_to_step3,
-    enforce_data_structure_contracts
+    InterfaceInfo,
+    VLANConfiguration,
+    LoadedData,
+    ValidationResult
 )
 
-from .cli_integration import (
-    SimplifiedDiscoveryCLI,
-    run_enhanced_database_menu
-)
+# Enhanced database menu function (for main.py compatibility)
+def run_enhanced_database_menu():
+    """Compatibility function for enhanced database menu"""
+    from ..discovery.simplified.cli_integration import SimplifiedDiscoveryCLI
+    cli = SimplifiedDiscoveryCLI()
+    cli.show_discovery_menu()
 
-# Package metadata
-__version__ = "1.0.0"
-__author__ = "Lab Automation Team"
-__description__ = "Simplified Bridge Domain Discovery System with 3-Step Workflow"
-
-# Export main interface
+# Export all original functions for backward compatibility
 __all__ = [
-    # Main discovery functions
-    "SimplifiedBridgeDomainDiscovery",
-    "run_simplified_discovery",
-    "validate_simplified_workflow",
-    
-    # Data structures
-    "RawBridgeDomain",
-    "ValidationResult",
-    "LoadedData", 
-    "VLANConfiguration",
-    "InterfaceInfo",
-    "ProcessedBridgeDomain",
-    "ConsolidationGroup",
-    "ConsolidatedBridgeDomain",
-    "DiscoveryResults",
-    
-    # Error handling
-    "DiscoveryError",
-    "DataQualityError", 
-    "ClassificationError",
-    "ConsolidationError",
-    "WorkflowError",
-    
-    # Validation functions
-    "validate_data_flow_step1_to_step2",
-    "validate_data_flow_step2_to_step3", 
-    "enforce_data_structure_contracts",
-    
-    # CLI integration
-    "SimplifiedDiscoveryCLI",
-    "run_enhanced_database_menu"
+    'run_simplified_discovery',
+    'SimplifiedBridgeDomainDiscovery',
+    'DiscoveryResults',
+    'run_enhanced_simplified_discovery_display',
+    'SimplifiedDiscoveryCLI',
+    'DataSyncManager',
+    'run_enhanced_database_menu',
+    'RawBridgeDomain',
+    'ProcessedBridgeDomain',
+    'ConsolidatedBridgeDomain',
+    'InterfaceInfo',
+    'VLANConfiguration',
+    'LoadedData',
+    'ValidationResult'
 ]
 
-# Validate package on import
-def _validate_package_integrity():
-    """Validate package integrity on import"""
-    try:
-        # Test that all main components can be imported
-        validate_simplified_workflow()
-        enforce_data_structure_contracts()
-        return True
-    except Exception as e:
-        import warnings
-        warnings.warn(f"Package integrity validation failed: {e}", RuntimeWarning)
-        return False
-
-# Run validation on import
-_package_valid = _validate_package_integrity()
-
-if _package_valid:
-    print("✅ Simplified Bridge Domain Discovery package loaded successfully")
-else:
-    print("⚠️  Package loaded with warnings - check system configuration")
+print("⚠️  Using compatibility layer for simplified_discovery")
+print("💡 Update imports to use config_engine.discovery.simplified")

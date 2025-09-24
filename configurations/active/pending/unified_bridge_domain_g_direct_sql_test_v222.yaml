@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_direct_sql_test_v222 interface bundle-60000.222
+- interfaces bundle-60000.222 l2-service enabled
+- interfaces bundle-60000.222 vlan-id 222
+- network-services bridge-domain instance g_direct_sql_test_v222 interface ge100-0/0/1.222
+- interfaces ge100-0/0/1.222 l2-service enabled
+- interfaces ge100-0/0/1.222 vlan-id 222
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_direct_sql_test_v222 interface bundle-60000.222
+- interfaces bundle-60000.222 l2-service enabled
+- interfaces bundle-60000.222 vlan-id 222
+- network-services bridge-domain instance g_direct_sql_test_v222 interface ge100-0/0/2.222
+- interfaces ge100-0/0/2.222 l2-service enabled
+- interfaces ge100-0/0/2.222 vlan-id 222
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_direct_sql_test_v222 interface bundle-60002.222
+- interfaces bundle-60002.222 l2-service enabled
+- interfaces bundle-60002.222 vlan-id 222
+- network-services bridge-domain instance g_direct_sql_test_v222 interface bundle-60003.222
+- interfaces bundle-60003.222 l2-service enabled
+- interfaces bundle-60003.222 vlan-id 222

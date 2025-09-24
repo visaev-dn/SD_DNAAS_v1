@@ -1,0 +1,9 @@
+DNAAS-LEAF-B13:
+  - network-services bridge-domain instance test_restore_v100 interface bundle-60000.100
+  - interfaces bundle-60000.100 l2-service enabled
+  - interfaces bundle-60000.100 vlan-id 100
+
+DNAAS-LEAF-B14:
+  - network-services bridge-domain instance test_restore_v100 interface bundle-60000.100
+  - interfaces bundle-60000.100 l2-service enabled
+  - interfaces bundle-60000.100 vlan-id 100 

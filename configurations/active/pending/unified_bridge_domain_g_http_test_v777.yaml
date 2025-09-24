@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_http_test_v777 interface bundle-60000.777
+- interfaces bundle-60000.777 l2-service enabled
+- interfaces bundle-60000.777 vlan-id 777
+- network-services bridge-domain instance g_http_test_v777 interface ge100-0/0/1.777
+- interfaces ge100-0/0/1.777 l2-service enabled
+- interfaces ge100-0/0/1.777 vlan-id 777
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_http_test_v777 interface bundle-60000.777
+- interfaces bundle-60000.777 l2-service enabled
+- interfaces bundle-60000.777 vlan-id 777
+- network-services bridge-domain instance g_http_test_v777 interface ge100-0/0/2.777
+- interfaces ge100-0/0/2.777 l2-service enabled
+- interfaces ge100-0/0/2.777 vlan-id 777
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_http_test_v777 interface bundle-60002.777
+- interfaces bundle-60002.777 l2-service enabled
+- interfaces bundle-60002.777 vlan-id 777
+- network-services bridge-domain instance g_http_test_v777 interface bundle-60003.777
+- interfaces bundle-60003.777 l2-service enabled
+- interfaces bundle-60003.777 vlan-id 777

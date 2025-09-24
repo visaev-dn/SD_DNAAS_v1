@@ -1,0 +1,21 @@
+DNAAS-LEAF-B13:
+- network-services bridge-domain instance g_debug_test2_v998 interface bundle-60000.998
+- interfaces bundle-60000.998 l2-service enabled
+- interfaces bundle-60000.998 vlan-id 998
+- network-services bridge-domain instance g_debug_test2_v998 interface ge100-0/0/3.998
+- interfaces ge100-0/0/3.998 l2-service enabled
+- interfaces ge100-0/0/3.998 vlan-id 998
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_debug_test2_v998 interface bundle-60000.998
+- interfaces bundle-60000.998 l2-service enabled
+- interfaces bundle-60000.998 vlan-id 998
+- network-services bridge-domain instance g_debug_test2_v998 interface ge100-0/0/4.998
+- interfaces ge100-0/0/4.998 l2-service enabled
+- interfaces ge100-0/0/4.998 vlan-id 998
+DNAAS-SPINE-B09:
+- network-services bridge-domain instance g_debug_test2_v998 interface bundle-60002.998
+- interfaces bundle-60002.998 l2-service enabled
+- interfaces bundle-60002.998 vlan-id 998
+- network-services bridge-domain instance g_debug_test2_v998 interface bundle-60003.998
+- interfaces bundle-60003.998 l2-service enabled
+- interfaces bundle-60003.998 vlan-id 998

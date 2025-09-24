@@ -1,0 +1,31 @@
+DNAAS-LEAF-B10:
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60000.251
+- interfaces bundle-60000.251 l2-service enabled
+- interfaces bundle-60000.251 vlan-id 251
+- network-services bridge-domain instance g_visaev_v251 interface ge100-0/0/3.251
+- interfaces ge100-0/0/3.251 l2-service enabled
+- interfaces ge100-0/0/3.251 vlan-id 251
+DNAAS-LEAF-B14:
+- network-services bridge-domain instance g_visaev_v251 interface ge100-0/0/12.251
+- interfaces ge100-0/0/12.251 l2-service enabled
+- interfaces ge100-0/0/12.251 vlan-id 251
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60000.251
+- interfaces bundle-60000.251 l2-service enabled
+- interfaces bundle-60000.251 vlan-id 251
+DNAAS-LEAF-B15:
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60000.251
+- interfaces bundle-60000.251 l2-service enabled
+- interfaces bundle-60000.251 vlan-id 251
+- network-services bridge-domain instance g_visaev_v251 interface ge100-0/0/5.251
+- interfaces ge100-0/0/5.251 l2-service enabled
+- interfaces ge100-0/0/5.251 vlan-id 251
+DNAAS-SPINE-B09:
+- interfaces bundle-60001.251 l2-service enabled
+- interfaces bundle-60001.251 vlan-id 251
+- interfaces bundle-60003.251 l2-service enabled
+- interfaces bundle-60003.251 vlan-id 251
+- interfaces bundle-60004.251 l2-service enabled
+- interfaces bundle-60004.251 vlan-id 251
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60001.251
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60003.251
+- network-services bridge-domain instance g_visaev_v251 interface bundle-60004.251

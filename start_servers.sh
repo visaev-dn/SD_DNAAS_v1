@@ -61,9 +61,9 @@ if ! check_port $FRONTEND_PORT; then
     exit 1
 fi
 
-# Start API Server
-echo -e "${BLUE}🔧 Starting API Server on port $API_PORT...${NC}"
-python3 api_server.py --port $API_PORT &
+# Start API Server (using BD Editor API)
+echo -e "${BLUE}🔧 Starting BD Editor API Server on port $API_PORT...${NC}"
+python3 bd_editor_api.py &
 API_PID=$!
 
 # Wait for API server to start

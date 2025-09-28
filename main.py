@@ -19,6 +19,42 @@ except ImportError:
         print("❌ Enhanced Simplified Discovery Display not available")
         print("💡 Please ensure the enhanced_cli_display.py file is in the correct location")
 
+# Import interface discovery system
+try:
+    from services.interface_discovery.cli_integration import (
+        enhanced_bd_editor_with_discovery,
+        interface_discovery_menu,
+        display_discovery_status
+    )
+    INTERFACE_DISCOVERY_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Interface Discovery not available: {e}")
+    INTERFACE_DISCOVERY_AVAILABLE = False
+    
+    def enhanced_bd_editor_with_discovery(db_manager):
+        print("❌ Interface Discovery not available - using manual input")
+        return manual_interface_input()
+    
+    def interface_discovery_menu():
+        print("❌ Interface Discovery not available")
+    
+    def display_discovery_status():
+        print("❌ Interface Discovery not available")
+
+def manual_interface_input():
+    """Fallback manual interface input"""
+    try:
+        print("\n📝 Manual Interface Entry:")
+        device_name = input("Enter device name: ").strip()
+        if not device_name:
+            return None, None
+        interface_name = input("Enter interface name: ").strip()
+        if not interface_name:
+            return None, None
+        return device_name, interface_name
+    except KeyboardInterrupt:
+        return None, None
+
 def show_main_menu():
     """Main menu for lab automation framework"""
     print("\n" + "🚀" + "=" * 68)
@@ -153,10 +189,17 @@ def show_working_advanced_tools_menu():
         print("1. 📊 Populate Devices from Inventory")
         print("2. 🌐 Bridge Domain Visualization")
         print("3. ✨ Enhanced Topology Analysis")
-        print("4. 🔙 Back to Main Menu")
+        if INTERFACE_DISCOVERY_AVAILABLE:
+            print("4. 🔌 Interface Discovery Management")
+            print("5. 📊 Interface Discovery Status")
+            print("6. 🔙 Back to Main Menu")
+            max_choice = 6
+        else:
+            print("4. 🔙 Back to Main Menu")
+            max_choice = 4
         print()
         
-        choice = input("Select an option [1-4]: ").strip()
+        choice = input(f"Select an option [1-{max_choice}]: ").strip()
         
         if choice == '1':
             run_populate_devices_from_inventory()
@@ -164,6 +207,12 @@ def show_working_advanced_tools_menu():
             run_bridge_domain_visualization()
         elif choice == '3':
             run_enhanced_topology_analysis()
+        elif choice == '4' and INTERFACE_DISCOVERY_AVAILABLE:
+            interface_discovery_menu()
+        elif choice == '5' and INTERFACE_DISCOVERY_AVAILABLE:
+            display_discovery_status()
+        elif choice == str(max_choice):
+            break
         elif choice == '4':
             break
         else:
@@ -318,26 +367,52 @@ def run_bridge_domain_builder():
             print("❌ Invalid VLAN ID. Must be a number.")
             return
         
-        # Get source and destination
-        source_leaf = input("Enter source leaf device: ").strip()
-        if not source_leaf:
-            print("❌ Source leaf device is required.")
-            return
-        
-        source_port = input("Enter source port (e.g., ge100-0/0/1): ").strip()
-        if not source_port:
-            print("❌ Source port is required.")
-            return
-        
-        dest_leaf = input("Enter destination leaf device: ").strip()
-        if not dest_leaf:
-            print("❌ Destination leaf device is required.")
-            return
-        
-        dest_port = input("Enter destination port (e.g., ge100-0/0/2): ").strip()
-        if not dest_port:
-            print("❌ Destination port is required.")
-            return
+        # Get source and destination using interface discovery
+        if INTERFACE_DISCOVERY_AVAILABLE:
+            print("\n🔍 Source Device & Interface Selection:")
+            print("Using Interface Discovery for intelligent selection...")
+            
+            from database_manager import DatabaseManager
+            db_manager = DatabaseManager()
+            
+            source_result = enhanced_bd_editor_with_discovery(db_manager)
+            if not source_result[0] or not source_result[1]:
+                print("❌ Source selection cancelled.")
+                return
+            
+            source_leaf, source_port = source_result
+            print(f"✅ Source selected: {source_leaf}:{source_port}")
+            
+            print("\n🎯 Destination Device & Interface Selection:")
+            dest_result = enhanced_bd_editor_with_discovery(db_manager)
+            if not dest_result[0] or not dest_result[1]:
+                print("❌ Destination selection cancelled.")
+                return
+            
+            dest_leaf, dest_port = dest_result
+            print(f"✅ Destination selected: {dest_leaf}:{dest_port}")
+            
+        else:
+            # Fallback to manual input
+            source_leaf = input("Enter source leaf device: ").strip()
+            if not source_leaf:
+                print("❌ Source leaf device is required.")
+                return
+            
+            source_port = input("Enter source port (e.g., ge100-0/0/1): ").strip()
+            if not source_port:
+                print("❌ Source port is required.")
+                return
+            
+            dest_leaf = input("Enter destination leaf device: ").strip()
+            if not dest_leaf:
+                print("❌ Destination leaf device is required.")
+                return
+            
+            dest_port = input("Enter destination port (e.g., ge100-0/0/2): ").strip()
+            if not dest_port:
+                print("❌ Destination port is required.")
+                return
         
         # Build configuration
         configs = builder.build_bridge_domain_config(
@@ -535,16 +610,32 @@ def run_enhanced_bridge_domain_builder():
             print("❌ Invalid VLAN ID. Must be a number.")
             return
         
-        # Get source device and interface
-        source_device = input("Enter source device name: ").strip()
-        if not source_device:
-            print("❌ Source device name cannot be empty.")
-            return
-        
-        source_interface = input("Enter source interface name: ").strip()
-        if not source_interface:
-            print("❌ Source interface name cannot be empty.")
-            return
+        # Get source device and interface using interface discovery
+        if INTERFACE_DISCOVERY_AVAILABLE:
+            print("\n🔍 Source Device & Interface Selection:")
+            print("Using Interface Discovery for intelligent selection...")
+            
+            from database_manager import DatabaseManager
+            db_manager = DatabaseManager()
+            
+            source_result = enhanced_bd_editor_with_discovery(db_manager)
+            if not source_result[0] or not source_result[1]:
+                print("❌ Source device/interface selection cancelled.")
+                return
+            
+            source_device, source_interface = source_result
+            print(f"✅ Source selected: {source_device}:{source_interface}")
+        else:
+            # Fallback to manual input
+            source_device = input("Enter source device name: ").strip()
+            if not source_device:
+                print("❌ Source device name cannot be empty.")
+                return
+            
+            source_interface = input("Enter source interface name: ").strip()
+            if not source_interface:
+                print("❌ Source interface name cannot be empty.")
+                return
         
         # Get destinations
         destinations = []
@@ -552,18 +643,44 @@ def run_enhanced_bridge_domain_builder():
         print("Add destinations for your bridge domain configuration.")
         
         while True:
-            dest_device = input("Enter destination device name (or 'done' to finish): ").strip()
-            if dest_device.lower() == 'done':
-                break
-            
-            if not dest_device:
-                print("❌ Destination device name cannot be empty.")
-                continue
-            
-            dest_interface = input(f"Enter interface for {dest_device}: ").strip()
-            if not dest_interface:
-                print("❌ Destination interface name cannot be empty.")
-                continue
+            if INTERFACE_DISCOVERY_AVAILABLE:
+                print(f"\n🎯 Destination {len(destinations) + 1} Selection:")
+                print("Using Interface Discovery for intelligent selection...")
+                print("(Select 'Cancel' to finish adding destinations)")
+                
+                dest_result = enhanced_bd_editor_with_discovery(db_manager)
+                if not dest_result[0] or not dest_result[1]:
+                    print("🔚 Finished adding destinations.")
+                    break
+                
+                dest_device, dest_interface = dest_result
+                
+                # Check for duplicate
+                duplicate = any(d['device'] == dest_device and d['port'] == dest_interface 
+                              for d in destinations)
+                if duplicate:
+                    print(f"⚠️  {dest_device}:{dest_interface} already added as destination.")
+                    continue
+                
+                # Check if same as source
+                if dest_device == source_device and dest_interface == source_interface:
+                    print("⚠️  Destination cannot be the same as source interface.")
+                    continue
+                
+            else:
+                # Fallback to manual input
+                dest_device = input("Enter destination device name (or 'done' to finish): ").strip()
+                if dest_device.lower() == 'done':
+                    break
+                
+                if not dest_device:
+                    print("❌ Destination device name cannot be empty.")
+                    continue
+                
+                dest_interface = input(f"Enter interface for {dest_device}: ").strip()
+                if not dest_interface:
+                    print("❌ Destination interface name cannot be empty.")
+                    continue
             
             destinations.append({
                 'device': dest_device,
@@ -575,9 +692,14 @@ def run_enhanced_bridge_domain_builder():
             if len(destinations) == 1:
                 print("💡 You can add more destinations for P2MP configuration.")
             
-            add_another = input("Add another destination? (y/n): ").strip().lower()
-            if add_another not in ['y', 'yes']:
-                break
+            if INTERFACE_DISCOVERY_AVAILABLE:
+                add_another = input("Add another destination? (y/n): ").strip().lower()
+                if add_another not in ['y', 'yes']:
+                    break
+            else:
+                add_another = input("Add another destination? (y/n): ").strip().lower()
+                if add_another not in ['y', 'yes']:
+                    break
         
         if not destinations:
             print("❌ No destinations specified.")
@@ -3729,8 +3851,8 @@ def get_discovered_bridge_domains(db_manager):
         
         # Query ALL bridge domains from unified table (no dual storage!)
         cursor.execute("""
-            SELECT name, vlan_id, username, discovery_data, interface_data, 
-                   dnaas_type, topology_type, source, created_at, id
+            SELECT name, vlan_id, username, discovery_data, 
+                   dnaas_type, topology_type, source, updated_at, id
             FROM bridge_domains 
             WHERE source = 'discovered'
             ORDER BY name
@@ -3742,16 +3864,15 @@ def get_discovered_bridge_domains(db_manager):
         discovered_bds = []
         for row in rows:
             discovered_bds.append({
-                'id': row[9],
+                'id': row[8],
                 'name': row[0],
                 'vlan_id': row[1],
                 'username': row[2],
                 'discovery_data': row[3],
-                'interface_data': row[4],
-                'dnaas_type': row[5],
-                'topology_type': row[6],
-                'source_type': row[7],
-                'created_at': row[8],
+                'dnaas_type': row[4],
+                'topology_type': row[5],
+                'source_type': row[6],
+                'updated_at': row[7],
                 'source': 'discovered',
                 'source_icon': '🔍'
             })
@@ -3772,8 +3893,8 @@ def get_user_created_bridge_domains(db_manager):
         
         # Query user-created bridge domains from unified table
         cursor.execute("""
-            SELECT name, vlan_id, username, discovery_data, interface_data, 
-                   dnaas_type, topology_type, source, created_at, id, deployment_status
+            SELECT name, vlan_id, username, discovery_data, 
+                   dnaas_type, topology_type, source, updated_at, id, deployment_status
             FROM bridge_domains 
             WHERE source IN ('user_created', 'builder', 'manual')
             ORDER BY name
@@ -3785,17 +3906,16 @@ def get_user_created_bridge_domains(db_manager):
         user_bds = []
         for row in rows:
             user_bds.append({
-                'id': row[9],
+                'id': row[8],
                 'name': row[0],
                 'vlan_id': row[1],
                 'username': row[2],
                 'discovery_data': row[3],
-                'interface_data': row[4],
-                'dnaas_type': row[5],
-                'topology_type': row[6],
-                'source_type': row[7],
-                'created_at': row[8],
-                'deployment_status': row[10],
+                'dnaas_type': row[4],
+                'topology_type': row[5],
+                'source_type': row[6],
+                'updated_at': row[7],
+                'deployment_status': row[9],
                 'source': 'user_created',
                 'source_icon': '🔨'
             })

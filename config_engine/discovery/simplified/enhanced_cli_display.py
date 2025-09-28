@@ -154,7 +154,7 @@ class EnhancedSimplifiedDiscoveryDisplay:
                 offset = (current_page - 1) * page_size
                 cursor.execute('''
                     SELECT name, username, vlan_id, topology_type, 
-                           1.0 as confidence, created_at, discovery_data, dnaas_type
+                           1.0 as confidence, updated_at, discovery_data, dnaas_type
                     FROM bridge_domains
                     WHERE source = 'discovered'
                     ORDER BY name
@@ -344,7 +344,7 @@ class EnhancedSimplifiedDiscoveryDisplay:
             # Build search query for unified bridge_domains table
             query = '''
                 SELECT name, username, vlan_id, topology_type, 
-                       1.0 as confidence, created_at, discovery_data, dnaas_type
+                       1.0 as confidence, updated_at, discovery_data, dnaas_type
                 FROM bridge_domains
                 WHERE source = 'discovered'
                 AND (name LIKE ? OR username LIKE ? OR vlan_id LIKE ?)
@@ -433,11 +433,10 @@ class EnhancedSimplifiedDiscoveryDisplay:
             conn = sqlite3.connect('instance/lab_automation.db')
             cursor = conn.cursor()
             
-            # Use unified bridge_domains table
+            # Use unified bridge_domains table - get all available columns
             cursor.execute('''
                 SELECT name, username, vlan_id, topology_type, 
-                       created_at, discovery_data, interface_data, dnaas_type,
-                       outer_vlan, inner_vlan, deployment_status, id
+                       updated_at, discovery_data, dnaas_type, deployment_status, id
                 FROM bridge_domains 
                 WHERE source = 'discovered'
                 AND name = ?
@@ -450,12 +449,16 @@ class EnhancedSimplifiedDiscoveryDisplay:
                 conn.close()
                 return
             
-            (bd_name, username, vlan_id, topo_type, created_at, discovery_data, 
-             interface_data, dnaas_type, outer_vlan, inner_vlan, deployment_status, bd_id) = result
+            (bd_name, username, vlan_id, topo_type, updated_at, discovery_data, 
+             dnaas_type, deployment_status, bd_id) = result
+            
+            # Initialize missing variables that the code expects
+            outer_vlan = None  # Not available in current schema
+            inner_vlan = None  # Not available in current schema
             
             # Parse JSON data
             discovery_json = json.loads(discovery_data) if discovery_data else {}
-            interface_json = json.loads(interface_data) if interface_data else {}
+            # Note: interface_data column doesn't exist, interface info is in discovery_data
             
             # Display detailed information
             print(f"\n📋 BRIDGE DOMAIN DETAILS: {bd_name}")
@@ -471,7 +474,7 @@ class EnhancedSimplifiedDiscoveryDisplay:
             print(f"   • DNAAS Type: {dnaas_type}")
             print(f"   • Topology Type: {topo_type}")
             print(f"   • Deployment Status: {deployment_status}")
-            print(f"   • Created: {created_at}")
+            print(f"   • Updated: {updated_at}")
             print()
             
             # Consolidation information
@@ -488,7 +491,7 @@ class EnhancedSimplifiedDiscoveryDisplay:
                 print()
             
             # DNAAS Analysis
-            bridge_domain_analysis = topology_json.get('bridge_domain_analysis', {})
+            bridge_domain_analysis = discovery_json.get('bridge_domain_analysis', {})
             if bridge_domain_analysis:
                 print(f"🏷️  DNAAS Analysis:")
                 print(f"   • DNAAS Type: {bridge_domain_analysis.get('dnaas_type', 'N/A')}")
@@ -571,13 +574,10 @@ class EnhancedSimplifiedDiscoveryDisplay:
                     'vlan_id': vlan_id,
                     'username': username,
                     'discovery_data': discovery_data,
-                    'interface_data': interface_data,
                     'dnaas_type': dnaas_type,
                     'topology_type': topo_type,
                     'source_type': 'discovered',
-                    'created_at': created_at,
-                    'outer_vlan': outer_vlan,
-                    'inner_vlan': inner_vlan,
+                    'updated_at': updated_at,
                     'deployment_status': deployment_status,
                     'source': 'discovered',
                     'source_icon': '🔍'
@@ -633,24 +633,25 @@ class EnhancedSimplifiedDiscoveryDisplay:
             
             dnaas_types[simplified_type] = count
         
-        # Get consolidation analysis from unified bridge_domains table
+        # Get consolidation analysis from discovery_data (CORRECTED)
         cursor.execute('''
-            SELECT consolidation_info FROM bridge_domains 
-            WHERE source = 'discovered' AND consolidation_info IS NOT NULL
+            SELECT discovery_data FROM bridge_domains 
+            WHERE source = 'discovered' AND discovery_data IS NOT NULL
         ''')
-        consolidation_data_list = cursor.fetchall()
+        discovery_data_list = cursor.fetchall()
         
         consolidated_count = 0
-        individual_count = stats['total_bridge_domains']  # Start with total, subtract consolidated
+        individual_count = 0
         
-        for (consolidation_info,) in consolidation_data_list:
+        for (discovery_data,) in discovery_data_list:
             try:
-                consolidation_json = json.loads(consolidation_info)
-                if consolidation_json.get('is_consolidated', False):
+                discovery_json = json.loads(discovery_data)
+                if discovery_json.get('is_consolidated', False):
                     consolidated_count += 1
-                    individual_count -= 1  # Remove from individual count
+                else:
+                    individual_count += 1
             except:
-                pass  # Keep as individual if parsing fails
+                individual_count += 1  # Default to individual if parsing fails
         
         stats['consolidated_count'] = consolidated_count
         stats['individual_count'] = individual_count
@@ -708,7 +709,7 @@ class EnhancedSimplifiedDiscoveryDisplay:
         
         # Recent activity
         cursor.execute('''
-            SELECT MAX(created_at) FROM bridge_domains 
+            SELECT MAX(updated_at) FROM bridge_domains 
             WHERE source = 'discovered'
         ''')
         last_created = cursor.fetchone()[0]

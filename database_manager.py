@@ -40,6 +40,43 @@ class DatabaseManager:
         self.logger.error(f"All database save methods failed for: {service_name}")
         return False
     
+    def get_bridge_domain_by_name(self, bd_name: str) -> Optional[Dict[str, Any]]:
+        """Get bridge domain by name from database"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Query bridge domains table
+            cursor.execute("""
+                SELECT id, name, vlan_id, dnaas_type, topology_type, original_username, 
+                       discovery_data, updated_at, source
+                FROM bridge_domains 
+                WHERE name = ?
+            """, (bd_name,))
+            
+            row = cursor.fetchone()
+            conn.close()
+            
+            if row:
+                return {
+                    'id': row[0],
+                    'name': row[1],
+                    'vlan_id': row[2],
+                    'dnaas_type': row[3],
+                    'topology_type': row[4],
+                    'original_username': row[5],
+                    'discovery_data': row[6],
+                    'updated_at': row[7],
+                    'source': row[8]
+                }
+            else:
+                self.logger.warning(f"Bridge domain not found: {bd_name}")
+                return None
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error getting bridge domain {bd_name}: {e}")
+            return None
+    
     def _save_with_direct_sql(self, service_name: str, vlan_id: int, config_data: Dict, file_path: Optional[Path] = None, config_metadata: Optional[Dict] = None) -> bool:
         """Save using direct SQLite connection"""
         try:

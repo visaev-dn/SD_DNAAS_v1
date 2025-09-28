@@ -9,8 +9,82 @@ from datetime import datetime
 
 
 def show_editing_interface(session, db_manager):
-    """CLI interface for editing BD - Task 2.2 Implementation"""
-    # User Vision: "let the user via the CLI change/add/remove endpoints"
+    """Enhanced CLI interface with intelligent BD editor system"""
+    
+    try:
+        # Try to use intelligent BD editor system
+        from services.bd_editor import (
+            PHASE_1_COMPLETE, 
+            PHASE_2_AVAILABLE, 
+            PHASE_3_AVAILABLE,
+            create_intelligent_menu,
+            display_bd_health_report,
+            is_bd_ready_for_editing
+        )
+        
+        working_copy = session['working_copy']
+        
+        if PHASE_1_COMPLETE and PHASE_2_AVAILABLE and PHASE_3_AVAILABLE:
+            print(f"\n🧠 INTELLIGENT BD EDITOR (All Phases Available)")
+            print("="*60)
+            print("💡 Enhanced with type-aware menus, validation, preview, and advanced features")
+            
+            # Health check before editing
+            if not is_bd_ready_for_editing(working_copy):
+                print("⚠️  BD health check indicates potential issues")
+                display_bd_health_report(working_copy)
+                
+                if not input("Continue editing anyway? (y/N): ").lower().startswith('y'):
+                    print("❌ Editing cancelled due to health check")
+                    return
+            
+            # Create intelligent menu adapter
+            menu_adapter = create_intelligent_menu(working_copy, session)
+            
+            print(f"✅ Using {type(menu_adapter).__name__} for BD type {working_copy.get('dnaas_type', 'unknown')}")
+            
+            # Intelligent editing loop
+            while True:
+                try:
+                    choice = menu_adapter.show_menu()
+                    
+                    if not menu_adapter.execute_action(choice):
+                        break  # User chose to exit
+                        
+                except KeyboardInterrupt:
+                    print("\\n⚠️  Intelligent editing interrupted")
+                    
+                    if input("Save session and exit? (Y/n): ").lower() != 'n':
+                        print("✅ Session saved - you can resume later")
+                    
+                    break
+                except Exception as e:
+                    print(f"❌ Error in intelligent menu: {e}")
+                    
+                    fallback = input("Switch to basic menu? (Y/n): ").lower() != 'n'
+                    if fallback:
+                        print("💡 Switching to basic menu mode")
+                        break
+                    else:
+                        return
+            
+            return
+            
+        else:
+            print(f"⚠️  Intelligent BD editor not fully available")
+            print(f"📊 Phases: 1({PHASE_1_COMPLETE}) | 2({PHASE_2_AVAILABLE}) | 3({PHASE_3_AVAILABLE})")
+            print("💡 Using basic menu with available intelligent features")
+            
+    except ImportError as e:
+        print(f"⚠️  Intelligent BD editor not available: {e}")
+        print("💡 Using basic BD editor menu")
+    
+    # Fallback to basic menu or enhanced basic menu
+    show_basic_editing_interface(session, db_manager)
+
+
+def show_basic_editing_interface(session, db_manager):
+    """Basic editing interface with intelligent enhancements where available"""
     
     while True:
         working_copy = session['working_copy']
@@ -25,20 +99,49 @@ def show_editing_interface(session, db_manager):
         print()
         
         print("📋 EDITING OPTIONS:")
-        print("1. 📍 Add Interface/Endpoint")      # User vision: "add endpoints"
-        print("2. 🗑️  Remove Interface/Endpoint")   # User vision: "remove endpoints" 
+        print("1. 📍 Add Interface/Endpoint")      # Enhanced with intelligent system
+        print("2. 🗑️  Remove Interface/Endpoint")   # Enhanced with intelligent system
         print("3. ✏️  Modify Interface/Endpoint")   # User vision: "change endpoints"
-        print("4. 🔄 Move Interface to Different Port")  # NEW - Interface migration
-        print("5. 📋 View All Interfaces")
-        print("6. 🔍 Preview Changes")
-        print("7. 💾 Save Changes (Week 3: Deploy)")
+        print("4. 🔄 Move Interface to Different Port")  # Interface migration
+        print("5. 📊 View All Interfaces")         # Enhanced with categorization
+        print("6. 🔍 Preview Changes")             # Enhanced with CLI commands
+        print("7. 💾 Save Changes & Deploy")       # Enhanced with deployment
         print("8. ❌ Cancel (discard changes)")
         print()
         
         choice = input("Choose action (1-8): ").strip()
         
         if choice == "1":
-            add_interface_cli(session)
+            # Try Phase 1 intelligent menu system
+            try:
+                from services.bd_editor import create_intelligent_menu, PHASE_1_COMPLETE
+                
+                if PHASE_1_COMPLETE:
+                    print("🧠 Using Phase 1 Intelligent Menu System...")
+                    
+                    # Create intelligent menu adapter
+                    menu_adapter = create_intelligent_menu(working_copy, session)
+                    
+                    # Use menu adapter's add interface method
+                    if hasattr(menu_adapter, 'add_customer_interface'):
+                        if menu_adapter.add_customer_interface():
+                            print("✅ Customer interface added using intelligent system")
+                        else:
+                            print("❌ Intelligent addition cancelled")
+                    else:
+                        print("⚠️  Menu adapter doesn't support interface addition yet")
+                        add_interface_cli(session)
+                else:
+                    print("⚠️  Phase 1 not complete, using standard method")
+                    add_interface_cli(session)
+                    
+            except ImportError as e:
+                print(f"💡 Intelligent menu system not available: {e}")
+                add_interface_cli(session)
+            except Exception as e:
+                print(f"❌ Intelligent system error: {e}")
+                print("💡 Falling back to standard interface addition")
+                add_interface_cli(session)
         elif choice == "2":
             remove_interface_cli(session)
         elif choice == "3":
@@ -48,7 +151,18 @@ def show_editing_interface(session, db_manager):
         elif choice == "5":
             view_all_interfaces(session)
         elif choice == "6":
-            preview_changes(session)
+            # Try intelligent preview system
+            try:
+                from services.bd_editor import display_configuration_preview, PHASE_2_AVAILABLE
+                
+                if PHASE_2_AVAILABLE:
+                    print("🔍 Using Intelligent Configuration Preview...")
+                    display_configuration_preview(working_copy, session)
+                else:
+                    preview_changes(session)
+                    
+            except ImportError:
+                preview_changes(session)
         elif choice == "7":
             save_changes_placeholder(session)
         elif choice == "8":
@@ -62,8 +176,8 @@ def show_editing_interface(session, db_manager):
 
 
 def add_interface_cli(session):
-    """Add new interface/endpoint - Task 2.3 Implementation"""
-    # User Vision: "add endpoints"
+    """Add new interface/endpoint with smart interface selection"""
+    # Enhanced with smart interface selection system
     
     print("\n📍 ADD NEW INTERFACE/ENDPOINT")
     print("=" * 40)
@@ -72,17 +186,39 @@ def add_interface_cli(session):
     
     print(f"Adding interface to: {working_copy['name']}")
     print(f"Current VLAN: {working_copy['vlan_id']}")
-    print()
     
-    device = input("Device name: ").strip()
-    if not device:
-        print("❌ Device name required")
-        return
-    
-    interface = input("Interface name: ").strip()
-    if not interface:
-        print("❌ Interface name required")
-        return
+    # Use enhanced smart interface selection for BD Editor
+    try:
+        from services.interface_discovery.cli_integration import enhanced_interface_selection_for_editor
+        
+        print("\n🎯 Using Enhanced Smart Interface Selection for BD Editor...")
+        print("💡 Smart device selection with shorthand support + intelligent interface filtering")
+        
+        result = enhanced_interface_selection_for_editor()
+        
+        if result[0] and result[1]:
+            device, interface = result
+            print(f"\n✅ Enhanced Smart Selection Complete:")
+            print(f"   Device: {device}")
+            print(f"   Interface: {interface}")
+            print("💡 Interface validated for BD configuration")
+        else:
+            print("❌ Smart selection cancelled")
+            return
+                
+    except ImportError:
+        print("⚠️  Enhanced smart interface selection not available")
+        print("💡 Using manual input...")
+        
+        device = input("Device name (or shorthand like 'b-15'): ").strip()
+        if not device:
+            print("❌ Device name required")
+            return
+        
+        interface = input("Interface name: ").strip()
+        if not interface:
+            print("❌ Interface name required")
+            return
     
     # VLAN ID with smart default
     vlan_prompt = f"VLAN ID (current: {working_copy['vlan_id']}): "

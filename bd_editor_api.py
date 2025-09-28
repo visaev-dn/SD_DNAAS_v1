@@ -147,7 +147,7 @@ def get_unified_bridge_domains():
                 'source': 'discovered',
                 'source_icon': '🔍',
                 'deployment_status': bd.get('deployment_status', 'pending'),
-                'created_at': bd['created_at'],
+                'updated_at': bd.get('updated_at'),
                 'can_edit': True,
                 'interface_count': endpoint_count,  # Calculated from discovery data
                 'has_raw_config': bool(bd.get('discovery_data'))
@@ -166,7 +166,7 @@ def get_unified_bridge_domains():
                 'source': 'user_created',
                 'source_icon': '🔨',
                 'deployment_status': bd.get('deployment_status', 'pending'),
-                'created_at': bd['created_at'],
+                'updated_at': bd.get('updated_at'),
                 'can_edit': True,
                 'interface_count': 0,
                 'has_raw_config': bool(bd.get('discovery_data'))
@@ -375,6 +375,264 @@ def get_bridge_domains_list():
         }), 500
 
 
+# =============================================================================
+# BD ASSIGNMENT & USER WORKSPACE ENDPOINTS
+# =============================================================================
+
+@app.route('/api/bridge-domains/<int:bd_id>/assign', methods=['POST'])
+@simple_auth_required
+def assign_bridge_domain_to_workspace(bd_id):
+    """Assign bridge domain to user's workspace"""
+    try:
+        from bd_assignment_manager import BDAssignmentManager
+        
+        # For development, use admin user (ID: 1)
+        user_id = 1
+        data = request.get_json() or {}
+        reason = data.get('reason', 'User workspace assignment')
+        
+        manager = BDAssignmentManager()
+        result = manager.assign_bridge_domain(user_id, bd_id, reason)
+        
+        if result.success:
+            return jsonify({
+                "success": True,
+                "assignment_id": result.assignment_id,
+                "message": f"Bridge domain assigned to your workspace"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.error
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Assignment failed for BD {bd_id}: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Assignment failed: {str(e)}"
+        }), 500
+
+
+@app.route('/api/bridge-domains/<int:bd_id>/unassign', methods=['POST'])
+@simple_auth_required
+def unassign_bridge_domain_from_workspace(bd_id):
+    """Remove bridge domain from user's workspace"""
+    try:
+        from bd_assignment_manager import BDAssignmentManager
+        
+        # For development, use admin user (ID: 1)
+        user_id = 1
+        
+        manager = BDAssignmentManager()
+        result = manager.unassign_bridge_domain(user_id, bd_id)
+        
+        if result.success:
+            return jsonify({
+                "success": True,
+                "message": f"Bridge domain removed from your workspace"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.error
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Unassignment failed for BD {bd_id}: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Unassignment failed: {str(e)}"
+        }), 500
+
+
+@app.route('/api/bridge-domains/<int:bd_id>/can-assign', methods=['GET'])
+@simple_auth_required
+def check_assignment_permission(bd_id):
+    """Check if user can assign bridge domain"""
+    try:
+        from bd_assignment_manager import BDAssignmentManager
+        
+        # For development, use admin user (ID: 1)
+        user_id = 1
+        
+        manager = BDAssignmentManager()
+        permission = manager.can_user_assign_bd(user_id, bd_id)
+        
+        return jsonify({
+            "success": True,
+            "allowed": permission.allowed,
+            "reason": permission.reason,
+            "details": permission.details
+        })
+        
+    except Exception as e:
+        logger.error(f"Permission check failed for BD {bd_id}: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Permission check failed: {str(e)}"
+        }), 500
+
+
+@app.route('/api/users/me/workspace/bridge-domains', methods=['GET'])
+@simple_auth_required
+def get_user_workspace_bridge_domains():
+    """Get all bridge domains in user's workspace"""
+    try:
+        from bd_assignment_manager import BDAssignmentManager
+        
+        # For development, use admin user (ID: 1)
+        user_id = 1
+        
+        manager = BDAssignmentManager()
+        assigned_bds = manager.get_user_assigned_bridge_domains(user_id)
+        
+        return jsonify({
+            "success": True,
+            "assigned_bridge_domains": assigned_bds,
+            "total_assigned": len(assigned_bds),
+            "message": f"Found {len(assigned_bds)} bridge domains in your workspace"
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get user workspace: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get workspace: {str(e)}"
+        }), 500
+
+
+@app.route('/api/bridge-domains/assignable', methods=['GET'])
+@simple_auth_required
+def get_assignable_bridge_domains():
+    """Get bridge domains user can assign (within VLAN ranges)"""
+    try:
+        from bd_assignment_manager import BDAssignmentManager
+        
+        # For development, use admin user (ID: 1)
+        user_id = 1
+        
+        manager = BDAssignmentManager()
+        assignable_bds = manager.get_assignable_bridge_domains(user_id)
+        
+        return jsonify({
+            "success": True,
+            "assignable_bridge_domains": assignable_bds,
+            "total_assignable": len(assignable_bds),
+            "message": f"Found {len(assignable_bds)} bridge domains you can assign"
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get assignable BDs: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get assignable BDs: {str(e)}"
+        }), 500
+
+
+# =============================================================================
+# COMPATIBILITY ENDPOINTS (Placeholders for frontend compatibility)
+# =============================================================================
+
+@app.route('/api/builder/devices', methods=['GET'])
+@simple_auth_required
+def get_builder_devices():
+    """Get available devices for builder (placeholder with proper structure)"""
+    # Return empty but properly structured response for frontend compatibility
+    return jsonify({
+        "success": True,
+        "devices": [],
+        "device_types": {},
+        "topology_info": {},
+        "message": "Builder devices endpoint - use BD Editor instead"
+    })
+
+
+@app.route('/api/configurations', methods=['GET'])
+@simple_auth_required
+def get_configurations_compatibility():
+    """Get configurations (placeholder - redirects to workspace)"""
+    return jsonify({
+        "success": True,
+        "configurations": [],
+        "message": "Use My Workspace tab for assigned bridge domains"
+    })
+
+@app.route('/api/bridge-domains/<bridge_domain_name>/edit-session', methods=['POST'])
+@simple_auth_required
+def create_editing_session(bridge_domain_name):
+    """Create an editing session for a specific bridge domain"""
+    try:
+        logger.info(f"Creating editing session for BD: {bridge_domain_name}")
+        
+        db_manager = DatabaseManager()
+        
+        # Get the bridge domain from database
+        bd_data = db_manager.get_bridge_domain_by_name(bridge_domain_name)
+        if not bd_data:
+            return jsonify({
+                "success": False,
+                "error": f"Bridge domain '{bridge_domain_name}' not found"
+            }), 404
+        
+        # Extract interfaces from discovery_data if available
+        interfaces = []
+        if bd_data.get('discovery_data'):
+            try:
+                discovery_json = json.loads(bd_data['discovery_data'])
+                
+                # Extract interface information from discovery data
+                for interface_name, interface_data in discovery_json.get('interfaces', {}).items():
+                    # Only include user-editable interfaces (access role)
+                    if interface_data.get('role') in ['access', 'endpoint']:
+                        interfaces.append({
+                            'device': interface_data.get('device', ''),
+                            'interface': interface_name,
+                            'vlan_id': interface_data.get('vlan_id', bd_data.get('vlan_id')),
+                            'role': interface_data.get('role', 'access'),
+                            'raw_cli_config': interface_data.get('raw_config', []),
+                            'outer_vlan': interface_data.get('outer_vlan'),
+                            'inner_vlan': interface_data.get('inner_vlan'),
+                            'vlan_manipulation': interface_data.get('vlan_manipulation')
+                        })
+                        
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.warning(f"Could not parse discovery_data for {bridge_domain_name}: {e}")
+        
+        # Create editing session
+        session_id = f"edit_{bridge_domain_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        editing_session = {
+            "session_id": session_id,
+            "bridge_domain": {
+                "id": bd_data.get('id'),
+                "name": bd_data.get('name', bridge_domain_name),
+                "vlan_id": bd_data.get('vlan_id'),
+                "dnaas_type": bd_data.get('dnaas_type', ''),
+                "topology_type": bd_data.get('topology_type', 'p2mp'),
+                "original_username": bd_data.get('original_username', ''),
+                "interfaces": interfaces
+            },
+            "changes_made": [],
+            "status": "active"
+        }
+        
+        logger.info(f"✅ Created editing session: {session_id} with {len(interfaces)} interfaces")
+        
+        return jsonify({
+            "success": True,
+            "editing_session": editing_session,
+            "message": f"Editing session created for {bridge_domain_name}"
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error creating editing session: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to create editing session: {str(e)}"
+        }), 500
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -392,6 +650,11 @@ if __name__ == '__main__':
     print("   • POST /api/auth/login - Simple authentication")
     print("   • GET /api/bridge-domains/unified-list - Get all BDs")
     print("   • GET /api/bridge-domains/<name>/interfaces/raw-config - Get raw config")
+    print("   • POST /api/bridge-domains/<id>/assign - Assign BD to workspace")
+    print("   • POST /api/bridge-domains/<id>/unassign - Remove BD from workspace")
+    print("   • GET /api/bridge-domains/<id>/can-assign - Check assignment permission")
+    print("   • GET /api/users/me/workspace/bridge-domains - Get user workspace")
+    print("   • GET /api/bridge-domains/assignable - Get assignable BDs")
     print("   • GET /api/health - Health check")
     print()
     print("🌐 Frontend: http://localhost:8080")

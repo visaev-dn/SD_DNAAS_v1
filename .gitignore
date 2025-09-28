@@ -64,5 +64,17 @@ backups/
 # Large archive files
 *.tar.gz
 
+# Database files (too large for GitHub)
+*.db
+*.sqlite
+*.sqlite3
+instance/*.db
+instance/*.backup*
+
 # Cleanup folder
-for_deletion/ 
+for_deletion/
+
+# Analysis files (generated)
+import_graph.json
+python_orphans.txt
+database_analysis.txt 
